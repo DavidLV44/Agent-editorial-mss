@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#0c7a8c">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&family=Manrope:wght@400;500;600&display=swap');
+  :root{--p:#0c7a8c;--pd:#085f6d;--pl:#e6f4f6;--pm:#b8dde2;--t:#0f172a;--m:#64748b;--b:#e2e8f0;--bg:#fff;--bga:#f8fafc;--r12:12px;--r16:16px;--r24:24px;--s1:0 1px 3px rgba(0,0,0,.06);--s2:0 4px 14px rgba(0,0,0,.09)}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{font-family:'Manrope',sans-serif;background:var(--bga);color:var(--t);min-height:100vh;padding:16px 14px 90px;max-width:680px;margin:0 auto}
+  @media(min-width:520px){body{padding:24px 18px 48px}}
+  .hdr{text-align:center;margin-bottom:20px;position:relative}
+  .badge{display:inline-flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--pm);border-radius:50px;padding:6px 16px;margin-bottom:14px;box-shadow:var(--s1)}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--p);animation:blink 2s infinite}
+  @keyframes blink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.4)}}
+  .badge span{font-size:11px;font-weight:700;color:var(--p);letter-spacing:.6px;text-transform:uppercase;font-family:'Outfit',sans-serif}
+  .hdr h1{font-family:'Outfit',sans-serif;font-size:26px;font-weight:900;color:var(--pd);margin-bottom:4px}
+  .hdr p{font-size:13px;color:var(--m)}
+  .card{background:var(--bg);border-radius:var(--r16);box-shadow:var(--s2);border:1px solid var(--b);padding:20px;margin-bottom:14px}
+  .flabel{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--p);margin-bottom:10px;display:block;font-family:'Outfit',sans-serif}
+  .silos{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+  .silo-btn{padding:10px 8px;border-radius:var(--r12);border:1.5px solid var(--b);background:var(--bga);font-size:11px;font-weight:700;color:var(--m);cursor:pointer;transition:all .2s;font-family:'Outfit',sans-serif;text-align:center;line-height:1.4}
+  .silo-btn.active,.silo-btn:hover{background:var(--p);border-color:var(--p);color:#fff}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+  .chip{padding:7px 14px;border-radius:50px;border:1.5px solid var(--b);background:var(--bga);font-size:12px;font-weight:600;color:var(--m);cursor:pointer;transition:all .2s;font-family:'Manrope',sans-serif;user-select:none}
+  .chip.active{background:var(--p);border-color:var(--p);color:#fff}
+  .chip:hover:not(.active){border-color:var(--p);color:var(--p)}
+  .angles{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+  .angle-chip{padding:6px 12px;border-radius:50px;border:1.5px dashed var(--b);background:transparent;font-size:11px;font-weight:600;color:var(--m);cursor:pointer;transition:all .2s;font-family:'Manrope',sans-serif;user-select:none}
+  .angle-chip.active{background:var(--pd);border-color:var(--pd);border-style:solid;color:#fff}
+  .angle-chip:hover:not(.active){border-color:var(--p);color:var(--p)}
+  input[type="text"]{width:100%;padding:12px 16px;border:1.5px solid var(--b);border-radius:var(--r12);font-family:'Manrope',sans-serif;font-size:14px;color:var(--t);background:var(--bga);outline:none;transition:border-color .2s,box-shadow .2s;margin-bottom:4px}
+  input[type="text"]:focus{border-color:var(--p);box-shadow:0 0 0 3px rgba(12,122,140,.1);background:#fff}
+  .hint{font-size:11px;color:var(--m);margin-bottom:0}
+  .kw-block{background:var(--bga);border:1px solid var(--b);border-radius:var(--r12);padding:10px 14px;margin-bottom:14px}
+  .kw-title{font-size:11px;font-weight:700;color:var(--pd);margin-bottom:7px;font-family:'Outfit',sans-serif}
+  .kw-list{display:flex;flex-wrap:wrap;gap:5px}
+  .kw-tag{background:var(--pl);color:var(--pd);border:1px solid var(--pm);border-radius:6px;padding:3px 9px;font-size:11px;font-weight:600;font-family:'Manrope',sans-serif}
+  .btn-gen{width:100%;padding:14px;background:linear-gradient(135deg,var(--p) 0%,var(--pd) 100%);color:#fff;border:none;border-radius:var(--r12);font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:16px;box-shadow:0 4px 14px rgba(12,122,140,.28)}
+  .btn-gen:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 20px rgba(12,122,140,.35)}
+  .btn-gen:disabled{opacity:.6;cursor:not-allowed;transform:none}
+  .loader{display:none;background:var(--bg);border-radius:var(--r24);box-shadow:var(--s2);border:1px solid var(--b);padding:44px 24px;text-align:center;margin-bottom:14px}
+  .loader.on{display:block}
+  .ring{width:44px;height:44px;margin:0 auto 18px;border:3px solid var(--pl);border-top-color:var(--p);border-radius:50%;animation:spin .7s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .loader h3{font-family:'Outfit',sans-serif;font-size:16px;font-weight:700;color:var(--pd);margin-bottom:4px}
+  .loader p{font-size:12px;color:var(--m);margin-bottom:20px}
+  .lsteps{display:flex;flex-direction:column;gap:7px;align-items:center}
+  .ls{font-size:12px;color:var(--m);opacity:0;transition:opacity .4s;display:flex;align-items:center;gap:7px}
+  .ls.on{opacity:1}
+  .lsdot{width:5px;height:5px;border-radius:50%;background:var(--p);flex-shrink:0}
+  .results{display:none}
+  .results.on{display:block}
+  .tabbar{display:flex;gap:4px;background:var(--bg);padding:5px;border-radius:var(--r16);margin-bottom:14px;box-shadow:var(--s1);border:1px solid var(--b);overflow-x:auto}
+  .tbtn{flex:1;min-width:72px;padding:8px 6px;border-radius:10px;border:none;background:transparent;font-family:'Manrope',sans-serif;font-size:11px;font-weight:700;color:var(--m);cursor:pointer;transition:all .2s;white-space:nowrap;text-align:center}
+  .tbtn.active{background:var(--p);color:#fff;box-shadow:0 2px 8px rgba(12,122,140,.3)}
+  .tbtn:hover:not(.active){color:var(--p);background:var(--pl)}
+  .panel{display:none}
+  .panel.active{display:block}
+  .ocard{background:var(--bg);border-radius:var(--r24);box-shadow:var(--s2);border:1px solid var(--b);overflow:hidden;margin-bottom:4px}
+  .ohead{padding:13px 18px;background:var(--pl);border-bottom:1px solid var(--pm);display:flex;justify-content:space-between;align-items:center}
+  .otitle{font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;color:var(--pd);text-transform:uppercase;letter-spacing:.6px}
+  .bcopy{padding:6px 13px;background:var(--p);color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;transition:all .2s;font-family:'Manrope',sans-serif}
+  .bcopy:hover{background:var(--pd)}
+  .bcopy.ok{background:#16a34a}
+  .obody{padding:18px;font-size:12.5px;line-height:1.75;color:var(--t);white-space:pre-wrap;max-height:480px;overflow-y:auto;font-family:'Manrope',sans-serif}
+  .obody.code{font-family:'Courier New',monospace;font-size:11.5px;background:#f8fffe}
+  .igrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;padding:14px}
+  .iitem{border-radius:var(--r12);overflow:hidden;border:1px solid var(--b);box-shadow:var(--s1)}
+  .iitem img{width:100%;display:block;aspect-ratio:16/9;object-fit:cover}
+  .ilabel{padding:6px 10px;font-size:10px;font-weight:700;color:var(--m);background:var(--bga);border-top:1px solid var(--b);font-family:'Outfit',sans-serif;text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;justify-content:space-between;gap:6px}
+  .btn-dl{padding:3px 9px;background:var(--p);color:#fff;border:none;border-radius:5px;font-size:10px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;white-space:nowrap;transition:background .2s;flex-shrink:0}
+  .btn-dl:hover{background:var(--pd)}
+  .btn-dl.ok{background:#16a34a}
+  .img-webp-badge{display:inline-block;background:#dcfce7;color:#166534;border-radius:4px;padding:1px 6px;font-size:9px;font-weight:700;font-family:'Outfit',sans-serif;letter-spacing:.4px;margin-left:4px}
+  .insta-slide-dl{position:absolute;bottom:52px;right:10px;padding:4px 10px;background:rgba(0,0,0,.55);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;backdrop-filter:blur(4px);transition:background .2s}
+  .insta-slide-dl:hover{background:rgba(12,122,140,.8)}
+  .iloader{width:100%;aspect-ratio:16/9;background:linear-gradient(90deg,#e6f4f6 25%,#b8dde2 50%,#e6f4f6 75%);background-size:200% 100%;animation:shimmer 1.4s infinite}
+  @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+  .srow{display:flex;gap:9px;overflow-x:auto;padding:14px;scroll-snap-type:x mandatory}
+  .sthumb{min-width:140px;height:140px;background:linear-gradient(135deg,var(--p) 0%,var(--pd) 100%);border-radius:var(--r12);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;text-align:center;color:#fff;font-size:10.5px;line-height:1.5;font-weight:600;position:relative;flex-shrink:0;scroll-snap-align:start;box-shadow:0 3px 10px rgba(12,122,140,.2);font-family:'Manrope',sans-serif}
+  .sthumb:first-child{background:linear-gradient(135deg,var(--pd) 0%,#062f38 100%)}
+  .snum{position:absolute;top:7px;left:9px;font-size:9px;opacity:.6;font-weight:700;font-family:'Outfit',sans-serif}
+  .divl{height:1px;background:var(--b);margin:0 14px}
+  .cgrid{display:grid;gap:10px;padding:14px}
+  .citem{background:var(--pl);border-left:4px solid var(--p);border-radius:0 var(--r12) var(--r12) 0;padding:12px 16px}
+  .ctag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--p);margin-bottom:5px;font-family:'Outfit',sans-serif}
+  .ctxt{font-size:12.5px;line-height:1.65;color:var(--t)}
+  .btn-reset{width:100%;padding:11px;background:transparent;color:var(--p);border:1.5px dashed var(--pm);border-radius:var(--r12);font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;margin-top:14px;min-height:44px}
+  .btn-reset:hover{background:var(--pl);border-style:solid}
+  /* ── Mobile touch targets ── */
+  .chip,.angle-chip,.silo-btn{min-height:40px;display:inline-flex;align-items:center;justify-content:center}
+  .tbtn{min-height:36px;padding:8px 10px}
+  input[type="text"]{font-size:16px!important} /* évite le zoom iOS */
+  /* ── FAB mobile ── */
+  .fab-bar{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--bg);border-top:1px solid var(--b);padding:10px 16px;padding-bottom:calc(10px + env(safe-area-inset-bottom));z-index:100;box-shadow:0 -4px 20px rgba(0,0,0,.08)}
+  @media(max-width:519px){.fab-bar{display:block}}
+  .fab-bar .btn-gen{margin-top:0;font-size:14px;padding:13px}
+  /* ── Historique ── */
+  .hist-btn{position:absolute;right:0;top:50%;transform:translateY(-50%);background:var(--bg);border:1px solid var(--b);border-radius:10px;padding:7px 12px;font-size:11px;font-weight:700;color:var(--m);cursor:pointer;font-family:'Outfit',sans-serif;display:flex;align-items:center;gap:5px;transition:all .2s;white-space:nowrap}
+  .hist-btn:hover{border-color:var(--p);color:var(--p)}
+  .hist-badge{background:var(--p);color:#fff;border-radius:50px;font-size:9px;font-weight:800;padding:1px 6px;font-family:'Outfit',sans-serif}
+  .hist-drawer{display:none;position:fixed;inset:0;z-index:200}
+  .hist-drawer.on{display:flex}
+  .hist-bg{position:absolute;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(3px)}
+  .hist-panel{position:absolute;right:0;top:0;bottom:0;width:min(100vw,400px);background:var(--bg);box-shadow:-8px 0 32px rgba(0,0,0,.15);display:flex;flex-direction:column;animation:slideIn .25s ease}
+  @keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
+  .hist-head{padding:16px 18px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+  .hist-head-title{font-family:'Outfit',sans-serif;font-size:15px;font-weight:800;color:var(--pd)}
+  .hist-head-actions{display:flex;gap:8px;align-items:center}
+  .hist-clear{padding:5px 12px;background:var(--bga);border:1px solid var(--b);border-radius:8px;font-size:11px;font-weight:700;color:#ef4444;cursor:pointer;font-family:'Outfit',sans-serif}
+  .hist-close{width:32px;height:32px;background:var(--bga);border:1px solid var(--b);border-radius:8px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--m)}
+  .hist-list{flex:1;overflow-y:auto;padding:12px}
+  .hist-empty{padding:40px 20px;text-align:center;color:var(--m);font-size:13px;font-family:'Manrope',sans-serif}
+  .hist-item{background:var(--bga);border:1px solid var(--b);border-radius:var(--r12);padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:all .2s;position:relative}
+  .hist-item:hover{border-color:var(--p);background:var(--pl)}
+  .hist-item-header{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px}
+  .hist-item-title{font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;color:var(--t);line-height:1.3}
+  .hist-item-del{width:24px;height:24px;background:none;border:none;color:#94a3b8;cursor:pointer;font-size:14px;flex-shrink:0;border-radius:4px;display:flex;align-items:center;justify-content:center;transition:color .2s}
+  .hist-item-del:hover{color:#ef4444;background:#fef2f2}
+  .hist-item-meta{display:flex;gap:6px;flex-wrap:wrap}
+  .hist-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:50px;font-family:'Outfit',sans-serif}
+  .hist-tag.silo{background:var(--pl);color:var(--pd)}
+  .hist-tag.fmt{background:#f3e8ff;color:#6b21a8}
+  .hist-tag.date{background:var(--bga);color:var(--m);border:1px solid var(--b)}
+  .hist-item-preview{font-size:11px;color:var(--m);margin-top:6px;font-family:'Manrope',sans-serif;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .hist-restore-hint{font-size:10px;color:var(--p);font-weight:700;font-family:'Outfit',sans-serif;margin-top:5px}
+  /* ── Toast notification ── */
+  .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:#0f172a;color:#fff;border-radius:50px;padding:10px 20px;font-size:12px;font-weight:700;font-family:'Outfit',sans-serif;opacity:0;transition:all .3s;z-index:300;white-space:nowrap;pointer-events:none}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  /* ── Tabbar scroll mobile ── */
+  .tabbar{-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .tabbar::-webkit-scrollbar{display:none}
+  /* ── Résultats header sticky mobile ── */
+  @media(max-width:519px){
+    .tabbar{position:sticky;top:0;z-index:10;margin-left:-14px;margin-right:-14px;border-radius:0;border-left:none;border-right:none}
+    .ohead{flex-wrap:wrap;gap:6px}
+    .obody{max-height:60vh}
+    .hdr h1{font-size:20px}
+    .hdr p{font-size:12px}
+    .silos{grid-template-columns:1fr 1fr 1fr;gap:6px}
+    .silo-btn{font-size:10px;padding:8px 5px}
+    .igrid{grid-template-columns:1fr 1fr;gap:8px}
+    .insta-slide{width:220px;height:220px}
+    .preview-box{border-radius:var(--r16) var(--r16) 0 0;max-height:95vh}
+    .preview-modal{align-items:flex-end;padding:0}
+    .preview-bar{border-radius:var(--r16) var(--r16) 0 0}
+  }
+  /* Erreur debug */
+  .err{background:#fef2f2;border:1px solid #fca5a5;border-left:4px solid #ef4444;border-radius:0 var(--r12) var(--r12) 0;padding:12px 16px;margin-bottom:14px;display:none}
+  .err.on{display:block}
+  .err-title{font-size:12px;font-weight:700;color:#991b1b;margin-bottom:8px;font-family:'Outfit',sans-serif;text-transform:uppercase}
+  .err-msg{font-size:12px;color:#7f1d1d;margin-bottom:8px;font-family:'Manrope',sans-serif}
+  .err-raw{font-size:10px;color:#7f1d1d;font-family:'Courier New',monospace;white-space:pre-wrap;background:#fde8e8;padding:8px;border-radius:6px;max-height:120px;overflow-y:auto;word-break:break-all}
+  ::-webkit-scrollbar{width:4px;height:4px}
+  ::-webkit-scrollbar-thumb{background:var(--pm);border-radius:3px}
+  .src-block{background:var(--bga);border:1px solid var(--b);border-radius:var(--r12);padding:10px 14px;margin-bottom:14px}
+  .src-title{font-size:11px;font-weight:700;color:var(--pd);margin-bottom:8px;font-family:'Outfit',sans-serif}
+  .src-list{display:flex;flex-direction:column;gap:5px}
+  .src-item{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border:1px solid var(--b);border-radius:8px;padding:7px 10px}
+  .src-badge{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:2px 6px;border-radius:4px;white-space:nowrap;flex-shrink:0;margin-top:1px;font-family:'Outfit',sans-serif}
+  .src-badge.etude{background:#dbeafe;color:#1e40af}
+  .src-badge.org{background:#dcfce7;color:#166534}
+  .src-badge.media{background:#fef9c3;color:#854d0e}
+  .src-badge.guide{background:#f3e8ff;color:#6b21a8}
+  .src-info{flex:1;min-width:0}
+  .src-name{font-size:11.5px;font-weight:700;color:var(--t);font-family:'Outfit',sans-serif;margin-bottom:1px}
+  .src-fact{font-size:10.5px;color:var(--m);line-height:1.45;font-family:'Manrope',sans-serif}
+  /* panel sources résultats */
+  .scard{background:var(--bg);border:1px solid var(--b);border-radius:var(--r12);padding:14px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start}
+  .scard-badge{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:3px 8px;border-radius:5px;white-space:nowrap;flex-shrink:0;font-family:'Outfit',sans-serif}
+  .scard-badge.etude{background:#dbeafe;color:#1e40af}
+  .scard-badge.org{background:#dcfce7;color:#166534}
+  .scard-badge.media{background:#fef9c3;color:#854d0e}
+  .scard-badge.guide{background:#f3e8ff;color:#6b21a8}
+  .scard-body{flex:1}
+  .scard-name{font-size:13px;font-weight:700;color:var(--t);font-family:'Outfit',sans-serif;margin-bottom:3px}
+  .scard-fact{font-size:12px;color:var(--m);line-height:1.55;font-family:'Manrope',sans-serif;margin-bottom:4px}
+  .scard-url{font-size:10.5px;color:var(--p);font-family:'Manrope',sans-serif;word-break:break-all}
+  /* ── Instagram Carrousel ── */
+  .insta-carousel{display:flex;gap:10px;overflow-x:auto;padding:16px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
+  .insta-slide{flex-shrink:0;width:260px;height:260px;border-radius:16px;overflow:hidden;position:relative;scroll-snap-align:start;box-shadow:0 4px 18px rgba(0,0,0,.18);cursor:pointer;transition:transform .2s}
+  .insta-slide:hover{transform:scale(1.02)}
+  .insta-slide-bg{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+  .insta-slide-bg-loading{width:100%;height:100%;position:absolute;inset:0;background:linear-gradient(135deg,var(--p) 0%,var(--pd) 100%);animation:shimmer 1.4s infinite}
+  .insta-slide-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.82) 0%,rgba(0,0,0,.25) 55%,rgba(0,0,0,.05) 100%)}
+  .insta-slide-num{position:absolute;top:10px;left:12px;font-size:10px;font-weight:800;color:rgba(255,255,255,.7);font-family:'Outfit',sans-serif;letter-spacing:.5px}
+  .insta-slide-dots{position:absolute;top:10px;right:12px;display:flex;gap:4px}
+  .insta-slide-dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.35)}
+  .insta-slide-dot.active{background:#fff}
+  .insta-slide-content{position:absolute;bottom:0;left:0;right:0;padding:14px 14px 16px}
+  .insta-slide-title{font-family:'Outfit',sans-serif;font-size:14px;font-weight:800;color:#fff;line-height:1.25;margin-bottom:6px;text-shadow:0 1px 4px rgba(0,0,0,.5)}
+  .insta-slide-text{font-family:'Manrope',sans-serif;font-size:11px;color:rgba(255,255,255,.88);line-height:1.5;text-shadow:0 1px 3px rgba(0,0,0,.5)}
+  .insta-caption-box{margin:0 16px 16px;background:var(--bga);border:1px solid var(--b);border-radius:var(--r12);padding:14px}
+  .insta-caption-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--p);font-family:'Outfit',sans-serif;margin-bottom:7px}
+  .insta-caption-text{font-size:12.5px;color:var(--t);line-height:1.65;font-family:'Manrope',sans-serif;white-space:pre-wrap;word-break:break-word}
+  .insta-hint{font-size:10px;color:var(--m);text-align:center;padding:0 16px 12px;font-family:'Manrope',sans-serif}
+  /* ── Facebook Post Mockup ── */
+  .fb-mock{padding:14px}
+  .fb-post{background:#fff;border:1px solid #ddd;border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+  .fb-header{display:flex;align-items:center;gap:10px;padding:12px 14px 8px}
+  .fb-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--pd));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;font-family:'Outfit',sans-serif;flex-shrink:0}
+  .fb-page-info{flex:1}
+  .fb-page-name{font-size:14px;font-weight:700;color:#050505;font-family:'Manrope',sans-serif;line-height:1.2}
+  .fb-page-meta{font-size:11px;color:#65676b;font-family:'Manrope',sans-serif}
+  .fb-body-text{padding:0 14px 10px;font-size:13.5px;color:#050505;line-height:1.6;font-family:'Manrope',sans-serif;white-space:pre-wrap;word-break:break-word}
+  .fb-link-preview{margin:0 14px 12px;border:1px solid #ddd;border-radius:8px;overflow:hidden}
+  .fb-link-img{width:100%;height:160px;object-fit:cover;display:block;background:linear-gradient(135deg,var(--pl),var(--pm))}
+  .fb-link-img-loading{width:100%;height:160px;background:linear-gradient(135deg,var(--pl),var(--pm));animation:shimmer 1.4s infinite}
+  .fb-link-meta{padding:10px 12px;background:#f0f2f5}
+  .fb-link-domain{font-size:10px;text-transform:uppercase;color:#65676b;font-family:'Manrope',sans-serif;letter-spacing:.4px;margin-bottom:2px}
+  .fb-link-title{font-size:13px;font-weight:700;color:#050505;font-family:'Manrope',sans-serif;line-height:1.3}
+  .fb-cta-bar{display:flex;justify-content:flex-end;padding:0 14px 12px}
+  .fb-cta-btn{background:var(--p);color:#fff;border:none;border-radius:6px;padding:8px 18px;font-size:12px;font-weight:700;font-family:'Outfit',sans-serif;cursor:default;letter-spacing:.3px}
+  .fb-reactions{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-top:1px solid #e4e6ea}
+  .fb-react-icons{display:flex;gap:2px;font-size:16px}
+  .fb-react-count{font-size:12px;color:#65676b;font-family:'Manrope',sans-serif}
+  .fb-actions{display:flex;gap:0;border-top:1px solid #e4e6ea}
+  .fb-action{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px;font-size:12px;font-weight:700;color:#65676b;font-family:'Manrope',sans-serif;border:none;background:none;cursor:default}
+  .fb-copy-row{display:flex;gap:8px;padding:12px 14px 0;flex-wrap:wrap}
+  .fb-copy-btn{flex:1;padding:9px;background:var(--bga);border:1.5px solid var(--b);border-radius:var(--r12);font-size:12px;font-weight:700;color:var(--p);font-family:'Outfit',sans-serif;cursor:pointer;transition:all .2s;text-align:center}
+  .fb-copy-btn:hover{background:var(--pl);border-color:var(--pm)}
+  /* ── Modal Prévisualisation HTML ── */
+  .preview-modal{display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);align-items:flex-start;justify-content:center;padding:20px}
+  .preview-modal.on{display:flex}
+  .preview-box{background:#fff;border-radius:var(--r24);box-shadow:0 20px 60px rgba(0,0,0,.3);width:100%;max-width:860px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden}
+  .preview-bar{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid var(--b);background:var(--bga);flex-shrink:0}
+  .preview-bar-title{font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;color:var(--pd)}
+  .preview-bar-actions{display:flex;gap:8px;align-items:center}
+  .preview-device-btn{padding:5px 12px;border-radius:8px;border:1.5px solid var(--b);background:var(--bg);font-size:11px;font-weight:700;color:var(--m);cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s}
+  .preview-device-btn.active{background:var(--p);border-color:var(--p);color:#fff}
+  .preview-close{padding:6px 14px;background:#ef4444;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif}
+  .preview-iframe-wrap{flex:1;overflow:hidden;display:flex;justify-content:center;background:#e2e8f0;padding:12px;transition:all .3s}
+  .preview-iframe-wrap.mobile{padding:24px}
+  .preview-iframe{width:100%;height:100%;border:none;border-radius:8px;background:#fff;box-shadow:0 4px 20px rgba(0,0,0,.15);transition:width .3s}
+  .preview-iframe-wrap.mobile .preview-iframe{width:390px;border-radius:24px;box-shadow:0 8px 32px rgba(0,0,0,.25)}
+  .btn-preview{padding:6px 13px;background:var(--bga);color:var(--pd);border:1.5px solid var(--b);border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;transition:all .2s;font-family:'Manrope',sans-serif}
+  .btn-preview:hover{background:var(--pl);border-color:var(--pm)}
+  .apikey-card{background:var(--bg);border-radius:var(--r16);box-shadow:var(--s1);border:1.5px dashed var(--pm);padding:16px 20px;margin-bottom:14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .apikey-card input{flex:1;min-width:200px;padding:10px 14px;border:1.5px solid var(--b);border-radius:var(--r12);font-family:'Manrope',sans-serif;font-size:13px;color:var(--t);background:var(--bga);outline:none;transition:border-color .2s}
+  .apikey-card input:focus{border-color:var(--p);background:#fff}
+  .apikey-card .btn-save{padding:10px 18px;background:var(--p);color:#fff;border:none;border-radius:var(--r12);font-family:'Outfit',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .2s}
+  .apikey-card .btn-save:hover{background:var(--pd)}
+  .apikey-card .btn-save.ok{background:#16a34a}
+  .apikey-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--p);font-family:'Outfit',sans-serif;width:100%}
+  .apikey-hint{font-size:10.5px;color:var(--m);width:100%;margin-top:-6px}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="badge"><div class="dot"></div><span>Agent Éditorial v2 Pro · High-Ticket</span></div>
+  <h1>MySentinelSolutions</h1>
+  <p>Stratégie premium · Classes MSS · Images IA · FB · Instagram</p>
+  <button class="hist-btn" onclick="openHist()">📋 Historique <span class="hist-badge" id="histCount">0</span></button>
+</div>
+
+<!-- API KEY -->
+<div class="apikey-card" id="apikeyCard">
+  <span class="apikey-label">🔑 Clé API Google AI Studio</span>
+  <span class="apikey-hint">Gratuit sur aistudio.google.com · stockée localement · jamais envoyée ailleurs qu'à generativelanguage.googleapis.com</span>
+  <input type="password" id="apiKeyInput" placeholder="AIza…" autocomplete="off" />
+  <button class="btn-save" id="btnSaveKey" onclick="saveKey()">Enregistrer</button>
+</div>
+
+<!-- FORM -->
+<div class="card" id="formCard">
+  <label class="flabel">🧩 Silo thématique</label>
+  <div class="silos" id="siloGroup">
+    <div class="silo-btn active" data-silo="recovery">💆 Récupération<br>& Bien-être</div>
+    <div class="silo-btn" data-silo="connected">🧠 Santé connectée<br>Premium</div>
+    <div class="silo-btn" data-silo="future">🚀 Futur<br>& Longévité</div>
+  </div>
+
+  <label class="flabel">🏷️ Catégorie produit</label>
+  <div class="chips" id="prodChips"></div>
+
+  <div class="kw-block">
+    <div class="kw-title">🔑 Mots-clés suggérés</div>
+    <div class="kw-list" id="kwList"></div>
+  </div>
+
+  <div class="src-block">
+    <div class="src-title">📚 Sources injectées dans le prompt</div>
+    <div class="src-list" id="srcList"></div>
+  </div>
+
+  <label class="flabel">📄 Format</label>
+  <div class="chips" id="fmtChips">
+    <div class="chip active" data-val="article">📝 Article Conseil</div>
+    <div class="chip" data-val="guide">📊 Guide Comparatif</div>
+    <div class="chip" data-val="fiche">🏷️ Fiche Produit</div>
+  </div>
+
+  <label class="flabel">🎯 Angle de conversion</label>
+  <div class="angles" id="angleChips">
+    <div class="angle-chip active" data-angle="test">🧪 J'ai testé 30 jours</div>
+    <div class="angle-chip" data-angle="secret">🤫 Secret des sportifs</div>
+    <div class="angle-chip" data-angle="kine">👨‍⚕️ Remplace le kiné ?</div>
+    <div class="angle-chip" data-angle="gadget">💡 Gadget ou révolution ?</div>
+    <div class="angle-chip" data-angle="comparatif">⚖️ Comparatif expert</div>
+  </div>
+
+  <label class="flabel">💬 Sujet / produit précis</label>
+  <input type="text" id="topicInput" placeholder="Ex : Bon Charge red light panel, Normatec 3…" />
+  <p class="hint">Laisse vide pour laisser l'agent choisir le meilleur sujet</p>
+
+  <button class="btn-gen" id="btnGen" onclick="generate()">✨ Générer le contenu high-ticket</button>
+</div>
+
+<!-- ERREUR DEBUG -->
+<div class="err" id="errBanner">
+  <div class="err-title">⚠️ Erreur de génération</div>
+  <div class="err-msg" id="errMsg"></div>
+  <div class="err-raw" id="errRaw"></div>
+</div>
+
+<!-- LOADER -->
+<div class="loader" id="loader">
+  <div class="ring"></div>
+  <h3>L'agent rédige votre contenu…</h3>
+  <p>Génération en cours (30-60 sec)</p>
+  <div class="lsteps">
+    <div class="ls" id="ls1"><div class="lsdot"></div>Analyse du sujet & stratégie SEO</div>
+    <div class="ls" id="ls2"><div class="lsdot"></div>Rédaction HTML (classes MSS)</div>
+    <div class="ls" id="ls3"><div class="lsdot"></div>Post Facebook + carrousel Instagram</div>
+    <div class="ls" id="ls4"><div class="lsdot"></div>Génération des prompts visuels</div>
+    <div class="ls" id="ls5"><div class="lsdot"></div>Création des images IA…</div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div class="results" id="results">
+  <div class="tabbar">
+    <button class="tbtn active" onclick="tab('html')">🌐 HTML</button>
+    <button class="tbtn" onclick="tab('images')">🖼️ Images</button>
+    <button class="tbtn" onclick="tab('facebook')">📘 FB</button>
+    <button class="tbtn" onclick="tab('instagram')">📸 Insta</button>
+    <button class="tbtn" onclick="tab('seo')">🔑 SEO</button>
+    <button class="tbtn" onclick="tab('conseils')">💡 Conseils</button>
+    <button class="tbtn" onclick="tab('sources')">📚 Sources</button>
+  </div>
+
+  <div class="panel active ocard" id="panel-html">
+    <div class="ohead"><span class="otitle">🌐 HTML Divi-Ready</span><div style="display:flex;gap:7px"><button class="btn-preview" onclick="openPreview()">👁️ Prévisualiser</button><button class="bcopy" onclick="copy('html',this)">📋 Copier</button></div></div>
+    <div class="obody code" id="c-html"></div>
+  </div>
+  <div class="panel ocard" id="panel-images">
+    <div class="ohead"><span class="otitle">🖼️ Visuels IA</span><button class="bcopy" onclick="copy('imageUrls',this)">📋 URLs</button></div>
+    <div class="igrid" id="img-grid"></div>
+  </div>
+  <div class="panel ocard" id="panel-facebook">
+    <div class="ohead"><span class="otitle">📘 Post Facebook</span></div>
+    <div class="fb-copy-row">
+      <button class="fb-copy-btn" onclick="copy('fb_text',this)">📋 Copier le texte</button>
+      <button class="fb-copy-btn" onclick="copy('fb_link',this)">🔗 Copier le lien</button>
+    </div>
+    <div class="fb-mock" id="c-facebook"></div>
+  </div>
+  <div class="panel ocard" id="panel-instagram">
+    <div class="ohead"><span class="otitle">📸 Carrousel Instagram</span><button class="bcopy" onclick="copy('insta_caption',this)">📋 Légende</button></div>
+    <p class="insta-hint">← Faites défiler les slides →</p>
+    <div class="insta-carousel" id="insta-carousel"></div>
+    <div class="insta-caption-box">
+      <div class="insta-caption-label">📝 Légende & hashtags</div>
+      <div class="insta-caption-text" id="insta-caption"></div>
+    </div>
+  </div>
+  <div class="panel ocard" id="panel-seo">
+    <div class="ohead"><span class="otitle">🔑 Stratégie SEO</span><button class="bcopy" onclick="copy('seo',this)">📋 Copier</button></div>
+    <div class="obody" id="c-seo"></div>
+  </div>
+  <div class="panel ocard" id="panel-conseils">
+    <div class="ohead"><span class="otitle">💡 Conseils</span></div>
+    <div class="cgrid" id="c-conseils"></div>
+  </div>
+  <div class="panel ocard" id="panel-sources">
+    <div class="ohead"><span class="otitle">📚 Sources utilisées</span></div>
+    <div class="cgrid" id="c-sources"></div>
+  </div>
+
+  <button class="btn-reset" onclick="reset()">+ Nouveau contenu</button>
+</div>
+
+<!-- FAB MOBILE (bouton génération sticky) -->
+<div class="fab-bar" id="fabBar" style="display:none">
+  <button class="btn-gen" id="btnGenFab" onclick="generate()">✨ Générer le contenu</button>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- DRAWER HISTORIQUE -->
+<div class="hist-drawer" id="histDrawer">
+  <div class="hist-bg" onclick="closeHist()"></div>
+  <div class="hist-panel">
+    <div class="hist-head">
+      <span class="hist-head-title">📋 Historique</span>
+      <div class="hist-head-actions">
+        <button class="hist-clear" onclick="clearHist()">🗑️ Tout effacer</button>
+        <button class="hist-close" onclick="closeHist()">✕</button>
+      </div>
+    </div>
+    <div class="hist-list" id="histList"></div>
+  </div>
+</div>
+
+<!-- MODAL PREVIEW -->
+<div class="preview-modal" id="previewModal" onclick="closePreviewOnBg(event)">
+  <div class="preview-box">
+    <div class="preview-bar">
+      <span class="preview-bar-title">👁️ Prévisualisation HTML</span>
+      <div class="preview-bar-actions">
+        <button class="preview-device-btn active" onclick="setDevice('desktop',this)">🖥️ Desktop</button>
+        <button class="preview-device-btn" onclick="setDevice('mobile',this)">📱 Mobile</button>
+        <button class="preview-close" onclick="closePreview()">✕ Fermer</button>
+      </div>
+    </div>
+    <div class="preview-iframe-wrap" id="previewWrap">
+      <iframe class="preview-iframe" id="previewFrame" sandbox="allow-same-origin allow-scripts"></iframe>
+    </div>
+  </div>
+</div>
+
+<script>
+const SILOS={
+  recovery:{label:'💆 Récupération & Bien-être',products:['Fauteuil massage IA','Pressothérapie / Bottes recovery','Cryothérapie domicile'],keywords:{'Fauteuil massage IA':['fauteuil massage haut de gamme','fauteuil massage avis 2026','fauteuil massant shiatsu professionnel','meilleur fauteuil massage qualité prix','fauteuil massage vaut-il le coup'],'Pressothérapie / Bottes recovery':['bottes pressothérapie avis','drainage lymphatique maison appareil','pressothérapie jambes lourdes','bottes recovery sport efficacité','appareil pressothérapie prix'],'Cryothérapie domicile':['cryothérapie à domicile','machine cryothérapie prix','cryothérapie bienfaits réels','appareil cryo maison avis','cryothérapie fonctionne vraiment']}},
+  connected:{label:'🧠 Santé connectée Premium',products:['Capteur sommeil IA sans contact','Casque neurofeedback / EEG','Miroir connecté fitness IA'],keywords:{'Capteur sommeil IA sans contact':['capteur sommeil sans contact avis','analyse sommeil maison technologie','tracker sommeil fiable 2026','améliorer sommeil technologie IA','meilleure technologie sommeil'],'Casque neurofeedback / EEG':['casque neurofeedback maison','stimulation cérébrale relaxation','EEG grand public avis','casque relaxation cérébrale prix','neurotech bien-être avis'],'Miroir connecté fitness IA':['miroir connecté coach IA','smart mirror fitness avis','miroir entraînement domicile prix','coach IA domicile miroir','miroir fitness comparatif']}},
+  future:{label:'🚀 Futur & Longévité',products:['Red Light Therapy (infrarouge)','Générateur PEMF','Biohacking & Anti-stress vagal'],keywords:{'Red Light Therapy (infrarouge)':['red light therapy maison avis','lampe infrarouge bienfaits','thérapie lumière rouge efficacité','red light therapy peau avant après','lampe infrarouge douleur avis'],'Générateur PEMF':['PEMF thérapie maison','générateur PEMF avis','champ électromagnétique pulsé bienfaits','appareil PEMF prix','PEMF récupération musculaire'],'Biohacking & Anti-stress vagal':['biohacking maison débutant','stimulation nerf vague stress','appareil anti stress vagal','biohacking longévité produits','hack santé technologie']}}
+};
+const SOURCES={
+  'Fauteuil massage IA':[
+    {type:'etude',name:'Journal of Pain Research (2020)',fact:'La massage therapy mécanisée réduit significativement la douleur chronique lombaire (-38% sur 8 semaines) et améliore la qualité du sommeil.',url:'pubmed.ncbi.nlm.nih.gov/32884342'},
+    {type:'org',name:'Mayo Clinic – Massage therapy',fact:'Reconnaît officiellement les bienfaits du massage pour réduire le stress, l\'anxiété, les douleurs musculaires et l\'insomnie.',url:'mayoclinic.org/tests-procedures/massage-therapy'},
+    {type:'etude',name:'INSERM – Revue médicale (2021)',fact:'La stimulation des tissus mous par compression robotisée présente les mêmes marqueurs biologiques de récupération qu\'un massage manuel.',url:'inserm.fr'},
+    {type:'media',name:'60 Millions de Consommateurs',fact:'Test comparatif fauteuils massants : 7 modèles évalués sur intensité, programme, durabilité — guide d\'achat indépendant.',url:'60millions-mag.com'}
+  ],
+  'Pressothérapie / Bottes recovery':[
+    {type:'etude',name:'Journal of Athletic Training (2021)',fact:'La compression pneumatique intermittente réduit les DOMS (douleurs musculaires différées) de 41% après effort intense vs groupe contrôle.',url:'pubmed.ncbi.nlm.nih.gov/33492411'},
+    {type:'etude',name:'Sports Medicine (Springer, 2022)',fact:'La pressothérapie accélère l\'élimination du lactate et améliore le retour veineux, validée sur 12 études randomisées.',url:'link.springer.com/journal/40279'},
+    {type:'org',name:'Société Française de Phlébologie',fact:'Recommande le drainage mécanique pour les insuffisances veineuses légères à modérées, avec une efficacité comparable au drainage manuel.',url:'phlebologie.org'},
+    {type:'media',name:'L\'Équipe – Récupération sportive',fact:'Reportage sur l\'usage des bottes recovery dans le peloton cycliste pro et les équipes de football de Ligue 1.',url:'lequipe.fr'}
+  ],
+  'Cryothérapie domicile':[
+    {type:'etude',name:'Cochrane Review – Cold therapy (2021)',fact:'La cryothérapie post-exercice réduit la perception de fatigue musculaire dans 9/12 études, mais l\'effet sur la performance reste débattu.',url:'cochranelibrary.com'},
+    {type:'etude',name:'Int. J. Sports Physiology & Performance',fact:'L\'immersion froide (10-15°C) pendant 10 min réduit l\'inflammation aiguë et accélère la récupération neuromusculaire.',url:'journals.humankinetics.com/view/journals/ijspp'},
+    {type:'org',name:'ANSM – Agence du médicament (France)',fact:'Encadrement des dispositifs de cryothérapie : rappel des contre-indications (troubles vasculaires, Raynaud) et règles d\'usage.',url:'ansm.sante.fr'},
+    {type:'media',name:'Doctissimo – Dossier cryothérapie',fact:'Dossier vulgarisé avec avis de médecins du sport français sur l\'usage à domicile des appareils grand public.',url:'doctissimo.fr'}
+  ],
+  'Capteur sommeil IA sans contact':[
+    {type:'org',name:'INSV – Institut National du Sommeil',fact:'Le manque de sommeil touche 1 Français sur 3. Les capteurs IA sans contact montrent une corrélation de 87% avec la polysomnographie clinique.',url:'institut-sommeil-vigilance.org'},
+    {type:'etude',name:'Nature – Scientific Reports (2022)',fact:'Les capteurs radar sans contact (60GHz) détectent les stades de sommeil avec une précision de 91% comparée à l\'EEG de référence.',url:'nature.com/srep'},
+    {type:'etude',name:'Sleep Medicine Reviews (2023)',fact:'Méta-analyse : les dispositifs de suivi du sommeil améliorent l\'observance des conseils d\'hygiène du sommeil de 34% sur 3 mois.',url:'journals.elsevier.com/sleep-medicine-reviews'},
+    {type:'media',name:'Que Choisir – Comparatif trackers',fact:'Test indépendant de 6 capteurs sommeil : méthode, résultats détaillés, rapport qualité/prix pour chaque modèle.',url:'quechoisir.org'}
+  ],
+  'Casque neurofeedback / EEG':[
+    {type:'etude',name:'Applied Psychophysiology & Biofeedback',fact:'Le neurofeedback EEG réduit les symptômes d\'anxiété chronique de 45% en 8 séances, avec des effets persistants à 3 mois.',url:'link.springer.com/journal/10484'},
+    {type:'etude',name:'Journal of Neural Engineering (2022)',fact:'Les casques EEG grand public atteignent 78% de fidélité par rapport aux systèmes cliniques pour la détection alpha/thêta.',url:'iopscience.iop.org/journal/1741-2552'},
+    {type:'org',name:'Inserm – Neurosciences (2021)',fact:'Dossier sur la plasticité cérébrale : le biofeedback cérébral peut modifier durablement les patterns d\'activation du cortex préfrontal.',url:'inserm.fr/dossier/neurofeedback'},
+    {type:'media',name:'Sciences & Avenir',fact:'Enquête sur les casques EEG grand public : ce qui est prouvé, ce qui est marketing, avis de neurologues.',url:'sciencesetavenir.fr'}
+  ],
+  'Miroir connecté fitness IA':[
+    {type:'org',name:'ACSM – American College of Sports Medicine',fact:'Recommande 150 min/semaine d\'activité modérée. Les coachs IA augmentent l\'adhérence de 28% vs programme papier seul.',url:'acsm.org'},
+    {type:'etude',name:'British Journal of Sports Medicine (2022)',fact:'Les retours visuels en temps réel (miroir) améliorent la technique de 31% et réduisent le risque de blessure lors de l\'entraînement.',url:'bjsm.bmj.com'},
+    {type:'etude',name:'JMIR mHealth & uHealth (2023)',fact:'Méta-analyse sur le coaching IA : taux d\'engagement supérieur de 44% vs application seule, et résultats mesurables à 12 semaines.',url:'mhealth.jmir.org'},
+    {type:'media',name:'60 Millions de Consommateurs',fact:'Comparatif miroirs connectés 2024 : Forme, Tonal, Echelon — méthode de test et verdicts indépendants.',url:'60millions-mag.com'}
+  ],
+  'Red Light Therapy (infrarouge)':[
+    {type:'etude',name:'Photobiomodulation, Photomedicine & Laser Surgery',fact:'La photobiomodulation (630-850nm) stimule la production d\'ATP mitochondrial et réduit l\'inflammation dans 23 études cliniques randomisées.',url:'liebertpub.com/journal/photob'},
+    {type:'etude',name:'PubMed – Hamblin MR et al. (2017)',fact:'"Mechanisms and applications of the anti-inflammatory effects of photobiomodulation" — revue de référence mondiale sur le sujet.',url:'pubmed.ncbi.nlm.nih.gov/28748217'},
+    {type:'etude',name:'Journal of Athletic Training (2019)',fact:'L\'exposition à 850nm pendant 20 min pré-exercice améliore l\'endurance musculaire de 12% et réduit les marqueurs de fatigue.',url:'pubmed.ncbi.nlm.nih.gov/30835557'},
+    {type:'org',name:'Healthline – Medical Review',fact:'Synthèse validée par dermatologues sur les usages prouvés : douleur, peau, récupération musculaire, avec niveau de preuve pour chaque.',url:'healthline.com/health/red-light-therapy'}
+  ],
+  'Générateur PEMF':[
+    {type:'etude',name:'Bioelectromagnetics (Wiley, 2020)',fact:'Les champs électromagnétiques pulsés (PEMF) favorisent la régénération osseuse et réduisent la douleur articulaire chronique dans 15 essais cliniques.',url:'onlinelibrary.wiley.com/journal/15214804'},
+    {type:'org',name:'FDA – Clearance PEMF devices (510k)',fact:'La FDA a approuvé les dispositifs PEMF pour la stimulation osseuse (non-union) et certains cas de dépression résistante (TMS).',url:'fda.gov/medical-devices'},
+    {type:'etude',name:'Journal of Orthopaedic Research (2021)',fact:'PEMF à 75Hz réduit l\'inflammation synoviale de 33% dans l\'arthrose du genou sur 6 semaines de traitement à domicile.',url:'onlinelibrary.wiley.com/journal/1554527x'},
+    {type:'media',name:'Verywell Health – PEMF review',fact:'Analyse par des médecins des études existantes, des limites méthodologiques et des recommandations d\'usage réalistes.',url:'verywellhealth.com'}
+  ],
+  'Biohacking & Anti-stress vagal':[
+    {type:'etude',name:'Journal of Physiology (2021)',fact:'La stimulation du nerf vague (par respiration cohérente cardiaque, froid, sons) augmente la VFC de 18% et réduit le cortisol salivaire.',url:'physoc.onlinelibrary.wiley.com/journal/14697793'},
+    {type:'etude',name:'Neuroscience & Biobehavioral Reviews (2022)',fact:'Méta-analyse : la stimulation vagale transcutanée non-invasive réduit l\'anxiété et améliore la régulation émotionnelle dans 19 études.',url:'journals.elsevier.com/neuroscience-and-biobehavioral-reviews'},
+    {type:'org',name:'INSERM – Stress et système nerveux',fact:'Dossier sur le système nerveux autonome : rôle du nerf vague dans la régulation du stress, protocoles validés.',url:'inserm.fr/dossier/stress'},
+    {type:'media',name:'National Geographic – Biohacking',fact:'Enquête grand public sur le biohacking : ce qui est prouvé par la science vs les tendances non validées.',url:'nationalgeographic.com'}
+  ]
+};
+
+function getSources(prod){
+  return SOURCES[prod]||[];
+}
+
+function renderSources(){
+  const srcs=getSources(selProd);
+  document.getElementById('srcList').innerHTML=srcs.map(s=>
+    `<div class="src-item"><span class="src-badge ${s.type}">${{etude:'Étude',org:'Organisme',media:'Média',guide:'Guide'}[s.type]||s.type}</span><div class="src-info"><div class="src-name">${s.name}</div><div class="src-fact">${s.fact}</div></div></div>`
+  ).join('');
+}
+
+function buildSourcesPrompt(prod){
+  const srcs=getSources(prod);
+  if(!srcs.length) return '';
+  return '\n\nSOURCES FIABLES À CITER (intègre 2-3 de ces références dans le contenu HTML avec des formulations comme "selon [source]", "une étude publiée dans [journal]", etc.) :\n'+
+    srcs.map((s,i)=>`${i+1}. [${s.name}] ${s.fact} (${s.url})`).join('\n');
+}
+
+function buildSourcesPanel(prod){
+  const srcs=getSources(prod);
+  const labels={etude:'Étude',org:'Organisme',media:'Média',guide:'Guide'};
+  document.getElementById('c-sources').innerHTML=srcs.map(s=>
+    `<div class="scard"><span class="scard-badge ${s.type}">${labels[s.type]||s.type}</span><div class="scard-body"><div class="scard-name">${s.name}</div><div class="scard-fact">${s.fact}</div><div class="scard-url">🔗 ${s.url}</div></div></div>`
+  ).join('');
+}
+
+const ANGLES={
+  test:"Angle test 30 jours : retour expérience personnel, honnête, concret, résultats chiffrés.",
+  secret:"Angle secret des sportifs : technique utilisée par les pros, effet exclusivité.",
+  kine:"Angle remplace le kiné : comparaison soins professionnels, économies, efficacité.",
+  gadget:"Angle gadget ou révolution : traite les objections, preuves, démonte les idées reçues.",
+  comparatif:"Angle comparatif expert : tableau clair, critères objectifs, verdict par profil."
+};
+
+let selSilo='recovery',selProd='',selFmt='article',selAngle='test',store={};
+
+function saveKey(){
+  const key=document.getElementById('apiKeyInput').value.trim();
+  if(!key){alert('Veuillez saisir votre clé API.');return;}
+  localStorage.setItem('mss_google_api_key',key);
+  const btn=document.getElementById('btnSaveKey');
+  btn.textContent='✅ Enregistrée'; btn.classList.add('ok');
+  setTimeout(()=>{btn.textContent='Enregistrer';btn.classList.remove('ok');},2000);
+}
+
+function loadKey(){
+  const saved=localStorage.getItem('mss_google_api_key');
+  if(saved) document.getElementById('apiKeyInput').value=saved;
+}
+
+function getKey(){
+  return document.getElementById('apiKeyInput').value.trim() || localStorage.getItem('mss_google_api_key') || '';
+}
+
+// ── Parsing JSON ultra-robuste ─────────────────────────────────
+function safeParseJSON(raw){
+  if(!raw||raw.trim()==='') throw new Error('Réponse vide de l\'API');
+
+  // Extraire directement entre le premier { et le dernier } (ignore markdown)
+  const s = raw.indexOf('{');
+  const e = raw.lastIndexOf('}');
+
+  if(s === -1 || e === -1 || e <= s){
+    throw new Error(`JSON introuvable.\n\nRéponse brute reçue (${raw.length} chars) :\n${raw.substring(0,500)}`);
+  }
+
+  const jsonStr = raw.substring(s, e+1);
+
+  try{
+    return JSON.parse(jsonStr);
+  } catch(parseErr){
+    throw new Error(`JSON malformé : ${parseErr.message}\n\nExtrait :\n${jsonStr.substring(0,300)}`);
+  }
+}
+
+function init(){
+  loadKey();
+  updateHistBadge();
+  updateFAB();
+  window.addEventListener('resize', updateFAB);
+  renderProds(); renderKW();
+  bindChips('#fmtChips', v => selFmt=v);
+  bindAngleChips();
+  document.querySelectorAll('#siloGroup .silo-btn').forEach(b=>{
+    b.addEventListener('click',()=>{
+      document.querySelectorAll('#siloGroup .silo-btn').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active'); selSilo=b.dataset.silo; selProd='';
+      renderProds(); renderKW();
+    });
+  });
+  document.getElementById('topicInput').addEventListener('keydown',e=>{ if(e.key==='Enter') generate(); });
+}
+
+function renderProds(){
+  const prods=SILOS[selSilo].products; selProd=prods[0];
+  const wrap=document.getElementById('prodChips');
+  wrap.innerHTML=prods.map((p,i)=>`<div class="chip ${i===0?'active':''}" data-prod="${p}">${p}</div>`).join('');
+  wrap.querySelectorAll('.chip').forEach(c=>{
+    c.addEventListener('click',()=>{
+      wrap.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));
+      c.classList.add('active'); selProd=c.dataset.prod; renderKW();
+    });
+  });
+}
+
+function renderKW(){
+  const kws=SILOS[selSilo].keywords[selProd]||[];
+  document.getElementById('kwList').innerHTML=kws.map(k=>`<span class="kw-tag">${k}</span>`).join('');
+  renderSources();
+}
+
+function bindChips(sel,cb){
+  document.querySelectorAll(sel+' .chip').forEach(c=>{
+    c.addEventListener('click',()=>{
+      document.querySelectorAll(sel+' .chip').forEach(x=>x.classList.remove('active'));
+      c.classList.add('active'); cb(c.dataset.val);
+    });
+  });
+}
+
+function bindAngleChips(){
+  document.querySelectorAll('#angleChips .angle-chip').forEach(c=>{
+    c.addEventListener('click',()=>{
+      document.querySelectorAll('#angleChips .angle-chip').forEach(x=>x.classList.remove('active'));
+      c.classList.add('active'); selAngle=c.dataset.angle;
+    });
+  });
+}
+
+function tab(name){
+  const names=['html','images','facebook','instagram','seo','conseils','sources'];
+  document.querySelectorAll('.tbtn').forEach((b,i)=>b.classList.toggle('active',names[i]===name));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+}
+
+function copy(key,btn){
+  const origText = btn.textContent;
+  navigator.clipboard.writeText(store[key]||'').then(()=>{
+    btn.textContent='✅ Copié!'; btn.classList.add('ok');
+    setTimeout(()=>{btn.textContent=origText;btn.classList.remove('ok');},2000);
+  });
+}
+
+function lstep(i){ document.getElementById('ls'+i)?.classList.add('on'); }
+
+function showErr(msg, raw=''){
+  document.getElementById('errMsg').textContent = msg;
+  document.getElementById('errRaw').textContent = raw ? raw.substring(0,600) : '';
+  document.getElementById('errBanner').classList.add('on');
+}
+
+function hideErr(){
+  document.getElementById('errBanner').classList.remove('on');
+}
+
+function reset(){
+  document.getElementById('results').classList.remove('on');
+  document.getElementById('formCard').style.display='block';
+  document.getElementById('topicInput').value='';
+  document.querySelectorAll('.ls').forEach(s=>s.classList.remove('on'));
+  updateFAB();
+  document.getElementById('insta-carousel').innerHTML='';
+  document.getElementById('insta-caption').textContent='';
+  document.getElementById('c-facebook').innerHTML='';
+  document.getElementById('img-grid').innerHTML='';
+  store={};
+  hideErr();
+  document.getElementById('topicInput').focus();
+}
+
+async function generate(){
+  hideErr();
+  const apiKey=getKey();
+  if(!apiKey){
+    showErr('Clé API manquante. Saisissez votre clé Anthropic en haut de la page.','');
+    return;
+  }
+  const topic=document.getElementById('topicInput').value.trim();
+  const siloData=SILOS[selSilo];
+  const kws=siloData.keywords[selProd]||[];
+  const fmtLabel={article:'Article Conseil (600-800 mots)',guide:'Guide Comparatif (1200-1800 mots)',fiche:'Fiche Produit (600-900 mots)'}[selFmt];
+  const sujet=topic||`${selProd} — meilleur choix ${new Date().getFullYear()}`;
+
+  document.getElementById('btnGen').disabled=true;
+  document.getElementById('formCard').style.display='none';
+  document.getElementById('loader').classList.add('on');
+  document.getElementById('results').classList.remove('on');
+  [400,1500,2800,4000,5400].forEach((d,i)=>setTimeout(()=>lstep(i+1),d));
+
+  // Prompt simplifié pour réduire la taille de réponse et éviter les troncatures
+  const systemPrompt=`Tu es l'agent éditorial de MySentinelSolutions.com, site premium santé tech français. Ton ton est accessible, enthousiaste, transparent.
+
+RÈGLE ABSOLUE : Réponds UNIQUEMENT avec du JSON brut. Zéro texte avant ou après. Zéro balise markdown. La réponse doit commencer par { et se terminer par }.
+
+Classes CSS disponibles (Divi) : section.hero .hero-content .pill h1 p .hero-actions a.btn.btn-primary, section.section .container .section-header h2, article.card h3 p a, article.product-card .product-card-content .product-image h3 .tag a.btn.btn-primary .product-card-overlay, .mss-highlight, .mss-insight .mss-insight-label, .mss-summary .mss-summary-label ul li, .mss-steps .mss-step h3 p, details summary, .grid .grid-two .product-grid, a.btn.btn-outline a.btn.btn-ghost .tag .pill .mss-divider.
+Polices : Outfit (titres), Manrope (corps). Placeholders : [IMG:hero] [IMG:product1] [IMG:product2].
+Affiliation : Amazon href="#amazon-NOM", AWIN href="#awin-NOM". Ajouter note affiliée dans .mss-insight.
+
+INSTRUCTIONS IMAGES (les prompts seront envoyés à Google Imagen 3) :
+- Rédige les prompts imagePrompt en anglais uniquement.
+- Style : photorealistic, premium lifestyle photography, cinematic lighting, shallow depth of field.
+- Évite : texte, logos, watermarks, visages flous, arrière-plans chargés.
+- Article hero (16:9) : cadrage large, ambiance premium, produit en contexte lifestyle.
+- Product images (16:9) : produit sur fond neutre épuré, studio shot, détail net.
+- Instagram slides (1:1) : composition centrée, couleurs vives mais harmonieuses, sujet unique.
+
+FORMAT JSON EXACT :
+{
+  "html": "<section class=\\"hero\\">...</section><section class=\\"section\\">...</section>",
+  "facebook": {
+    "texte": "Post Facebook complet (200-400 mots). Commence par un emoji accrocheur. Paragraphes courts. Storytelling personnel. Termine par une question ouverte pour engager.",
+    "lien": "https://mysentinelsolutions.com/slug-de-larticle",
+    "titre_lien": "Titre accrocheur de l'article pour la preview Facebook",
+    "cta": "Texte du bouton CTA (ex: Lire le guide complet →)"
+  },
+  "instagram": {
+    "slides": [
+      {"titre": "Titre slide 1 (court, percutant)", "texte": "2 à 4 lignes max. Accroche forte.", "imagePrompt": "prompt anglais pour image IA carrée 1:1"},
+      {"titre": "Titre slide 2", "texte": "2 à 4 lignes. Chiffre ou fait marquant.", "imagePrompt": "prompt image IA 1:1"},
+      {"titre": "Titre slide 3", "texte": "2 à 4 lignes. Avantage clé.", "imagePrompt": "prompt image IA 1:1"},
+      {"titre": "Titre slide 4", "texte": "2 à 4 lignes. Preuve ou étude.", "imagePrompt": "prompt image IA 1:1"},
+      {"titre": "Titre slide 5 — CTA", "texte": "Appel à l'action clair. Lien en bio.", "imagePrompt": "prompt image IA 1:1 avec ambiance premium"}
+    ],
+    "legende": "Légende complète Instagram (émojis, 3-5 phrases, hashtags à la fin)"
+  },
+  "seo": "Titre SEO | meta description | mot-clé principal",
+  "conseils": {"seo":"conseil","conversion":"conseil","ux":"conseil","prochaine_idee":"idée"},
+  "images": [{"id":"hero","prompt":"photorealistic luxury health technology 16:9"},{"id":"product1","prompt":"premium wellness device white background"},{"id":"product2","prompt":"person using health tech device"}]
+}`;
+
+  const sourcesContext = buildSourcesPrompt(selProd);
+  const userPrompt=`Silo: ${siloData.label} | Catégorie: ${selProd} | Sujet: ${sujet} | Format: ${fmtLabel} | Angle: ${ANGLES[selAngle]} | Mots-clés: ${kws.slice(0,3).join(', ')}${sourcesContext}
+
+Génère maintenant. Commence par { directement.`;
+
+  let rawResponse = '';
+
+  try{
+    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        system_instruction:{parts:[{text:systemPrompt}]},
+        contents:[{role:"user",parts:[{text:userPrompt}]}],
+        generationConfig:{maxOutputTokens:65536,temperature:0.7}
+      })
+    });
+
+    const data=await res.json();
+
+    // Vérification erreur API
+    if(data.error){
+      throw new Error('Erreur API Google : '+data.error.message);
+    }
+
+    // Vérification contenu
+    if(!data.candidates || data.candidates.length===0){
+      throw new Error('Réponse API vide. '+(data.promptFeedback?.blockReason||''));
+    }
+
+    const cand = data.candidates[0];
+    const finishReason = cand?.finishReason || 'unknown';
+    console.log('finishReason:', finishReason, '| usageMetadata:', data.usageMetadata);
+    if(finishReason === 'MAX_TOKENS'){
+      throw new Error('Réponse tronquée par la limite de tokens (MAX_TOKENS). Essayez un format plus court ou un sujet plus simple.');
+    }
+    if(finishReason === 'SAFETY'){
+      throw new Error('Réponse bloquée par les filtres de sécurité Google. Reformulez le sujet.');
+    }
+    rawResponse = data.candidates.map(c=>c.content?.parts?.map(p=>p.text||'').join('')||'').join('');
+    console.log('Réponse brute (',rawResponse.length,'chars):',rawResponse.substring(0,200));
+
+    const parsed=safeParseJSON(rawResponse);
+
+    // ── Facebook ──
+    const fb = parsed.facebook||{};
+    store.fb_text = fb.texte||'';
+    store.fb_link = fb.lien||'';
+    buildFacebook(fb);
+
+    // ── Instagram ──
+    const ig = parsed.instagram||{};
+    store.insta_caption = ig.legende||'';
+    document.getElementById('insta-caption').textContent = ig.legende||'(vide)';
+
+    // ── SEO ──
+    store.seo = parsed.seo||'';
+    document.getElementById('c-seo').textContent=parsed.seo||'(vide)';
+
+    const cons=parsed.conseils||{};
+    document.getElementById('c-conseils').innerHTML=[
+      {tag:'🔍 SEO',txt:cons.seo},
+      {tag:'💰 Conversion',txt:cons.conversion},
+      {tag:'✨ UX',txt:cons.ux},
+      {tag:'🚀 Prochain article',txt:cons.prochaine_idee}
+    ].map(c=>`<div class="citem"><div class="ctag">${c.tag}</div><div class="ctxt">${c.txt||'—'}</div></div>`).join('');
+
+    // ── Images Imagen 3 (Google AI Studio → WebP) ──
+    const imageData=parsed.images||[];
+    const imageMap={};
+    store.webp = store.webp||{};
+    lstep(5);
+    const grid=document.getElementById('img-grid');
+    grid.innerHTML='';
+    const slugBase = sanitizeFilename(sujet||selProd);
+
+    const articleImgPromises=imageData.map(async imgDef=>{
+      const wrapper=document.createElement('div');
+      wrapper.className='iitem';
+      wrapper.innerHTML=`<div class="iloader" style="aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;font-size:11px;color:#64748b">⏳ Génération Imagen…</div><div class="ilabel"><span>${imgDef.id}</span></div>`;
+      grid.appendChild(wrapper);
+      try{
+        const promptFull = imgDef.prompt+', photorealistic, premium quality, professional photography, no text overlay, no watermark, no logo, sharp focus, beautiful lighting';
+        const webpUrl = await generateImageGemini(promptFull, '16:9');
+        store.webp['article-'+imgDef.id] = webpUrl;
+        imageMap[imgDef.id] = webpUrl;
+        const dlKey = 'article-'+imgDef.id;
+        const dlName = slugBase+'-'+imgDef.id;
+        wrapper.innerHTML=`<img src="${webpUrl}" alt="${imgDef.id}" style="width:100%;display:block;aspect-ratio:16/9;object-fit:cover"><div class="ilabel"><span>${imgDef.id}<span class="img-webp-badge">WebP</span></span><button class="btn-dl" onclick="downloadWebP('${dlKey}','${dlName}')">⬇️ Télécharger</button></div>`;
+      }catch(e){
+        console.warn('Image article échouée:',imgDef.id, e.message);
+        wrapper.querySelector('.iloader').textContent='⚠️ '+e.message.substring(0,50);
+        imageMap[imgDef.id]='';
+      }
+    });
+
+    // ── Images Instagram slides ──
+    const igSlides = (parsed.instagram?.slides)||[];
+    buildInstaSlides(igSlides, slugBase);
+
+    // ── Facebook image ──
+    buildFacebookImage(slugBase);
+
+    await Promise.allSettled(articleImgPromises);
+
+    let finalHtml=parsed.html||'';
+    // Injection des WebP dans le HTML (prévisualisation + copie)
+    Object.entries(imageMap).forEach(([id,url])=>{
+      if(url) finalHtml=finalHtml.replaceAll(`[IMG:${id}]`,url);
+    });
+    // Note WordPress pour les images non remplacées
+    finalHtml = finalHtml.replace(/\[IMG:([^\]]+)\]/g,'<!-- ⚠️ Remplacer par URL WordPress : $1 -->');
+    store.html=finalHtml;
+    store.imageUrls=Object.entries(imageMap).map(([id,url])=>`${id}: ${url?'WebP généré':'erreur'}`).join('\n');
+    document.getElementById('c-html').textContent=finalHtml;
+
+    buildSourcesPanel(selProd);
+    document.getElementById('loader').classList.remove('on');
+    document.getElementById('results').classList.add('on');
+    updateFAB();
+
+    // ── Sauvegarde historique ──
+    histAdd({
+      id: Date.now().toString(36),
+      date: new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}),
+      sujet: sujet,
+      silo: siloData.label,
+      format: fmtLabel,
+      seoPreview: parsed.seo||'',
+      conseils: parsed.conseils||{},
+      store: {
+        html: store.html||'',
+        seo: store.seo||'',
+        fb_text: store.fb_text||'',
+        fb_link: store.fb_link||'',
+        fbHtml: document.getElementById('c-facebook').innerHTML,
+        insta_caption: store.insta_caption||''
+      }
+    });
+    updateHistBadge();
+    showToast('✅ Contenu généré & sauvegardé');
+
+  }catch(err){
+    console.error('Erreur génération:',err);
+    document.getElementById('loader').classList.remove('on');
+    document.getElementById('formCard').style.display='block';
+    showErr(err.message, rawResponse);
+    document.querySelectorAll('.ls').forEach(s=>s.classList.remove('on'));
+  }
+
+  document.getElementById('btnGen').disabled=false;
+}
+
+function buildFacebook(fb){
+  const texte = fb.texte||'(vide)';
+  const lien = fb.lien||'https://mysentinelsolutions.com';
+  const titreLien = fb.titre_lien||'MySentinelSolutions';
+  const cta = fb.cta||'Lire l\'article →';
+  const domain = (() => { try{ return new URL(lien).hostname; } catch(e){ return 'mysentinelsolutions.com'; }})();
+  document.getElementById('c-facebook').innerHTML=`
+    <div class="fb-post">
+      <div class="fb-header">
+        <div class="fb-avatar">M</div>
+        <div class="fb-page-info">
+          <div class="fb-page-name">MySentinelSolutions</div>
+          <div class="fb-page-meta">Page · Santé & Bien-être · À l'instant</div>
+        </div>
+      </div>
+      <div class="fb-body-text">${escHtml(texte)}</div>
+      <div class="fb-link-preview" id="fb-link-preview">
+        <div class="fb-link-img-loading" id="fb-link-img-wrap"></div>
+        <div class="fb-link-meta">
+          <div class="fb-link-domain">${escHtml(domain)}</div>
+          <div class="fb-link-title">${escHtml(titreLien)}</div>
+        </div>
+      </div>
+      <div class="fb-cta-bar"><button class="fb-cta-btn">${escHtml(cta)}</button></div>
+      <div class="fb-reactions">
+        <div class="fb-react-icons">👍 ❤️ 🔥</div>
+        <div class="fb-react-count">Soyez le premier à réagir</div>
+      </div>
+      <div class="fb-actions">
+        <div class="fb-action">👍 J'aime</div>
+        <div class="fb-action">💬 Commenter</div>
+        <div class="fb-action">↗️ Partager</div>
+      </div>
+    </div>`;
+}
+
+async function buildFacebookImage(slugBase){
+  const wrap = document.getElementById('fb-link-img-wrap');
+  if(!wrap) return;
+  try{
+    const prompt = `premium health technology wellness blog article cover, clean modern lifestyle photography, professional studio lighting, no text, no watermark`;
+    const webpUrl = await generateImageGemini(prompt, '16:9');
+    store.webp['fb-cover'] = webpUrl;
+    const img = document.createElement('img');
+    img.className = 'fb-link-img';
+    img.src = webpUrl;
+    if(wrap.parentNode) wrap.parentNode.replaceChild(img, wrap);
+  }catch(e){
+    console.warn('FB image failed:', e.message);
+    if(wrap) wrap.style.background='linear-gradient(135deg,#e6f4f6,#b8dde2)';
+  }
+}
+
+async function buildInstaSlides(slides, slugBase){
+  const carousel = document.getElementById('insta-carousel');
+  carousel.innerHTML = '';
+  store.webp = store.webp||{};
+  const total = slides.length;
+
+  for(let i=0; i<slides.length; i++){
+    const s = slides[i];
+    const slide = document.createElement('div');
+    slide.className = 'insta-slide';
+    const dotsHtml = Array.from({length:total},(_,di)=>`<div class="insta-slide-dot${di===i?' active':''}"></div>`).join('');
+    slide.innerHTML=`
+      <div class="insta-slide-bg-loading" id="insta-bg-${i}" style="display:flex;align-items:center;justify-content:center;font-size:10px;color:rgba(255,255,255,.7)">⏳ Imagen…</div>
+      <div class="insta-slide-overlay"></div>
+      <div class="insta-slide-num">${i+1} / ${total}</div>
+      <div class="insta-slide-dots">${dotsHtml}</div>
+      <button class="insta-slide-dl" onclick="downloadWebP('insta-${i}','${slugBase}-insta-slide-${i+1}')">⬇️ WebP</button>
+      <div class="insta-slide-content">
+        <div class="insta-slide-title">${escHtml(s.titre||'')}</div>
+        <div class="insta-slide-text">${escHtml(s.texte||'')}</div>
+      </div>`;
+    carousel.appendChild(slide);
+
+    // Génération async sans bloquer l'affichage des slides
+    (async(idx, prompt)=>{
+      try{
+        const fullPrompt = (prompt||'premium wellness technology')+', square format, vibrant colors, professional photography, no text overlay, no watermark, cinematic lighting';
+        const webpUrl = await generateImageGemini(fullPrompt, '1:1');
+        store.webp['insta-'+idx] = webpUrl;
+        const bg = document.getElementById(`insta-bg-${idx}`);
+        if(bg){
+          const img = document.createElement('img');
+          img.className = 'insta-slide-bg';
+          img.src = webpUrl;
+          bg.parentNode.replaceChild(img, bg);
+        }
+      }catch(e){
+        console.warn(`Insta slide ${idx} image failed:`, e.message);
+        const bg = document.getElementById(`insta-bg-${idx}`);
+        if(bg) bg.textContent = '';
+      }
+    })(i, s.imagePrompt);
+  }
+}
+
+function escHtml(str){
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Imagen 3 (Google AI Studio) ─────────────────────────────────
+async function generateImageGemini(prompt, aspectRatio){
+  const key = getKey();
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${encodeURIComponent(key)}`,
+    {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        instances:[{prompt: prompt}],
+        parameters:{
+          sampleCount:1,
+          aspectRatio: aspectRatio||'16:9',
+          safetyFilterLevel:'block_few',
+          personGeneration:'allow_adult'
+        }
+      })
+    }
+  );
+  const data = await res.json();
+  if(data.error) throw new Error('Imagen: '+data.error.message);
+  const pred = data.predictions?.[0];
+  if(!pred?.bytesBase64Encoded) throw new Error('Imagen: aucune image retournée');
+  return await base64ToWebP(pred.bytesBase64Encoded, pred.mimeType||'image/png');
+}
+
+async function base64ToWebP(b64, srcMime, quality=0.85){
+  return new Promise(resolve=>{
+    const img = new Image();
+    img.onload = ()=>{
+      const canvas = document.createElement('canvas');
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      canvas.getContext('2d').drawImage(img,0,0);
+      resolve(canvas.toDataURL('image/webp', quality));
+    };
+    img.onerror = ()=>resolve(`data:${srcMime};base64,${b64}`);
+    img.src = `data:${srcMime};base64,${b64}`;
+  });
+}
+
+function downloadWebP(storeKey, filename){
+  const url = store.webp?.[storeKey];
+  if(!url){ alert('Image non disponible.'); return; }
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = sanitizeFilename(filename)+'.webp';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+function sanitizeFilename(str){
+  return str.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-z0-9]+/g,'-')
+    .replace(/^-+|-+$/g,'')
+    .substring(0,50);
+}
+
+// ── Toast ────────────────────────────────────────────────────────
+function showToast(msg, duration=2500){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), duration);
+}
+
+// ── Historique (localStorage) ─────────────────────────────────────
+const HIST_KEY = 'mss_history';
+const HIST_MAX = 20;
+
+function histLoad(){ try{ return JSON.parse(localStorage.getItem(HIST_KEY)||'[]'); }catch(e){ return []; } }
+function histSave(list){ localStorage.setItem(HIST_KEY, JSON.stringify(list)); }
+
+function histAdd(entry){
+  const list = histLoad();
+  list.unshift(entry);
+  if(list.length > HIST_MAX) list.splice(HIST_MAX);
+  histSave(list);
+  updateHistBadge();
+}
+
+function updateHistBadge(){
+  const n = histLoad().length;
+  document.getElementById('histCount').textContent = n;
+}
+
+function openHist(){
+  renderHistList();
+  document.getElementById('histDrawer').classList.add('on');
+  document.body.style.overflow='hidden';
+}
+
+function closeHist(){
+  document.getElementById('histDrawer').classList.remove('on');
+  document.body.style.overflow='';
+}
+
+function clearHist(){
+  if(!confirm('Effacer tout l\'historique ?')) return;
+  histSave([]);
+  updateHistBadge();
+  renderHistList();
+  showToast('Historique effacé');
+}
+
+function histDelete(id, e){
+  e.stopPropagation();
+  const list = histLoad().filter(h=>h.id!==id);
+  histSave(list);
+  updateHistBadge();
+  renderHistList();
+  showToast('Entrée supprimée');
+}
+
+function histRestore(id){
+  const entry = histLoad().find(h=>h.id===id);
+  if(!entry) return;
+  store = {...entry.store};
+  // Restaurer l'interface résultats
+  document.getElementById('formCard').style.display='none';
+  document.getElementById('loader').classList.remove('on');
+  document.getElementById('c-html').textContent = store.html||'';
+  document.getElementById('c-seo').textContent = store.seo||'';
+  document.getElementById('c-facebook').innerHTML = store.fbHtml||'';
+  document.getElementById('insta-caption').textContent = store.insta_caption||'';
+  document.getElementById('insta-carousel').innerHTML = '';
+  document.getElementById('img-grid').innerHTML = '<div style="padding:14px;font-size:12px;color:var(--m)">Images non restaurées — régénérez pour les obtenir.</div>';
+  const cons = entry.conseils||{};
+  document.getElementById('c-conseils').innerHTML=[
+    {tag:'🔍 SEO',txt:cons.seo},{tag:'💰 Conversion',txt:cons.conversion},
+    {tag:'✨ UX',txt:cons.ux},{tag:'🚀 Prochain article',txt:cons.prochaine_idee}
+  ].map(c=>`<div class="citem"><div class="ctag">${c.tag}</div><div class="ctxt">${c.txt||'—'}</div></div>`).join('');
+  document.getElementById('results').classList.add('on');
+  closeHist();
+  tab('html');
+  showToast('✅ Contenu restauré');
+}
+
+function renderHistList(){
+  const list = histLoad();
+  const el = document.getElementById('histList');
+  if(!list.length){
+    el.innerHTML='<div class="hist-empty">Aucune génération sauvegardée.<br>Générez votre premier contenu !</div>';
+    return;
+  }
+  el.innerHTML = list.map(h=>`
+    <div class="hist-item" onclick="histRestore('${h.id}')">
+      <div class="hist-item-header">
+        <div class="hist-item-title">${escHtml(h.sujet||'Sans titre')}</div>
+        <button class="hist-item-del" onclick="histDelete('${h.id}',event)" title="Supprimer">✕</button>
+      </div>
+      <div class="hist-item-meta">
+        <span class="hist-tag silo">${escHtml(h.silo||'')}</span>
+        <span class="hist-tag fmt">${escHtml(h.format||'')}</span>
+        <span class="hist-tag date">${h.date||''}</span>
+      </div>
+      ${h.seoPreview ? `<div class="hist-item-preview">${escHtml(h.seoPreview)}</div>` : ''}
+      <div class="hist-restore-hint">Appuyer pour restaurer →</div>
+    </div>`).join('');
+}
+
+// ── FAB mobile ────────────────────────────────────────────────────
+function updateFAB(){
+  const fab = document.getElementById('fabBar');
+  const formVisible = document.getElementById('formCard').style.display !== 'none';
+  const isMobile = window.innerWidth < 520;
+  fab.style.display = (isMobile && formVisible) ? 'block' : 'none';
+}
+
+function openPreview(){
+  const html = store.html||'';
+  if(!html){ alert('Générez d\'abord du contenu.'); return; }
+  const fullPage = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&family=Manrope:wght@400;500;600&display=swap');
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Manrope',sans-serif;color:#0f172a;line-height:1.6;background:#fff}
+    .hero{background:linear-gradient(135deg,#0c7a8c 0%,#085f6d 100%);padding:60px 24px;color:#fff;text-align:center}
+    .hero-content{max-width:780px;margin:0 auto}
+    .pill{display:inline-block;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);border-radius:50px;padding:5px 16px;font-size:12px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:18px}
+    .hero h1{font-family:'Outfit',sans-serif;font-size:clamp(24px,5vw,42px);font-weight:900;margin-bottom:14px;line-height:1.2}
+    .hero p{font-size:16px;opacity:.9;margin-bottom:24px;max-width:600px;margin-left:auto;margin-right:auto}
+    .hero-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+    .hero-image{width:100%;max-height:420px;object-fit:cover;display:block;border-radius:12px;margin-top:28px}
+    .section{padding:48px 24px}
+    .container{max-width:860px;margin:0 auto}
+    .section-header{margin-bottom:20px}
+    .section-header h2{font-family:'Outfit',sans-serif;font-size:clamp(20px,4vw,32px);font-weight:800;color:#085f6d;margin-bottom:8px}
+    .section p{margin-bottom:16px;font-size:15px}
+    .btn{display:inline-block;padding:12px 24px;border-radius:10px;font-family:'Outfit',sans-serif;font-weight:700;font-size:14px;text-decoration:none;cursor:pointer;transition:all .2s}
+    .btn-primary{background:#0c7a8c;color:#fff}
+    .btn-primary:hover{background:#085f6d}
+    .btn-outline{background:transparent;color:#0c7a8c;border:2px solid #0c7a8c}
+    .btn-ghost{background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.4)}
+    .tag{display:inline-block;background:#e6f4f6;color:#085f6d;border-radius:6px;padding:3px 10px;font-size:12px;font-weight:700;font-family:'Outfit',sans-serif;margin-bottom:8px}
+    .mss-highlight{background:#e6f4f6;color:#085f6d;border-radius:4px;padding:1px 5px;font-weight:600}
+    .mss-insight{background:#f0fdf4;border-left:4px solid #16a34a;border-radius:0 10px 10px 0;padding:12px 16px;margin:16px 0;font-size:13px}
+    .mss-insight-label{font-weight:700;color:#166534;font-family:'Outfit',sans-serif;margin-bottom:4px}
+    .mss-summary{background:#e6f4f6;border-radius:10px;padding:16px;margin:16px 0}
+    .mss-summary-label{font-weight:700;color:#085f6d;font-family:'Outfit',sans-serif;margin-bottom:8px}
+    .mss-summary ul{padding-left:18px}
+    .mss-summary li{font-size:14px;margin-bottom:6px}
+    .mss-steps{display:flex;flex-direction:column;gap:14px;margin:20px 0}
+    .mss-step{background:#f8fafc;border-left:4px solid #0c7a8c;border-radius:0 10px 10px 0;padding:14px 18px}
+    .mss-step h3{font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;color:#085f6d;margin-bottom:6px}
+    .mss-divider{height:2px;background:linear-gradient(90deg,#0c7a8c,transparent);border-radius:2px;margin:32px 0}
+    details{background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;margin-bottom:10px;overflow:hidden}
+    summary{padding:14px 18px;font-family:'Outfit',sans-serif;font-weight:700;font-size:14px;color:#085f6d;cursor:pointer;list-style:none}
+    summary::-webkit-details-marker{display:none}
+    summary::before{content:'+ ';font-weight:900}
+    details[open] summary::before{content:'− '}
+    details p{padding:0 18px 14px;font-size:14px;color:#475569}
+    .grid{display:grid;gap:20px}
+    .grid-two{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+    .product-grid{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+    .card,.product-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+    .product-card-content{padding:20px}
+    .product-card h3{font-family:'Outfit',sans-serif;font-size:17px;font-weight:800;color:#085f6d;margin-bottom:10px}
+    .product-card h4{font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;color:#0f172a;margin:14px 0 6px}
+    .product-card p{font-size:14px;color:#475569;margin-bottom:12px}
+    .product-card ul{padding-left:18px;margin-bottom:12px}
+    .product-card li{font-size:13.5px;color:#475569;margin-bottom:4px}
+    .product-card img,.product-image img{width:100%;height:200px;object-fit:cover;display:block}
+    .product-card-overlay{display:block;width:calc(100% - 40px);margin:0 20px 20px;text-align:center}
+    table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13.5px}
+    th{background:#085f6d;color:#fff;padding:10px 14px;text-align:left;font-family:'Outfit',sans-serif}
+    td{padding:9px 14px;border-bottom:1px solid #e2e8f0}
+    tr:nth-child(even) td{background:#f8fafc}
+  </style></head><body>${html}</body></html>`;
+  const frame = document.getElementById('previewFrame');
+  frame.srcdoc = fullPage;
+  document.getElementById('previewModal').classList.add('on');
+  document.body.style.overflow='hidden';
+}
+
+function closePreview(){
+  document.getElementById('previewModal').classList.remove('on');
+  document.body.style.overflow='';
+}
+
+function closePreviewOnBg(e){
+  if(e.target===document.getElementById('previewModal')) closePreview();
+}
+
+function setDevice(mode, btn){
+  document.querySelectorAll('.preview-device-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('previewWrap').classList.toggle('mobile', mode==='mobile');
+}
+
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closePreview(); });
+
+init();
+</script>
+</body>
+</html>
