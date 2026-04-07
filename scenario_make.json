@@ -1,0 +1,339 @@
+{
+  "name": "MSS · Agent Éditorial FreeCash – Génération & Publication Auto",
+  "description": "Scénario Make.com : webhook entrant → génération de contenu via Google Gemini → construction du visuel FreeCash → notification Slack + email + post planifié",
+  "version": "1.0.0",
+  "created_at": "2026-04-07",
+
+  "flow": [
+
+    {
+      "id": 1,
+      "module": "webhook:CustomWebHook",
+      "label": "🔔 Déclencheur Webhook entrant",
+      "description": "Reçoit une requête POST avec les paramètres de génération. Peut être appelé depuis un bouton Notion, un formulaire Typeform, ou l'agent HTML.",
+      "metadata": {
+        "designer": { "x": 0, "y": 0 }
+      },
+      "parameters": {
+        "hook": {
+          "name": "MSS Agent Editorial – FreeCash Trigger",
+          "method": "POST",
+          "expected_body": {
+            "silo": "string — ex: recovery | connected | future",
+            "produit": "string — ex: Red Light Therapy (infrarouge)",
+            "format": "string — ex: article | guide | fiche",
+            "angle": "string — ex: test | secret | kine | gadget | comparatif",
+            "sujet": "string — optionnel, laissez vide pour auto",
+            "google_api_key": "string — clé Google AI Studio (ou stocker dans Data Store Make)"
+          }
+        }
+      }
+    },
+
+    {
+      "id": 2,
+      "module": "builtin:SetVariable",
+      "label": "📦 Initialisation des variables",
+      "description": "Prépare les variables utiles pour la suite du scénario.",
+      "metadata": { "designer": { "x": 200, "y": 0 } },
+      "variables": {
+        "timestamp": "{{now}}",
+        "sujet_final": "{{if(1.sujet; 1.sujet; concat(1.produit; ' — meilleur choix 2026'))}}",
+        "api_key": "{{if(1.google_api_key; 1.google_api_key; datastore.google_api_key)}}",
+        "gemini_url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+        "imagen_url": "https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict"
+      }
+    },
+
+    {
+      "id": 3,
+      "module": "http:ActionSendData",
+      "label": "🤖 Appel Gemini 2.5 Flash – Génération contenu",
+      "description": "Envoie le prompt à l'API Google Gemini pour générer HTML, Facebook, Instagram, SEO et prompts visuels.",
+      "metadata": { "designer": { "x": 400, "y": 0 } },
+      "parameters": {
+        "url": "{{2.gemini_url}}?key={{2.api_key}}",
+        "method": "POST",
+        "headers": [
+          { "name": "Content-Type", "value": "application/json" }
+        ],
+        "body_type": "raw",
+        "body": {
+          "system_instruction": {
+            "parts": [
+              {
+                "text": "Tu es l'agent éditorial de MySentinelSolutions.com. Réponds UNIQUEMENT avec du JSON brut valide commençant par { et se terminant par }. Format attendu : {\"html\":\"...\",\"facebook\":{\"texte\":\"...\",\"lien\":\"...\",\"titre_lien\":\"...\",\"cta\":\"...\"},\"instagram\":{\"slides\":[{\"titre\":\"\",\"texte\":\"\",\"imagePrompt\":\"\"}],\"legende\":\"\"},\"seo\":\"...\",\"conseils\":{\"seo\":\"\",\"conversion\":\"\",\"ux\":\"\",\"prochaine_idee\":\"\"},\"images\":[{\"id\":\"hero\",\"prompt\":\"...\"},{\"id\":\"product1\",\"prompt\":\"...\"},{\"id\":\"freecash\",\"prompt\":\"photorealistic cashback rewards platform lifestyle, person earning money online, premium setup, laptop and smartphone, green and gold accents, no text overlay\"}]}"
+              }
+            ]
+          },
+          "contents": [
+            {
+              "role": "user",
+              "parts": [
+                {
+                  "text": "{{concat('Silo: '; 1.silo; ' | Catégorie: '; 1.produit; ' | Sujet: '; 2.sujet_final; ' | Format: '; 1.format; ' | Angle: '; 1.angle; ' | Inclure visuel FreeCash partenaire dans les images. Génère maintenant.')}}"
+                }
+              ]
+            }
+          ],
+          "generationConfig": {
+            "maxOutputTokens": 65536,
+            "temperature": 0.7
+          }
+        },
+        "timeout": 120,
+        "parse_response": true
+      }
+    },
+
+    {
+      "id": 4,
+      "module": "builtin:JSONParser",
+      "label": "🔍 Parsing JSON – Extraction du contenu",
+      "description": "Extrait le JSON brut de la réponse Gemini et parse chaque champ.",
+      "metadata": { "designer": { "x": 600, "y": 0 } },
+      "parameters": {
+        "input": "{{3.body.candidates[].content.parts[].text}}",
+        "extract_between": { "start": "{", "end": "}" }
+      }
+    },
+
+    {
+      "id": 5,
+      "module": "http:ActionSendData",
+      "label": "🖼️ Imagen 3 – Visuel FreeCash Hero",
+      "description": "Génère le visuel FreeCash (image hero 16:9) via Google Imagen 3.",
+      "metadata": { "designer": { "x": 800, "y": -100 } },
+      "parameters": {
+        "url": "{{2.imagen_url}}?key={{2.api_key}}",
+        "method": "POST",
+        "headers": [{ "name": "Content-Type", "value": "application/json" }],
+        "body": {
+          "instances": [
+            {
+              "prompt": "{{concat(4.images[3].prompt; ', photorealistic, premium quality, professional photography, cinematic lighting, no text overlay, no watermark, no logo, sharp focus')}}"
+            }
+          ],
+          "parameters": {
+            "sampleCount": 1,
+            "aspectRatio": "16:9",
+            "safetyFilterLevel": "block_few",
+            "personGeneration": "allow_adult"
+          }
+        },
+        "timeout": 90,
+        "parse_response": true
+      }
+    },
+
+    {
+      "id": 6,
+      "module": "http:ActionSendData",
+      "label": "🖼️ Imagen 3 – Visuel Hero Article",
+      "description": "Génère l'image hero de l'article (16:9).",
+      "metadata": { "designer": { "x": 800, "y": 0 } },
+      "parameters": {
+        "url": "{{2.imagen_url}}?key={{2.api_key}}",
+        "method": "POST",
+        "headers": [{ "name": "Content-Type", "value": "application/json" }],
+        "body": {
+          "instances": [
+            {
+              "prompt": "{{concat(4.images[1].prompt; ', photorealistic, premium lifestyle photography, cinematic lighting, no text overlay, no watermark, sharp focus, beautiful lighting')}}"
+            }
+          ],
+          "parameters": {
+            "sampleCount": 1,
+            "aspectRatio": "16:9",
+            "safetyFilterLevel": "block_few",
+            "personGeneration": "allow_adult"
+          }
+        },
+        "timeout": 90,
+        "parse_response": true
+      }
+    },
+
+    {
+      "id": 7,
+      "module": "googleDrive:ActionCreateFile",
+      "label": "💾 Google Drive – Sauvegarde HTML",
+      "description": "Sauvegarde le contenu HTML généré dans Google Drive (dossier MSS Articles).",
+      "metadata": { "designer": { "x": 1000, "y": -50 } },
+      "parameters": {
+        "name": "{{concat(formatDate(now; 'YYYY-MM-DD'); ' – '; 2.sujet_final; '.html')}}",
+        "folder": { "id": "VOTRE_FOLDER_ID_GOOGLE_DRIVE" },
+        "content_type": "text/html",
+        "content": "{{4.html}}"
+      }
+    },
+
+    {
+      "id": 8,
+      "module": "googleSheets:ActionAddRow",
+      "label": "📊 Google Sheets – Log de génération",
+      "description": "Enregistre les métadonnées de chaque génération dans un spreadsheet de suivi.",
+      "metadata": { "designer": { "x": 1000, "y": 50 } },
+      "parameters": {
+        "spreadsheet_id": "VOTRE_SPREADSHEET_ID",
+        "sheet_name": "Historique",
+        "values": {
+          "A": "{{2.timestamp}}",
+          "B": "{{1.silo}}",
+          "C": "{{1.produit}}",
+          "D": "{{2.sujet_final}}",
+          "E": "{{1.format}}",
+          "F": "{{1.angle}}",
+          "G": "{{4.seo}}",
+          "H": "{{7.id}}",
+          "I": "Généré via Make"
+        }
+      }
+    },
+
+    {
+      "id": 9,
+      "module": "slack:ActionCreateMessage",
+      "label": "💬 Slack – Notification équipe",
+      "description": "Envoie une notification dans le canal #agent-editorial avec un résumé du contenu généré.",
+      "metadata": { "designer": { "x": 1200, "y": -100 } },
+      "parameters": {
+        "channel": "#agent-editorial",
+        "message": {
+          "blocks": [
+            {
+              "type": "header",
+              "text": { "type": "plain_text", "text": "✅ Nouveau contenu MSS généré !" }
+            },
+            {
+              "type": "section",
+              "fields": [
+                { "type": "mrkdwn", "text": "*Sujet:*\n{{2.sujet_final}}" },
+                { "type": "mrkdwn", "text": "*Silo:*\n{{1.silo}}" },
+                { "type": "mrkdwn", "text": "*Format:*\n{{1.format}}" },
+                { "type": "mrkdwn", "text": "*Angle:*\n{{1.angle}}" }
+              ]
+            },
+            {
+              "type": "section",
+              "text": { "type": "mrkdwn", "text": "*SEO:* {{4.seo}}" }
+            },
+            {
+              "type": "section",
+              "text": { "type": "mrkdwn", "text": "*Visuel FreeCash:* Image générée via Imagen 3 ✅" }
+            },
+            {
+              "type": "actions",
+              "elements": [
+                {
+                  "type": "button",
+                  "text": { "type": "plain_text", "text": "📄 Voir HTML" },
+                  "url": "https://drive.google.com/file/d/{{7.id}}/view"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+
+    {
+      "id": 10,
+      "module": "email:ActionSendEmail",
+      "label": "📧 Email – Récap hebdomadaire",
+      "description": "Envoie un email de synthèse avec le lien vers le contenu et la prévisualisation du visuel FreeCash.",
+      "metadata": { "designer": { "x": 1200, "y": 0 } },
+      "parameters": {
+        "to": "redaction@mysentinelsolutions.com",
+        "subject": "{{concat('[MSS] Nouveau contenu : '; 2.sujet_final)}}",
+        "html_body": "{{concat('<h2>Contenu généré</h2><p><strong>Sujet :</strong> '; 2.sujet_final; '</p><p><strong>SEO :</strong> '; 4.seo; '</p><h3>Post Facebook</h3><p>'; replace(4.facebook.texte; newline; '<br>'); '</p><h3>Visuel FreeCash</h3><p>Image 16:9 générée via Imagen 3 — disponible dans Google Drive.</p><p><a href=\"https://drive.google.com/file/d/'; 7.id; '/view\">Voir le fichier HTML →</a></p>')}}"
+      }
+    },
+
+    {
+      "id": 11,
+      "module": "wordpress:ActionCreatePost",
+      "label": "📝 WordPress – Brouillon article (optionnel)",
+      "description": "Crée un brouillon WordPress avec le contenu HTML généré. Désactivez si vous n'utilisez pas WordPress.",
+      "metadata": { "designer": { "x": 1200, "y": 100 } },
+      "active": false,
+      "parameters": {
+        "site_url": "https://mysentinelsolutions.com",
+        "title": "{{2.sujet_final}}",
+        "content": "{{4.html}}",
+        "status": "draft",
+        "categories": ["{{1.silo}}"],
+        "tags": ["freecash", "{{1.produit}}", "mss-agent"],
+        "meta": {
+          "_yoast_wpseo_title": "{{4.seo}}",
+          "_yoast_wpseo_metadesc": "{{substring(4.seo; 0; 160)}}"
+        }
+      }
+    },
+
+    {
+      "id": 12,
+      "module": "builtin:SetVariable",
+      "label": "✅ Réponse webhook – Succès",
+      "description": "Renvoie une réponse JSON au webhook appelant avec le résumé de la génération.",
+      "metadata": { "designer": { "x": 1400, "y": 0 } },
+      "parameters": {
+        "response": {
+          "status": 200,
+          "body": {
+            "success": true,
+            "sujet": "{{2.sujet_final}}",
+            "seo": "{{4.seo}}",
+            "html_drive_id": "{{7.id}}",
+            "freecash_image_generated": true,
+            "conseils": {
+              "seo": "{{4.conseils.seo}}",
+              "conversion": "{{4.conseils.conversion}}",
+              "prochaine_idee": "{{4.conseils.prochaine_idee}}"
+            },
+            "generated_at": "{{2.timestamp}}"
+          }
+        }
+      }
+    }
+
+  ],
+
+  "error_handler": {
+    "module": "slack:ActionCreateMessage",
+    "label": "🚨 Erreur – Alerte Slack",
+    "parameters": {
+      "channel": "#alerts",
+      "message": "🚨 *Erreur scénario MSS FreeCash*\n> Module: {{error.module}}\n> Message: {{error.message}}\n> Timestamp: {{now}}"
+    }
+  },
+
+  "connections_required": [
+    { "app": "Google AI Studio", "scopes": ["generativelanguage.googleapis.com"], "note": "Clé API passée dans le webhook ou stockée dans Make Data Store" },
+    { "app": "Google Drive", "scopes": ["drive.file"], "note": "Pour sauvegarde HTML" },
+    { "app": "Google Sheets", "scopes": ["spreadsheets"], "note": "Pour le log de génération" },
+    { "app": "Slack", "scopes": ["chat:write"], "note": "Pour les notifications équipe" },
+    { "app": "Email (SMTP)", "note": "Pour les récaps de génération" },
+    { "app": "WordPress (optionnel)", "note": "Pour créer des brouillons automatiquement" }
+  ],
+
+  "configuration_steps": [
+    "1. Importer ce fichier dans Make.com via Scenarios > Import Blueprint",
+    "2. Configurer le webhook (module 1) et copier l'URL générée",
+    "3. Remplacer VOTRE_FOLDER_ID_GOOGLE_DRIVE par l'ID du dossier Drive cible",
+    "4. Remplacer VOTRE_SPREADSHEET_ID par l'ID du Google Sheets de suivi",
+    "5. Configurer les connexions Slack, Email et WordPress si nécessaire",
+    "6. Stocker la clé Google AI Studio dans Make Data Store (clé: google_api_key)",
+    "7. Tester avec un POST sur le webhook : { 'silo':'recovery', 'produit':'Red Light Therapy (infrarouge)', 'format':'article', 'angle':'test', 'sujet':'' }",
+    "8. Activer le scénario"
+  ],
+
+  "webhook_test_payload": {
+    "silo": "recovery",
+    "produit": "Red Light Therapy (infrarouge)",
+    "format": "article",
+    "angle": "test",
+    "sujet": "Red Light Therapy maison : mon test après 30 jours",
+    "google_api_key": "AIza..."
+  }
+}

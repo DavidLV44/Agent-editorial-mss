@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FreeCash · Visuel Promotionnel – MySentinelSolutions</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&family=Manrope:wght@400;500;600;700&display=swap');
+  :root{
+    --p:#0c7a8c;--pd:#085f6d;--pl:#e6f4f6;--pm:#b8dde2;
+    --gold:#f59e0b;--gold-d:#d97706;--gold-l:#fef3c7;
+    --green:#16a34a;--green-l:#dcfce7;
+    --t:#0f172a;--m:#64748b;--b:#e2e8f0;--bg:#fff;--bga:#f8fafc;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Manrope',sans-serif;background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 50%,#085f6d 100%);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+
+  /* ── Controls ── */
+  .controls{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:24px}
+  .ctrl-btn{padding:8px 18px;border-radius:50px;border:1.5px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:rgba(255,255,255,.8);font-family:'Outfit',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;backdrop-filter:blur(6px)}
+  .ctrl-btn:hover,.ctrl-btn.active{background:var(--gold);border-color:var(--gold);color:#0f172a}
+  .ctrl-btn.dl{background:var(--p);border-color:var(--p);color:#fff}
+  .ctrl-btn.dl:hover{background:var(--pd)}
+
+  /* ── Card wrapper ── */
+  .card-wrap{position:relative;display:inline-block;filter:drop-shadow(0 24px 64px rgba(0,0,0,.45))}
+
+  /* ── Main Visual 1200×630 (OG / Facebook) ── */
+  .fc-card{
+    width:1200px;height:630px;
+    background:linear-gradient(135deg,#0a1628 0%,#0d2137 40%,#05414f 100%);
+    border-radius:20px;overflow:hidden;position:relative;
+    display:flex;flex-direction:column;
+  }
+  /* Scale for screen display */
+  .scale-screen .fc-card{transform:scale(0.55);transform-origin:top left}
+  .scale-screen .card-wrap{width:660px;height:347px}
+
+  /* Background decor */
+  .fc-bg-circle1{position:absolute;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(245,158,11,.12) 0%,transparent 70%);top:-200px;right:-150px;pointer-events:none}
+  .fc-bg-circle2{position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(12,122,140,.18) 0%,transparent 70%);bottom:-200px;left:-100px;pointer-events:none}
+  .fc-lines{position:absolute;inset:0;background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.025) 0px,rgba(255,255,255,.025) 1px,transparent 1px,transparent 60px),repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0px,rgba(255,255,255,.025) 1px,transparent 1px,transparent 60px);pointer-events:none}
+
+  .fc-content{position:relative;z-index:2;flex:1;display:flex;padding:52px 64px;gap:64px;align-items:center}
+
+  /* Left column */
+  .fc-left{flex:1;display:flex;flex-direction:column;gap:18px}
+  .fc-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.35);border-radius:50px;padding:6px 16px;width:fit-content}
+  .fc-badge span{font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;color:var(--gold);letter-spacing:.8px;text-transform:uppercase}
+  .fc-dot{width:7px;height:7px;border-radius:50%;background:var(--gold);animation:blink 2s infinite}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+  .fc-title{font-family:'Outfit',sans-serif;font-size:62px;font-weight:900;color:#fff;line-height:1.05;letter-spacing:-1px}
+  .fc-title .hl{color:var(--gold);display:inline-block;position:relative}
+  .fc-title .hl::after{content:'';position:absolute;bottom:-4px;left:0;right:0;height:3px;background:var(--gold);border-radius:2px;opacity:.6}
+  .fc-subtitle{font-size:17px;color:rgba(255,255,255,.65);line-height:1.6;max-width:480px}
+  .fc-cta-row{display:flex;align-items:center;gap:20px;margin-top:8px}
+  .fc-cta{padding:16px 36px;background:linear-gradient(135deg,var(--gold) 0%,var(--gold-d) 100%);color:#0f172a;border-radius:12px;font-family:'Outfit',sans-serif;font-size:16px;font-weight:800;text-decoration:none;display:inline-flex;align-items:center;gap:8px;box-shadow:0 8px 24px rgba(245,158,11,.4);transition:all .2s;cursor:default}
+  .fc-cta-hint{font-size:12px;color:rgba(255,255,255,.45);font-family:'Manrope',sans-serif}
+  .fc-stats{display:flex;gap:32px;padding-top:8px;border-top:1px solid rgba(255,255,255,.08);margin-top:8px}
+  .fc-stat{}
+  .fc-stat-val{font-family:'Outfit',sans-serif;font-size:26px;font-weight:900;color:#fff}
+  .fc-stat-val .unit{font-size:14px;font-weight:600;color:var(--gold);margin-left:2px}
+  .fc-stat-lbl{font-size:11px;color:rgba(255,255,255,.45);margin-top:2px;font-family:'Manrope',sans-serif}
+
+  /* Right column – reward card */
+  .fc-right{display:flex;flex-direction:column;gap:16px;align-items:flex-end}
+  .fc-reward-card{width:290px;background:linear-gradient(145deg,rgba(255,255,255,.08) 0%,rgba(255,255,255,.04) 100%);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:24px;backdrop-filter:blur(12px);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+  .fc-rc-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.4);font-family:'Outfit',sans-serif;margin-bottom:14px}
+  .fc-rc-items{display:flex;flex-direction:column;gap:10px}
+  .fc-rc-item{display:flex;align-items:center;gap:12px;padding:10px 14px;background:rgba(255,255,255,.05);border-radius:10px;border:1px solid rgba(255,255,255,.07)}
+  .fc-rc-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+  .fc-rc-icon.g{background:linear-gradient(135deg,#16a34a,#15803d)}
+  .fc-rc-icon.y{background:linear-gradient(135deg,#f59e0b,#d97706)}
+  .fc-rc-icon.b{background:linear-gradient(135deg,#0c7a8c,#085f6d)}
+  .fc-rc-info{flex:1}
+  .fc-rc-name{font-size:12px;font-weight:700;color:#fff;font-family:'Outfit',sans-serif}
+  .fc-rc-desc{font-size:10.5px;color:rgba(255,255,255,.45);margin-top:1px;font-family:'Manrope',sans-serif}
+  .fc-rc-val{font-size:13px;font-weight:800;color:var(--gold);font-family:'Outfit',sans-serif;flex-shrink:0}
+  .fc-rc-total{margin-top:12px;padding:12px 14px;background:linear-gradient(135deg,rgba(245,158,11,.15),rgba(245,158,11,.08));border:1px solid rgba(245,158,11,.25);border-radius:10px;display:flex;justify-content:space-between;align-items:center}
+  .fc-rc-total-lbl{font-size:11px;color:rgba(255,255,255,.6);font-family:'Manrope',sans-serif}
+  .fc-rc-total-val{font-size:20px;font-weight:900;color:var(--gold);font-family:'Outfit',sans-serif}
+  .fc-trust{display:flex;align-items:center;gap:8px;margin-top:4px;justify-content:flex-end}
+  .fc-trust-icon{font-size:14px}
+  .fc-trust-txt{font-size:10.5px;color:rgba(255,255,255,.35);font-family:'Manrope',sans-serif}
+
+  /* Footer bar */
+  .fc-footer{position:relative;z-index:2;background:rgba(0,0,0,.25);border-top:1px solid rgba(255,255,255,.06);padding:14px 64px;display:flex;align-items:center;justify-content:space-between}
+  .fc-footer-brand{font-family:'Outfit',sans-serif;font-size:13px;font-weight:800;color:rgba(255,255,255,.45);letter-spacing:.5px}
+  .fc-footer-brand span{color:var(--p)}
+  .fc-footer-tags{display:flex;gap:10px}
+  .fc-ftag{padding:4px 12px;border-radius:50px;border:1px solid rgba(255,255,255,.12);font-size:10px;font-weight:700;font-family:'Outfit',sans-serif;color:rgba(255,255,255,.4);letter-spacing:.4px}
+  .fc-footer-url{font-size:11px;color:rgba(255,255,255,.3);font-family:'Manrope',sans-serif}
+
+  /* ── Square version 1080×1080 ── */
+  .fc-card-sq{
+    width:1080px;height:1080px;display:none;
+    background:linear-gradient(160deg,#0a1628 0%,#0d2137 45%,#05414f 100%);
+    border-radius:20px;overflow:hidden;position:relative;flex-direction:column;
+    align-items:center;justify-content:center;text-align:center;
+  }
+  .fc-card-sq .fc-bg-circle1{width:900px;height:900px;top:-350px;right:-300px}
+  .fc-card-sq .fc-bg-circle2{width:700px;height:700px;bottom:-300px;left:-250px}
+  .fc-card-sq .fc-content-sq{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:24px;padding:80px 100px}
+  .fc-card-sq .fc-title{font-size:80px;text-align:center}
+  .fc-card-sq .fc-subtitle{text-align:center;max-width:700px;font-size:20px}
+  .fc-card-sq .fc-badge{margin:0 auto}
+  .fc-card-sq .fc-cta{padding:20px 52px;font-size:19px}
+  .fc-card-sq .fc-stats{justify-content:center;gap:60px;padding:24px 0;border-top:1px solid rgba(255,255,255,.1)}
+  .fc-card-sq .fc-stat-val{font-size:40px}
+  .fc-card-sq .fc-footer{padding:20px 80px;width:100%}
+  .scale-screen .fc-card-sq{transform:scale(0.44);transform-origin:top left}
+  .scale-screen .card-wrap.sq{width:476px;height:476px}
+
+  /* ── Story version 1080×1920 ── */
+  .fc-card-st{
+    width:1080px;height:1920px;display:none;
+    background:linear-gradient(160deg,#0a1628 0%,#0d2137 40%,#05414f 75%,#071e26 100%);
+    border-radius:20px;overflow:hidden;position:relative;
+    flex-direction:column;align-items:center;justify-content:center;
+  }
+  .fc-card-st .fc-content-st{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:32px;padding:100px 80px;text-align:center;width:100%}
+  .fc-card-st .fc-title{font-size:96px;text-align:center}
+  .fc-card-st .fc-subtitle{font-size:24px;text-align:center;max-width:800px}
+  .fc-card-st .fc-badge{margin:0 auto}
+  .fc-card-st .fc-cta{padding:24px 64px;font-size:22px;border-radius:16px}
+  .fc-card-st .fc-stats{justify-content:center;gap:80px;padding:32px 0;border-top:1px solid rgba(255,255,255,.1);width:100%}
+  .fc-card-st .fc-stat-val{font-size:52px}
+  .fc-card-st .fc-reward-card{width:640px;margin-top:16px}
+  .fc-card-st .fc-rc-item{padding:16px 20px}
+  .fc-card-st .fc-rc-icon{width:48px;height:48px;font-size:22px}
+  .fc-card-st .fc-rc-name{font-size:16px}
+  .fc-card-st .fc-rc-val{font-size:17px}
+  .scale-screen .fc-card-st{transform:scale(0.25);transform-origin:top left}
+  .scale-screen .card-wrap.st{width:270px;height:480px}
+
+  /* ── Format label ── */
+  .fmt-label{font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;color:rgba(255,255,255,.4);text-align:center;margin-bottom:8px;letter-spacing:.6px;text-transform:uppercase}
+</style>
+</head>
+<body>
+
+<div class="controls">
+  <button class="ctrl-btn active" onclick="showFormat('banner',this)">🖼️ Banner 1200×630</button>
+  <button class="ctrl-btn" onclick="showFormat('square',this)">◻️ Carré 1080×1080</button>
+  <button class="ctrl-btn" onclick="showFormat('story',this)">📱 Story 1080×1920</button>
+  <button class="ctrl-btn dl" onclick="downloadVisual()">⬇️ Télécharger</button>
+</div>
+
+<!-- ══ BANNER 1200×630 ══ -->
+<div id="wrap-banner" class="card-wrap scale-screen">
+  <p class="fmt-label">Banner Facebook / OG · 1200 × 630 px</p>
+  <div class="fc-card" id="fc-banner">
+    <div class="fc-bg-circle1"></div>
+    <div class="fc-bg-circle2"></div>
+    <div class="fc-lines"></div>
+    <div class="fc-content">
+      <div class="fc-left">
+        <div class="fc-badge"><div class="fc-dot"></div><span>Programme Partenaire Actif</span></div>
+        <h1 class="fc-title">Gagnez du <span class="hl">cash</span><br>en ligne, gratuitement</h1>
+        <p class="fc-subtitle">Offres, sondages et missions rémunérés. Cashout immédiat via PayPal, crypto ou carte cadeau. Rejoignez +3 M de membres.</p>
+        <div class="fc-cta-row">
+          <div class="fc-cta">🚀 Commencer gratuitement</div>
+          <span class="fc-cta-hint">Aucune carte requise</span>
+        </div>
+        <div class="fc-stats">
+          <div class="fc-stat">
+            <div class="fc-stat-val">+3M<span class="unit"> membres</span></div>
+            <div class="fc-stat-lbl">Utilisateurs actifs</div>
+          </div>
+          <div class="fc-stat">
+            <div class="fc-stat-val">€50<span class="unit"> /mois</span></div>
+            <div class="fc-stat-lbl">Gain moyen</div>
+          </div>
+          <div class="fc-stat">
+            <div class="fc-stat-val">24h<span class="unit"> chrono</span></div>
+            <div class="fc-stat-lbl">Délai de paiement</div>
+          </div>
+        </div>
+      </div>
+      <div class="fc-right">
+        <div class="fc-reward-card">
+          <div class="fc-rc-label">Vos gains cette semaine</div>
+          <div class="fc-rc-items">
+            <div class="fc-rc-item">
+              <div class="fc-rc-icon g">🎮</div>
+              <div class="fc-rc-info">
+                <div class="fc-rc-name">Test d'application</div>
+                <div class="fc-rc-desc">15 min · Complété</div>
+              </div>
+              <div class="fc-rc-val">+€2,50</div>
+            </div>
+            <div class="fc-rc-item">
+              <div class="fc-rc-icon y">📋</div>
+              <div class="fc-rc-info">
+                <div class="fc-rc-name">Sondage premium</div>
+                <div class="fc-rc-desc">8 min · En cours</div>
+              </div>
+              <div class="fc-rc-val">+€1,80</div>
+            </div>
+            <div class="fc-rc-item">
+              <div class="fc-rc-icon b">🛒</div>
+              <div class="fc-rc-info">
+                <div class="fc-rc-name">Offre partenaire</div>
+                <div class="fc-rc-desc">Cashback · Validé</div>
+              </div>
+              <div class="fc-rc-val">+€5,00</div>
+            </div>
+          </div>
+          <div class="fc-rc-total">
+            <span class="fc-rc-total-lbl">Total disponible</span>
+            <span class="fc-rc-total-val">€9,30 💰</span>
+          </div>
+        </div>
+        <div class="fc-trust">
+          <span class="fc-trust-icon">🔒</span>
+          <span class="fc-trust-txt">Paiements 100% sécurisés · Trustpilot ★★★★½</span>
+        </div>
+      </div>
+    </div>
+    <div class="fc-footer">
+      <span class="fc-footer-brand">My<span>Sentinel</span>Solutions</span>
+      <div class="fc-footer-tags">
+        <span class="fc-ftag">CASHBACK</span>
+        <span class="fc-ftag">OFFRES</span>
+        <span class="fc-ftag">MISSIONS</span>
+      </div>
+      <span class="fc-footer-url">mysentinelsolutions.com/freecash</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SQUARE 1080×1080 ══ -->
+<div id="wrap-square" class="card-wrap sq scale-screen" style="display:none">
+  <p class="fmt-label">Carré Instagram / Facebook · 1080 × 1080 px</p>
+  <div class="fc-card-sq" id="fc-square">
+    <div class="fc-bg-circle1"></div>
+    <div class="fc-bg-circle2"></div>
+    <div class="fc-lines"></div>
+    <div class="fc-content-sq">
+      <div class="fc-badge"><div class="fc-dot"></div><span>Programme Partenaire</span></div>
+      <h1 class="fc-title">Gagnez du <span class="hl">cash</span><br>en ligne</h1>
+      <p class="fc-subtitle">Offres, sondages et missions rémunérés. Cashout via PayPal ou crypto. +3 M de membres satisfaits.</p>
+      <div class="fc-cta">🚀 Commencer gratuitement</div>
+      <div class="fc-stats">
+        <div class="fc-stat">
+          <div class="fc-stat-val">+3M<span class="unit"></span></div>
+          <div class="fc-stat-lbl">Membres actifs</div>
+        </div>
+        <div class="fc-stat">
+          <div class="fc-stat-val">€50<span class="unit"></span></div>
+          <div class="fc-stat-lbl">Gain moyen/mois</div>
+        </div>
+        <div class="fc-stat">
+          <div class="fc-stat-val">24h</div>
+          <div class="fc-stat-lbl">Paiement</div>
+        </div>
+      </div>
+    </div>
+    <div class="fc-footer">
+      <span class="fc-footer-brand">My<span>Sentinel</span>Solutions</span>
+      <span class="fc-footer-url">mysentinelsolutions.com/freecash</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ STORY 1080×1920 ══ -->
+<div id="wrap-story" class="card-wrap st scale-screen" style="display:none">
+  <p class="fmt-label">Story Instagram / Facebook · 1080 × 1920 px</p>
+  <div class="fc-card-st" id="fc-story">
+    <div class="fc-bg-circle1"></div>
+    <div class="fc-bg-circle2"></div>
+    <div class="fc-lines"></div>
+    <div class="fc-content-st">
+      <div class="fc-badge"><div class="fc-dot"></div><span>Programme Partenaire Actif</span></div>
+      <h1 class="fc-title">Gagnez du <span class="hl">cash</span><br>gratuitement</h1>
+      <p class="fc-subtitle">Offres, sondages et missions rémunérés. Cashout immédiat via PayPal, crypto ou carte cadeau.</p>
+      <div class="fc-cta">🚀 Commencer gratuitement →</div>
+      <div class="fc-reward-card">
+        <div class="fc-rc-label">Vos gains cette semaine</div>
+        <div class="fc-rc-items">
+          <div class="fc-rc-item">
+            <div class="fc-rc-icon g">🎮</div>
+            <div class="fc-rc-info"><div class="fc-rc-name">Test d'application</div><div class="fc-rc-desc">15 min · Complété</div></div>
+            <div class="fc-rc-val">+€2,50</div>
+          </div>
+          <div class="fc-rc-item">
+            <div class="fc-rc-icon y">📋</div>
+            <div class="fc-rc-info"><div class="fc-rc-name">Sondage premium</div><div class="fc-rc-desc">8 min · En cours</div></div>
+            <div class="fc-rc-val">+€1,80</div>
+          </div>
+          <div class="fc-rc-item">
+            <div class="fc-rc-icon b">🛒</div>
+            <div class="fc-rc-info"><div class="fc-rc-name">Offre partenaire</div><div class="fc-rc-desc">Cashback · Validé</div></div>
+            <div class="fc-rc-val">+€5,00</div>
+          </div>
+        </div>
+        <div class="fc-rc-total"><span class="fc-rc-total-lbl">Total disponible</span><span class="fc-rc-total-val">€9,30 💰</span></div>
+      </div>
+      <div class="fc-stats">
+        <div class="fc-stat"><div class="fc-stat-val">+3M</div><div class="fc-stat-lbl">Membres</div></div>
+        <div class="fc-stat"><div class="fc-stat-val">€50</div><div class="fc-stat-lbl">Gain/mois</div></div>
+        <div class="fc-stat"><div class="fc-stat-val">24h</div><div class="fc-stat-lbl">Paiement</div></div>
+      </div>
+    </div>
+    <div class="fc-footer">
+      <span class="fc-footer-brand">My<span>Sentinel</span>Solutions</span>
+      <span class="fc-footer-url">mysentinelsolutions.com/freecash</span>
+    </div>
+  </div>
+</div>
+
+<script>
+let activeFormat = 'banner';
+const formats = {
+  banner: { wrap: 'wrap-banner', card: 'fc-banner', w: 1200, h: 630 },
+  square: { wrap: 'wrap-square', card: 'fc-square', w: 1080, h: 1080 },
+  story:  { wrap: 'wrap-story',  card: 'fc-story',  w: 1080, h: 1920 }
+};
+
+function showFormat(fmt, btn) {
+  activeFormat = fmt;
+  document.querySelectorAll('.ctrl-btn:not(.dl)').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  Object.keys(formats).forEach(f => {
+    const wrap = document.getElementById(formats[f].wrap);
+    wrap.style.display = f === fmt ? 'inline-block' : 'none';
+    const card = document.getElementById(formats[f].card);
+    card.style.display = f === fmt ? 'flex' : 'none';
+  });
+}
+
+// Init display
+document.getElementById('fc-banner').style.display = 'flex';
+
+async function downloadVisual() {
+  const { card, w, h } = formats[activeFormat];
+  const el = document.getElementById(card);
+
+  // Temporarily remove scale for capture
+  const wrap = el.closest('.card-wrap');
+  wrap.classList.remove('scale-screen');
+  el.style.transform = 'none';
+
+  // html2canvas via CDN (fallback: prompt)
+  if (typeof html2canvas === 'undefined') {
+    // Load dynamically
+    await new Promise((res, rej) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+      s.onload = res; s.onerror = rej;
+      document.head.appendChild(s);
+    });
+  }
+
+  try {
+    const canvas = await html2canvas(el, {
+      width: w, height: h,
+      scale: 1,
+      useCORS: true,
+      backgroundColor: null,
+      logging: false
+    });
+    const link = document.createElement('a');
+    link.download = `freecash-visuel-${activeFormat}-${w}x${h}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  } catch(e) {
+    alert('Export: ' + e.message + '\n\nOuvrez DevTools > Console pour détails.');
+  }
+
+  wrap.classList.add('scale-screen');
+}
+</script>
+</body>
+</html>
