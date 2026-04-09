@@ -248,6 +248,56 @@
   .apikey-card .btn-save.ok{background:#16a34a}
   .apikey-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--p);font-family:'Outfit',sans-serif;width:100%}
   .apikey-hint{font-size:10.5px;color:var(--m);width:100%;margin-top:-6px}
+  /* ── Notification 21h ── */
+  .notif-21h{background:linear-gradient(135deg,#0f172a,#1e293b);color:#fff;border-radius:var(--r12);padding:13px 16px;margin-bottom:14px;display:none;align-items:center;gap:10px}
+  .notif-21h.show{display:flex;animation:pulse21 2s infinite}
+  @keyframes pulse21{0%,100%{box-shadow:0 0 0 0 rgba(12,122,140,.5)}70%{box-shadow:0 0 0 10px rgba(12,122,140,0)}}
+  .notif-21h-text{flex:1;font-size:12.5px;font-family:'Manrope',sans-serif;line-height:1.4}
+  .notif-21h-text strong{font-family:'Outfit',sans-serif;font-size:13px;display:block;margin-bottom:2px}
+  .notif-21h-btn{padding:9px 16px;background:var(--p);color:#fff;border:none;border-radius:10px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .2s;flex-shrink:0}
+  .notif-21h-btn:hover{background:var(--pd)}
+  /* ── Veille RSS ── */
+  .veille-card{background:var(--bg);border-radius:var(--r16);box-shadow:var(--s2);border:1.5px solid var(--pm);margin-bottom:14px;overflow:hidden}
+  .veille-head{padding:14px 18px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;background:linear-gradient(135deg,var(--pl) 0%,#f0f9fb 100%)}
+  .veille-head-left{display:flex;align-items:center;gap:10px}
+  .veille-head-titles{display:flex;flex-direction:column}
+  .veille-head-title{font-family:'Outfit',sans-serif;font-size:14px;font-weight:800;color:var(--pd);line-height:1.2}
+  .veille-head-sub{font-size:10.5px;color:var(--m);font-family:'Manrope',sans-serif}
+  .veille-badge-new{background:var(--p);color:#fff;border-radius:50px;font-size:9px;font-weight:800;padding:2px 8px;font-family:'Outfit',sans-serif;animation:blink 2s infinite;display:none}
+  .veille-toggle-icon{font-size:12px;color:var(--m);transition:transform .3s;margin-left:4px}
+  .veille-toggle-icon.open{transform:rotate(180deg)}
+  .veille-body{display:none;border-top:1px solid var(--pm)}
+  .veille-body.open{display:block}
+  .veille-controls{display:flex;gap:8px;padding:11px 14px;background:var(--bga);border-bottom:1px solid var(--b);flex-wrap:wrap;align-items:center}
+  .veille-refresh-btn{padding:8px 14px;background:var(--p);color:#fff;border:none;border-radius:10px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:5px;white-space:nowrap}
+  .veille-refresh-btn:hover:not(:disabled){background:var(--pd)}
+  .veille-refresh-btn:disabled{opacity:.6;cursor:not-allowed}
+  .veille-status{font-size:11px;color:var(--m);font-family:'Manrope',sans-serif;flex:1;min-width:0}
+  .veille-select-info{font-size:11px;font-weight:700;color:var(--pd);font-family:'Outfit',sans-serif;white-space:nowrap}
+  .veille-articles{max-height:400px;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+  .veille-article{background:var(--bga);border:1px solid var(--b);border-radius:10px;padding:9px 12px;cursor:pointer;transition:all .15s;display:flex;gap:9px;align-items:flex-start}
+  .veille-article:hover{border-color:var(--pm);background:var(--pl)}
+  .veille-article.selected{border-color:var(--p);background:var(--pl)}
+  .veille-article-cb{width:16px;height:16px;border-radius:4px;border:2px solid var(--b);background:var(--bg);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;transition:all .15s}
+  .veille-article.selected .veille-article-cb{background:var(--p);border-color:var(--p)}
+  .veille-article-body{flex:1;min-width:0}
+  .veille-article-title{font-family:'Outfit',sans-serif;font-size:12px;font-weight:700;color:var(--t);line-height:1.35;margin-bottom:4px}
+  .veille-article-meta{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+  .veille-article-cat{font-size:9px;font-weight:700;color:var(--pd);font-family:'Outfit',sans-serif;background:var(--pl);border:1px solid var(--pm);border-radius:4px;padding:1px 6px;text-transform:uppercase;letter-spacing:.4px}
+  .veille-article-src{font-size:10px;color:var(--m);font-family:'Manrope',sans-serif}
+  .veille-article-date{font-size:10px;color:var(--m);font-family:'Manrope',sans-serif}
+  .veille-article-desc{font-size:11px;color:var(--m);font-family:'Manrope',sans-serif;margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.45}
+  .veille-empty{padding:28px 20px;text-align:center;color:var(--m);font-size:12px;font-family:'Manrope',sans-serif}
+  .veille-loading{padding:18px;text-align:center;color:var(--m);font-size:12px;font-family:'Manrope',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px}
+  .btn-digest{width:100%;padding:13px;background:linear-gradient(135deg,var(--pd) 0%,#062f38 100%);color:#fff;border:none;font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:opacity .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+  .btn-digest:hover:not(:disabled){opacity:.9}
+  .btn-digest:disabled{opacity:.5;cursor:not-allowed}
+  /* ── Digest panel ── */
+  .digest-banner{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;padding:12px 16px;background:var(--pl);border-bottom:1px solid var(--pm)}
+  .digest-banner-label{font-family:'Outfit',sans-serif;font-size:12px;font-weight:700;color:var(--pd)}
+  .digest-banner-btn{padding:5px 12px;background:var(--p);color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;white-space:nowrap}
+  .digest-banner-btn:hover{background:var(--pd)}
+  .digest-body{padding:18px;white-space:pre-wrap;line-height:1.85;font-size:12.5px;color:var(--t);font-family:'Manrope',sans-serif;max-height:560px;overflow-y:auto}
 </style>
 </head>
 <body>
@@ -265,6 +315,44 @@
   <span class="apikey-hint">Gratuit sur aistudio.google.com · stockée localement · jamais envoyée ailleurs qu'à generativelanguage.googleapis.com</span>
   <input type="password" id="apiKeyInput" placeholder="AIza…" autocomplete="off" />
   <button class="btn-save" id="btnSaveKey" onclick="saveKey()">Enregistrer</button>
+</div>
+
+<!-- NOTIFICATION 21h -->
+<div class="notif-21h" id="notif21h">
+  <span style="font-size:22px">🔔</span>
+  <div class="notif-21h-text">
+    <strong>Compte rendu du soir disponible</strong>
+    Il est 21h — générez votre veille quotidienne IA &amp; Santé Connectée
+  </div>
+  <button class="notif-21h-btn" onclick="openVeille()">Générer →</button>
+</div>
+
+<!-- VEILLE RSS -->
+<div class="veille-card" id="veilleCard">
+  <div class="veille-head" onclick="toggleVeille()">
+    <div class="veille-head-left">
+      <span style="font-size:20px;flex-shrink:0">📡</span>
+      <div class="veille-head-titles">
+        <span class="veille-head-title">Veille IA &amp; Santé Connectée</span>
+        <span class="veille-head-sub" id="veilleHeadSub">Actualités en temps réel · Compte rendu à 21h</span>
+      </div>
+      <span class="veille-badge-new" id="veilleNewBadge"></span>
+    </div>
+    <span class="veille-toggle-icon" id="veilleToggleIcon">▼</span>
+  </div>
+  <div class="veille-body" id="veilleBody">
+    <div class="veille-controls">
+      <button class="veille-refresh-btn" id="veilleRefreshBtn" onclick="fetchVeille()">🔄 Actualiser les flux</button>
+      <span class="veille-status" id="veilleStatus">Cliquez pour charger les dernières actualités</span>
+      <span class="veille-select-info" id="veilleSelectInfo" style="display:none"></span>
+    </div>
+    <div class="veille-articles" id="veilleArticles">
+      <div class="veille-empty">📡 Actualisez les flux pour voir les dernières actualités IA &amp; Santé Connectée</div>
+    </div>
+    <button class="btn-digest" id="btnDigest" onclick="generateDigest()" disabled>
+      📰 Générer le compte rendu du jour
+    </button>
+  </div>
 </div>
 
 <!-- FORM -->
@@ -303,6 +391,7 @@
     <div class="angle-chip" data-angle="kine">👨‍⚕️ Remplace le kiné ?</div>
     <div class="angle-chip" data-angle="gadget">💡 Gadget ou révolution ?</div>
     <div class="angle-chip" data-angle="comparatif">⚖️ Comparatif expert</div>
+    <div class="angle-chip" data-angle="veille_pro">📡 Ton Veille Pro</div>
   </div>
 
   <label class="flabel">💬 Sujet / produit précis</label>
@@ -343,6 +432,7 @@
     <button class="tbtn" onclick="tab('seo')">🔑 SEO</button>
     <button class="tbtn" onclick="tab('conseils')">💡 Conseils</button>
     <button class="tbtn" onclick="tab('sources')">📚 Sources</button>
+    <button class="tbtn" onclick="tab('digest')">📡 Digest</button>
   </div>
 
   <div class="panel active ocard" id="panel-html">
@@ -381,6 +471,15 @@
   <div class="panel ocard" id="panel-sources">
     <div class="ohead"><span class="otitle">📚 Sources utilisées</span></div>
     <div class="cgrid" id="c-sources"></div>
+  </div>
+
+  <div class="panel ocard" id="panel-digest">
+    <div class="ohead"><span class="otitle">📡 Compte rendu de veille</span><div style="display:flex;gap:7px"><button class="bcopy" onclick="copy('digestSocial',this)">📱 Réseaux</button><button class="bcopy" onclick="copy('digestText',this)">📋 Tout copier</button></div></div>
+    <div class="digest-banner" id="digestBanner">
+      <span class="digest-banner-label" id="digestBannerLabel">Veille du —</span>
+      <button class="digest-banner-btn" onclick="openVeille()">+ Nouvelle veille</button>
+    </div>
+    <div class="digest-body" id="c-digest"></div>
   </div>
 
   <button class="btn-reset" onclick="reset()">+ Nouveau contenu</button>
@@ -520,7 +619,8 @@ const ANGLES={
   secret:"Angle secret des sportifs : technique utilisée par les pros, effet exclusivité.",
   kine:"Angle remplace le kiné : comparaison soins professionnels, économies, efficacité.",
   gadget:"Angle gadget ou révolution : traite les objections, preuves, démonte les idées reçues.",
-  comparatif:"Angle comparatif expert : tableau clair, critères objectifs, verdict par profil."
+  comparatif:"Angle comparatif expert : tableau clair, critères objectifs, verdict par profil.",
+  veille_pro:"Angle veille professionnelle : ton sérieux, factuel, pédagogique. Aucun langage commercial. Partage d'une avancée récente ou tendance émergente. Style expert s'adressant à des professionnels de santé et passionnés de healthtech. Posts réseaux : informatifs, sans accroche racoleuse, avec données chiffrées et source."
 };
 
 let selSilo='recovery',selProd='',selFmt='article',selAngle='test',store={};
@@ -580,6 +680,8 @@ function init(){
     });
   });
   document.getElementById('topicInput').addEventListener('keydown',e=>{ if(e.key==='Enter') generate(); });
+  loadCachedVeille();
+  checkDigestSchedule();
 }
 
 function renderProds(){
@@ -619,7 +721,7 @@ function bindAngleChips(){
 }
 
 function tab(name){
-  const names=['html','images','facebook','instagram','seo','conseils','sources'];
+  const names=['html','images','facebook','instagram','seo','conseils','sources','digest'];
   document.querySelectorAll('.tbtn').forEach((b,i)=>b.classList.toggle('active',names[i]===name));
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('panel-'+name).classList.add('active');
@@ -1226,6 +1328,313 @@ function setDevice(mode, btn){
 }
 
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') closePreview(); });
+
+// ── Veille RSS ────────────────────────────────────────────────────
+const RSS_FEEDS = [
+  { name:'Healthcare IT News', url:'https://www.healthcareitnews.com/feed',      cat:'IT Santé' },
+  { name:'mHealth Intelligence', url:'https://mhealthintelligence.com/feed',      cat:'mSanté' },
+  { name:'Digital Health Today', url:'https://digitalhealthtoday.com/feed/',      cat:'eHealth' },
+  { name:'STAT News',            url:'https://www.statnews.com/feed/',             cat:'Médical' },
+  { name:'Rock Health',          url:'https://rockhealth.com/feed/',               cat:'HealthTech' },
+  { name:'MIT Tech Review',      url:'https://www.technologyreview.com/feed/',     cat:'IA & Tech' },
+  { name:'Fierce Health IT',     url:'https://www.fiercehealthcare.com/rss/xml',   cat:'Digital Santé' },
+];
+
+let veilleArticles = [];
+let veilleSelected = new Set();
+let veilleIsOpen = false;
+
+function toggleVeille(){
+  veilleIsOpen = !veilleIsOpen;
+  document.getElementById('veilleBody').classList.toggle('open', veilleIsOpen);
+  document.getElementById('veilleToggleIcon').classList.toggle('open', veilleIsOpen);
+}
+
+function openVeille(){
+  if(!veilleIsOpen){
+    veilleIsOpen = true;
+    document.getElementById('veilleBody').classList.add('open');
+    document.getElementById('veilleToggleIcon').classList.add('open');
+  }
+  document.getElementById('veilleCard').scrollIntoView({behavior:'smooth'});
+  if(!veilleArticles.length) fetchVeille();
+}
+
+async function fetchVeille(){
+  const btn = document.getElementById('veilleRefreshBtn');
+  const status = document.getElementById('veilleStatus');
+  const container = document.getElementById('veilleArticles');
+  btn.disabled = true;
+  btn.innerHTML = '⏳ Chargement…';
+  status.textContent = 'Récupération des flux RSS en cours…';
+  container.innerHTML = '<div class="veille-loading"><div class="ring" style="width:18px;height:18px;border-width:2px;margin:0"></div>&nbsp;Chargement…</div>';
+
+  const results = [];
+  let ok = 0, errors = 0;
+
+  await Promise.allSettled(RSS_FEEDS.map(async feed => {
+    try{
+      const proxy = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feed.url)}&count=6`;
+      const res = await fetch(proxy);
+      const data = await res.json();
+      if(data.status === 'ok'){
+        data.items.forEach(item => results.push({
+          title:       (item.title||'').trim(),
+          description: (item.description||'').replace(/<[^>]+>/g,'').substring(0,220).trim(),
+          link:        item.link||'',
+          pubDate:     item.pubDate||'',
+          source:      feed.name,
+          cat:         feed.cat
+        }));
+        ok++;
+      } else { errors++; }
+    } catch(e){ errors++; }
+  }));
+
+  results.sort((a,b) => new Date(b.pubDate) - new Date(a.pubDate));
+  veilleArticles = results;
+  veilleSelected.clear();
+
+  localStorage.setItem('mss_veille_cache', JSON.stringify(results.slice(0,60)));
+  localStorage.setItem('mss_veille_fetched', new Date().toISOString());
+
+  renderVeilleArticles();
+  updateVeilleNewBadge(results);
+
+  btn.disabled = false;
+  btn.innerHTML = '🔄 Actualiser les flux';
+  const errTxt = errors ? ` · ${errors} flux indisponibles` : '';
+  status.textContent = `${results.length} actualités · ${ok} flux chargés${errTxt}`;
+  showToast(`📡 ${results.length} actualités chargées`);
+}
+
+function updateVeilleNewBadge(articles){
+  const lastRead = localStorage.getItem('mss_veille_last_read');
+  const newCount = lastRead
+    ? articles.filter(a => new Date(a.pubDate) > new Date(lastRead)).length
+    : articles.length;
+  const badge = document.getElementById('veilleNewBadge');
+  if(newCount > 0){
+    badge.textContent = newCount + ' nouveau' + (newCount > 1 ? 'x' : '');
+    badge.style.display = 'inline-flex';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+function renderVeilleArticles(){
+  const container = document.getElementById('veilleArticles');
+  if(!veilleArticles.length){
+    container.innerHTML = '<div class="veille-empty">Aucune actualité disponible. Actualisez les flux.</div>';
+    return;
+  }
+  container.innerHTML = veilleArticles.map((a,i) => `
+    <div class="veille-article${veilleSelected.has(i)?' selected':''}" onclick="toggleVeilleItem(${i})">
+      <div class="veille-article-cb">${veilleSelected.has(i)?'✓':''}</div>
+      <div class="veille-article-body">
+        <div class="veille-article-title">${escHtml(a.title)}</div>
+        <div class="veille-article-meta">
+          <span class="veille-article-cat">${escHtml(a.cat)}</span>
+          <span class="veille-article-src">${escHtml(a.source)}</span>
+          <span class="veille-article-date">· ${formatVeilleDate(a.pubDate)}</span>
+        </div>
+        ${a.description ? `<div class="veille-article-desc">${escHtml(a.description)}</div>` : ''}
+      </div>
+    </div>`).join('');
+  updateVeilleSelectInfo();
+  localStorage.setItem('mss_veille_last_read', new Date().toISOString());
+  document.getElementById('veilleNewBadge').style.display = 'none';
+}
+
+function toggleVeilleItem(i){
+  if(veilleSelected.has(i)) veilleSelected.delete(i);
+  else veilleSelected.add(i);
+  const els = document.querySelectorAll('.veille-article');
+  if(els[i]){
+    els[i].classList.toggle('selected', veilleSelected.has(i));
+    const cb = els[i].querySelector('.veille-article-cb');
+    if(cb) cb.textContent = veilleSelected.has(i) ? '✓' : '';
+  }
+  updateVeilleSelectInfo();
+}
+
+function updateVeilleSelectInfo(){
+  const n = veilleSelected.size;
+  const info = document.getElementById('veilleSelectInfo');
+  const btn = document.getElementById('btnDigest');
+  if(n > 0){
+    info.style.display = 'inline';
+    info.textContent = n + ' article' + (n>1?'s':'') + ' sélectionné' + (n>1?'s':'');
+    btn.disabled = false;
+    btn.innerHTML = `📰 Générer le compte rendu (${n} article${n>1?'s':''})`;
+  } else {
+    info.style.display = 'none';
+    btn.disabled = true;
+    btn.innerHTML = '📰 Générer le compte rendu du jour';
+  }
+}
+
+function formatVeilleDate(dateStr){
+  if(!dateStr) return '';
+  try{
+    const d = new Date(dateStr);
+    const diff = Math.floor((Date.now() - d) / 60000);
+    if(diff < 60)   return `il y a ${diff} min`;
+    if(diff < 1440) return `il y a ${Math.floor(diff/60)}h`;
+    return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'});
+  }catch(e){ return ''; }
+}
+
+function loadCachedVeille(){
+  try{
+    const cached = JSON.parse(localStorage.getItem('mss_veille_cache')||'[]');
+    const fetched = localStorage.getItem('mss_veille_fetched');
+    if(cached.length && fetched){
+      veilleArticles = cached;
+      const age = Math.floor((Date.now() - new Date(fetched)) / 60000);
+      const ageStr = age < 60 ? age+'min' : Math.floor(age/60)+'h';
+      document.getElementById('veilleStatus').textContent =
+        `${cached.length} actualités en cache (il y a ${ageStr}) — cliquez Actualiser`;
+      updateVeilleNewBadge(cached);
+    }
+  }catch(e){}
+}
+
+// ── Génération du digest quotidien ────────────────────────────────
+async function generateDigest(){
+  const apiKey = getKey();
+  if(!apiKey){ showErr('Clé API manquante. Saisissez votre clé Google AI Studio.',''); return; }
+
+  const selected = [...veilleSelected].map(i => veilleArticles[i]).filter(Boolean);
+  if(!selected.length){ showToast('Sélectionnez au moins 1 article'); return; }
+
+  const btnDigest = document.getElementById('btnDigest');
+  btnDigest.disabled = true;
+  btnDigest.innerHTML = '⏳ Génération…';
+
+  document.getElementById('formCard').style.display = 'none';
+  document.getElementById('loader').classList.add('on');
+  document.getElementById('results').classList.remove('on');
+  document.querySelectorAll('.ls').forEach(s => s.classList.remove('on'));
+  document.querySelector('#loader h3').textContent = 'Génération du compte rendu…';
+  document.querySelector('#loader p').textContent = 'Analyse des articles · Synthèse · Posts réseaux';
+  [300,1400,2600,3800].forEach((d,i) => setTimeout(()=>lstep(i+1),d));
+  hideErr();
+
+  const todayStr = new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const articlesText = selected.map((a,i) =>
+    `[${i+1}] SOURCE: ${a.source} | CATÉGORIE: ${a.cat}\nTITRE: ${a.title}\nRÉSUMÉ: ${a.description||'(aucun résumé)'}\nDATE: ${a.pubDate}\nURL: ${a.link}`
+  ).join('\n\n---\n\n');
+
+  const systemPrompt = `Tu es expert senior en IA et Santé Connectée, rédacteur de veille stratégique pour MySentinelSolutions.com.
+Ton style : sérieux, analytique, pédagogique. JAMAIS commercial, JAMAIS de langage promotionnel.
+
+RÈGLE ABSOLUE : Réponds UNIQUEMENT avec du JSON brut. Commence par { et termine par }. Zéro markdown.
+
+FORMAT JSON EXACT :
+{
+  "headline": "Fait marquant du jour en 1 phrase (max 20 mots)",
+  "digest": "Compte rendu complet en texte brut (500-700 mots) structuré en 5 parties :\n1. RÉSUMÉ EXÉCUTIF (3-5 lignes)\n2. ACTUALITÉS PHARES (analyse 2-4 lignes par article avec [SOURCE])\n3. TENDANCES & SIGNAUX FAIBLES (ce que ces news révèlent)\n4. IMPLICATIONS POUR MySentinelSolutions (liens avec santé connectée premium)\n5. PISTES DE CONTENU (2-3 idées d'articles à produire)",
+  "social_linkedin": "Post LinkedIn (200-280 mots) : ton expert, 3 points clés chiffrés, CTA vers mysentinelsolutions.com. Zéro emoji excessif. Zéro langage racoleur. Format professionnel.",
+  "social_facebook": "Post Facebook (100-160 mots) : pédagogique et accessible, 1-2 emojis max, question d'engagement. Lien en commentaire.",
+  "social_twitter": "5 tweets numérotés 1/5 à 5/5, concis et percutants, données chiffrées, ton expert.",
+  "tags": ["tag1","tag2","tag3"]
+}`;
+
+  const userPrompt = `Date : ${todayStr}\n${selected.length} articles analysés :\n\n${articlesText}\n\nGénère le compte rendu. Commence par { directement.`;
+
+  let rawResponse = '';
+  try{
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`,
+      { method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          system_instruction:{parts:[{text:systemPrompt}]},
+          contents:[{role:'user',parts:[{text:userPrompt}]}],
+          generationConfig:{maxOutputTokens:8192,temperature:0.55}
+        })
+      }
+    );
+    const data = await res.json();
+    if(data.error) throw new Error('Erreur API : '+data.error.message);
+    if(!data.candidates?.length) throw new Error('Réponse API vide.');
+    rawResponse = data.candidates.map(c=>c.content?.parts?.map(p=>p.text||'').join('')||'').join('');
+    const parsed = safeParseJSON(rawResponse);
+
+    store.digestText = [
+      `🗓️ VEILLE ${todayStr.toUpperCase()}`,
+      `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+      parsed.digest||'',
+    ].join('\n\n');
+
+    store.digestSocial = [
+      `📎 LINKEDIN :\n${parsed.social_linkedin||''}`,
+      `\n📘 FACEBOOK :\n${parsed.social_facebook||''}`,
+      `\n🐦 TWITTER/X :\n${parsed.social_twitter||''}`
+    ].join('\n\n');
+
+    document.getElementById('c-digest').textContent = [
+      `★ ${parsed.headline||''}`,
+      '',
+      store.digestText,
+      '',
+      '━━━ POSTS RÉSEAUX SOCIAUX ━━━',
+      '',
+      store.digestSocial
+    ].join('\n');
+
+    const todayShort = new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'});
+    document.getElementById('digestBannerLabel').textContent =
+      `Veille du ${todayShort} · ${selected.length} source${selected.length>1?'s':''} analysée${selected.length>1?'s':''}`;
+
+    localStorage.setItem('mss_last_digest_date', new Date().toDateString());
+    checkDigestSchedule();
+
+    histAdd({
+      id: Date.now().toString(36),
+      date: new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}),
+      sujet: `Veille ${todayShort} — ${parsed.headline||''}`,
+      silo: '📡 Veille IA & Santé',
+      format: 'Digest quotidien',
+      seoPreview: parsed.headline||'',
+      conseils:{},
+      store:{html:'',seo:'',fb_text:parsed.social_facebook||'',fb_link:'https://mysentinelsolutions.com',fbHtml:'',insta_caption:''}
+    });
+    updateHistBadge();
+
+    document.getElementById('loader').classList.remove('on');
+    document.getElementById('results').classList.add('on');
+    updateFAB();
+    tab('digest');
+    showToast('✅ Compte rendu généré');
+
+  }catch(err){
+    console.error('Erreur digest:', err);
+    document.getElementById('loader').classList.remove('on');
+    document.getElementById('formCard').style.display = 'block';
+    showErr(err.message, rawResponse);
+    document.querySelectorAll('.ls').forEach(s=>s.classList.remove('on'));
+  }finally{
+    document.querySelector('#loader h3').textContent = 'L\'agent rédige votre contenu…';
+    document.querySelector('#loader p').textContent = 'Génération en cours (30-60 sec)';
+    btnDigest.disabled = false;
+    updateVeilleSelectInfo();
+  }
+}
+
+// ── Notification 21h ──────────────────────────────────────────────
+function checkDigestSchedule(){
+  const h = new Date().getHours();
+  const lastDate = localStorage.getItem('mss_last_digest_date');
+  const todayStr = new Date().toDateString();
+  const notif = document.getElementById('notif21h');
+  if(h >= 21 && lastDate !== todayStr){
+    notif.classList.add('show');
+  } else {
+    notif.classList.remove('show');
+  }
+}
+setInterval(checkDigestSchedule, 5 * 60 * 1000);
 
 init();
 </script>
