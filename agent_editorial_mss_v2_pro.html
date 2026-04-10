@@ -248,6 +248,50 @@
   .apikey-card .btn-save.ok{background:#16a34a}
   .apikey-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--p);font-family:'Outfit',sans-serif;width:100%}
   .apikey-hint{font-size:10.5px;color:var(--m);width:100%;margin-top:-6px}
+  /* ── Veille RSS Module ── */
+  .veille-card{background:var(--bg);border-radius:var(--r16);box-shadow:var(--s2);border:1.5px solid var(--pm);padding:20px;margin-bottom:14px}
+  .veille-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+  .veille-title{font-family:'Outfit',sans-serif;font-size:15px;font-weight:800;color:var(--pd);display:flex;align-items:center;gap:8px}
+  .veille-live{background:var(--p);color:#fff;border-radius:50px;font-size:9px;font-weight:800;padding:2px 9px;font-family:'Outfit',sans-serif;animation:blink 2s infinite}
+  .veille-controls{display:flex;gap:7px;flex-wrap:wrap}
+  .btn-veille{padding:8px 15px;border:none;border-radius:var(--r12);font-family:'Outfit',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;min-height:36px}
+  .btn-veille.pri{background:var(--p);color:#fff}
+  .btn-veille.pri:hover{background:var(--pd)}
+  .btn-veille.sec{background:transparent;color:var(--p);border:1.5px solid var(--pm)}
+  .btn-veille.sec:hover{background:var(--pl)}
+  .btn-veille:disabled{opacity:.5;cursor:not-allowed}
+  .feed-filter{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+  .feed-fbtn{padding:5px 12px;border-radius:50px;border:1.5px solid var(--b);background:var(--bga);font-size:11px;font-weight:600;color:var(--m);cursor:pointer;transition:all .2s;font-family:'Manrope',sans-serif;min-height:32px}
+  .feed-fbtn.active{background:var(--p);border-color:var(--p);color:#fff}
+  .feed-status-txt{text-align:center;padding:18px;font-size:12px;color:var(--m);font-family:'Manrope',sans-serif}
+  .feed-items{display:flex;flex-direction:column;gap:7px;max-height:340px;overflow-y:auto;margin-bottom:12px}
+  .feed-item{background:var(--bga);border:1.5px solid var(--b);border-radius:var(--r12);padding:11px 13px;cursor:pointer;transition:all .2s}
+  .feed-item:hover{border-color:var(--pm);background:var(--pl)}
+  .feed-item.sel{border-color:var(--p);background:var(--pl);border-width:2px}
+  .feed-item-hdr{display:flex;gap:8px;align-items:flex-start;margin-bottom:4px}
+  .feed-item-title{font-family:'Outfit',sans-serif;font-size:12.5px;font-weight:700;color:var(--t);line-height:1.3;flex:1}
+  .feed-item-chk{width:18px;height:18px;border-radius:50%;border:2px solid var(--b);background:var(--bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;transition:all .2s;margin-top:1px}
+  .feed-item.sel .feed-item-chk{background:var(--p);border-color:var(--p);color:#fff}
+  .feed-item-meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  .feed-item-src{font-size:10px;font-weight:700;color:var(--p);font-family:'Outfit',sans-serif;background:var(--pl);padding:1px 7px;border-radius:4px}
+  .feed-item-date{font-size:10px;color:var(--m);font-family:'Manrope',sans-serif}
+  .feed-item-desc{font-size:11.5px;color:var(--m);line-height:1.55;margin-top:5px;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-family:'Manrope',sans-serif}
+  .feed-sel-bar{display:none;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--pl);border-radius:var(--r12);margin-bottom:10px}
+  .feed-sel-bar.on{display:flex}
+  .feed-sel-txt{font-size:12px;font-weight:700;color:var(--pd);font-family:'Outfit',sans-serif}
+  .notif-bar{background:linear-gradient(135deg,var(--p),var(--pd));color:#fff;border-radius:var(--r12);padding:12px 16px;margin-bottom:14px;display:none;align-items:center;gap:10px}
+  .notif-bar.on{display:flex}
+  .notif-bar-text{flex:1;font-size:13px;font-weight:600;font-family:'Manrope',sans-serif}
+  .notif-bar-btn{padding:7px 14px;background:rgba(255,255,255,.2);color:#fff;border:1.5px solid rgba(255,255,255,.4);border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;transition:background .2s;white-space:nowrap}
+  .notif-bar-btn:hover{background:rgba(255,255,255,.35)}
+  .rapport-meta{font-size:11px;color:var(--m);font-family:'Manrope',sans-serif;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--b)}
+  .rapport-sec-title{font-family:'Outfit',sans-serif;font-size:11px;font-weight:800;color:var(--pd);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;padding-bottom:5px;border-bottom:2px solid var(--pm);display:flex;align-items:center;justify-content:space-between}
+  .rapport-art{background:var(--bga);border:1px solid var(--b);border-radius:var(--r12);padding:12px 14px;margin-bottom:8px}
+  .rapport-art-title{font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;color:var(--t);margin-bottom:4px}
+  .rapport-art-body{font-size:12px;color:var(--m);line-height:1.6;font-family:'Manrope',sans-serif}
+  .rapport-art-src{font-size:10px;color:var(--p);font-weight:700;font-family:'Outfit',sans-serif;margin-top:5px}
+  .rapport-social{background:var(--pl);border-radius:var(--r12);padding:14px 16px;margin-bottom:4px}
+  .rapport-social-body{font-size:12.5px;color:var(--t);line-height:1.7;font-family:'Manrope',sans-serif;white-space:pre-wrap;word-break:break-word}
 </style>
 </head>
 <body>
@@ -265,6 +309,36 @@
   <span class="apikey-hint">Gratuit sur aistudio.google.com · stockée localement · jamais envoyée ailleurs qu'à generativelanguage.googleapis.com</span>
   <input type="password" id="apiKeyInput" placeholder="AIza…" autocomplete="off" />
   <button class="btn-save" id="btnSaveKey" onclick="saveKey()">Enregistrer</button>
+</div>
+
+<!-- NOTIFICATION 21H -->
+<div class="notif-bar" id="notifBar">
+  <div class="notif-bar-text">📰 Il est 21h — Votre rapport de veille quotidien est prêt à générer !</div>
+  <button class="notif-bar-btn" onclick="startRapportAuto()">Générer le rapport →</button>
+  <button class="notif-bar-btn" onclick="closeNotif()" style="padding:7px 10px">✕</button>
+</div>
+
+<!-- VEILLE RSS -->
+<div class="veille-card" id="veilleCard">
+  <div class="veille-hdr">
+    <div class="veille-title">📡 Veille IA &amp; Santé Connectée <span class="veille-live">Live</span></div>
+    <div class="veille-controls">
+      <button class="btn-veille sec" onclick="loadVeille()" id="btnRefresh">🔄 Actualiser</button>
+      <button class="btn-veille pri" onclick="startRapportAuto()" id="btnRapport21">📰 Rapport 21h</button>
+    </div>
+  </div>
+  <div class="feed-filter">
+    <button class="feed-fbtn active" onclick="filterFeed('all',this)">Tout</button>
+    <button class="feed-fbtn" onclick="filterFeed('ia',this)">🤖 IA</button>
+    <button class="feed-fbtn" onclick="filterFeed('sante',this)">❤️ Santé</button>
+    <button class="feed-fbtn" onclick="filterFeed('tech',this)">💡 Tech</button>
+  </div>
+  <div id="feedStatus" class="feed-status-txt">Cliquez sur "Actualiser" pour charger les dernières actualités IA &amp; Santé.</div>
+  <div class="feed-items" id="feedItems" style="display:none"></div>
+  <div class="feed-sel-bar" id="feedSelBar">
+    <span class="feed-sel-txt" id="feedSelTxt">0 article sélectionné</span>
+    <button class="btn-veille pri" onclick="generateRapportFromSelection()" style="padding:6px 12px;font-size:11px">📰 Générer le rapport →</button>
+  </div>
 </div>
 
 <!-- FORM -->
@@ -343,6 +417,7 @@
     <button class="tbtn" onclick="tab('seo')">🔑 SEO</button>
     <button class="tbtn" onclick="tab('conseils')">💡 Conseils</button>
     <button class="tbtn" onclick="tab('sources')">📚 Sources</button>
+    <button class="tbtn" onclick="tab('rapport')">📰 Rapport</button>
   </div>
 
   <div class="panel active ocard" id="panel-html">
@@ -381,6 +456,13 @@
   <div class="panel ocard" id="panel-sources">
     <div class="ohead"><span class="otitle">📚 Sources utilisées</span></div>
     <div class="cgrid" id="c-sources"></div>
+  </div>
+
+  <div class="panel ocard" id="panel-rapport">
+    <div class="ohead"><span class="otitle">📰 Rapport de Veille</span><button class="bcopy" onclick="copy('rapport',this)">📋 Copier tout</button></div>
+    <div class="obody" id="c-rapport" style="max-height:none;padding:18px">
+      <div style="text-align:center;color:var(--m);font-size:12px;font-family:'Manrope',sans-serif;padding:20px 0">Sélectionnez des articles dans le module Veille ci-dessus et cliquez sur "Générer le rapport".</div>
+    </div>
   </div>
 
   <button class="btn-reset" onclick="reset()">+ Nouveau contenu</button>
@@ -567,6 +649,7 @@ function safeParseJSON(raw){
 function init(){
   loadKey();
   updateHistBadge();
+  checkDailyNotif();
   updateFAB();
   window.addEventListener('resize', updateFAB);
   renderProds(); renderKW();
@@ -619,7 +702,7 @@ function bindAngleChips(){
 }
 
 function tab(name){
-  const names=['html','images','facebook','instagram','seo','conseils','sources'];
+  const names=['html','images','facebook','instagram','seo','conseils','sources','rapport'];
   document.querySelectorAll('.tbtn').forEach((b,i)=>b.classList.toggle('active',names[i]===name));
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('panel-'+name).classList.add('active');
@@ -648,6 +731,7 @@ function hideErr(){
 function reset(){
   document.getElementById('results').classList.remove('on');
   document.getElementById('formCard').style.display='block';
+  document.getElementById('veilleCard').style.display='block';
   document.getElementById('topicInput').value='';
   document.querySelectorAll('.ls').forEach(s=>s.classList.remove('on'));
   updateFAB();
@@ -1226,6 +1310,300 @@ function setDevice(mode, btn){
 }
 
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') closePreview(); });
+
+// ── VEILLE RSS MODULE ─────────────────────────────────────────────
+const RSS_FEEDS = [
+  { label:'MIT Tech Review',  url:'https://www.technologyreview.com/feed/',                                           tag:'ia',    icon:'🔬' },
+  { label:'The Verge – AI',   url:'https://www.theverge.com/rss/ai-artificial-intelligence/index.xml',               tag:'ia',    icon:'🤖' },
+  { label:'TechCrunch Health',url:'https://techcrunch.com/tag/health/feed/',                                          tag:'sante', icon:'❤️' },
+  { label:'Wired Health',     url:'https://www.wired.com/feed/tag/health/rss',                                        tag:'sante', icon:'💊' },
+  { label:'Science Daily AI', url:'https://www.sciencedaily.com/rss/computers_math/artificial_intelligence.xml',     tag:'ia',    icon:'🧠' },
+  { label:'Healthline News',  url:'https://www.healthline.com/rss/news',                                              tag:'sante', icon:'🏥' },
+  { label:'VentureBeat AI',   url:'https://venturebeat.com/category/ai/feed/',                                        tag:'ia',    icon:'💡' },
+];
+
+let veilleArticles = [];
+let selectedArticles = new Set();
+let currentFeedFilter = 'all';
+
+async function fetchFeedProxy(feedDef) {
+  const proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(feedDef.url);
+  const res = await fetch(proxyUrl);
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  const data = await res.json();
+  if (!data.contents) throw new Error('Empty response');
+  const parser = new DOMParser();
+  const xml = parser.parseFromString(data.contents, 'text/xml');
+  const items = xml.querySelectorAll('item, entry');
+  return Array.from(items).slice(0, 6).map(item => {
+    const title = item.querySelector('title')?.textContent?.trim() || '';
+    const rawDesc = item.querySelector('description, summary, content')?.textContent || '';
+    const desc = rawDesc.replace(/<[^>]+>/g,'').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&nbsp;/g,' ').trim().substring(0,280);
+    const linkEl = item.querySelector('link');
+    const link = linkEl?.textContent?.trim() || linkEl?.getAttribute('href') || '';
+    const pubRaw = item.querySelector('pubDate, published, updated')?.textContent?.trim() || '';
+    const d = pubRaw ? new Date(pubRaw) : null;
+    const dateStr = d && !isNaN(d) ? d.toLocaleDateString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
+    return { title, desc, link, dateStr, tag: feedDef.tag, source: feedDef.label, icon: feedDef.icon, id: Math.random().toString(36).slice(2) };
+  }).filter(a => a.title);
+}
+
+async function loadVeille() {
+  const btnR = document.getElementById('btnRefresh');
+  const status = document.getElementById('feedStatus');
+  const itemsEl = document.getElementById('feedItems');
+  btnR.disabled = true;
+  btnR.textContent = '⏳ Chargement…';
+  status.style.display = 'block';
+  status.textContent = 'Récupération des flux RSS en cours…';
+  itemsEl.style.display = 'none';
+  veilleArticles = [];
+  selectedArticles.clear();
+  updateSelBar();
+
+  const results = await Promise.allSettled(RSS_FEEDS.map(f => fetchFeedProxy(f)));
+  results.forEach((r, i) => {
+    if (r.status === 'fulfilled') veilleArticles.push(...r.value);
+    else console.warn('Feed', RSS_FEEDS[i].label, 'failed:', r.reason?.message);
+  });
+
+  btnR.disabled = false;
+  btnR.textContent = '🔄 Actualiser';
+
+  if (!veilleArticles.length) {
+    status.textContent = 'Aucun article chargé. Vérifiez votre connexion et réessayez.';
+    return;
+  }
+  status.style.display = 'none';
+  itemsEl.style.display = 'flex';
+  renderFeedItems();
+  localStorage.setItem('mss_veille_last', new Date().toISOString());
+  showToast('✅ ' + veilleArticles.length + ' articles chargés');
+}
+
+function renderFeedItems() {
+  const itemsEl = document.getElementById('feedItems');
+  const filtered = currentFeedFilter === 'all' ? veilleArticles : veilleArticles.filter(a => a.tag === currentFeedFilter);
+  if (!filtered.length) {
+    itemsEl.innerHTML = '<div class="feed-status-txt">Aucun article dans cette catégorie.</div>';
+    return;
+  }
+  itemsEl.innerHTML = filtered.map(a => `
+    <div class="feed-item${selectedArticles.has(a.id) ? ' sel' : ''}" onclick="toggleArticle('${a.id}')">
+      <div class="feed-item-hdr">
+        <div class="feed-item-chk">${selectedArticles.has(a.id) ? '✓' : ''}</div>
+        <div class="feed-item-title">${escHtml(a.title)}</div>
+      </div>
+      <div class="feed-item-meta">
+        <span class="feed-item-src">${a.icon} ${escHtml(a.source)}</span>
+        ${a.dateStr ? `<span class="feed-item-date">${a.dateStr}</span>` : ''}
+      </div>
+      ${a.desc ? `<div class="feed-item-desc">${escHtml(a.desc)}</div>` : ''}
+    </div>`).join('');
+}
+
+function toggleArticle(id) {
+  if (selectedArticles.has(id)) selectedArticles.delete(id);
+  else selectedArticles.add(id);
+  renderFeedItems();
+  updateSelBar();
+}
+
+function updateSelBar() {
+  const bar = document.getElementById('feedSelBar');
+  const txt = document.getElementById('feedSelTxt');
+  const n = selectedArticles.size;
+  bar.classList.toggle('on', n > 0);
+  txt.textContent = n + ' article' + (n > 1 ? 's' : '') + ' sélectionné' + (n > 1 ? 's' : '');
+}
+
+function filterFeed(tag, btn) {
+  currentFeedFilter = tag;
+  document.querySelectorAll('.feed-fbtn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderFeedItems();
+}
+
+async function generateRapportFromSelection() {
+  const selected = veilleArticles.filter(a => selectedArticles.has(a.id));
+  if (!selected.length) { showToast('Sélectionnez au moins 1 article'); return; }
+  await generateRapport(selected);
+}
+
+async function startRapportAuto() {
+  closeNotif();
+  if (!veilleArticles.length) {
+    showToast('Chargement de la veille…');
+    await loadVeille();
+    if (!veilleArticles.length) return;
+  }
+  selectedArticles.clear();
+  veilleArticles.slice(0, 5).forEach(a => selectedArticles.add(a.id));
+  renderFeedItems();
+  updateSelBar();
+  await generateRapport(veilleArticles.slice(0, 5));
+}
+
+async function generateRapport(articles) {
+  const apiKey = getKey();
+  if (!apiKey) { showErr('Clé API manquante. Saisissez votre clé Google AI Studio.', ''); return; }
+
+  hideErr();
+  document.getElementById('formCard').style.display = 'none';
+  document.getElementById('veilleCard').style.display = 'none';
+  document.getElementById('loader').classList.add('on');
+  document.getElementById('results').classList.remove('on');
+  document.querySelector('.loader h3').textContent = 'Analyse de la veille en cours…';
+  document.querySelector('.loader p').textContent = 'Génération du rapport professionnel (20-40 sec)';
+  [400,1200,2400,3600].forEach((d,i) => setTimeout(() => lstep(i+1), d));
+
+  const today = new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const articlesText = articles.map((a,i) =>
+    `${i+1}. [${a.source}] ${a.title}\n${a.desc||'(pas de résumé disponible)'}`
+  ).join('\n\n');
+
+  const systemPrompt = `Tu es l'analyste senior de MySentinelSolutions.com, expert reconnu en IA & Santé Connectée.
+TON : professionnel, sérieux, factuel. Pas de marketing. Synthèses claires avec implications concrètes pour le secteur.
+RÈGLE ABSOLUE : Réponds UNIQUEMENT avec du JSON brut. Commence par { et termine par }.`;
+
+  const userPrompt = `Date du jour : ${today}
+
+ARTICLES EN VEILLE :
+${articlesText}
+
+Génère un rapport de veille quotidien professionnel. FORMAT JSON EXACT :
+{
+  "titre_rapport": "Titre factuel du rapport du jour (ex: Veille IA & Santé — 3 tendances clés du ${today})",
+  "synthese": "Synthèse exécutive en 4-6 paragraphes. Langage expert, factuel. Liens entre les actualités. Implications pour le secteur santé connectée & IA médicale. 5-10 minutes de lecture.",
+  "points_cles": ["Point clé 1 (fact + implication)", "Point clé 2", "Point clé 3"],
+  "linkedin": "Post LinkedIn professionnel (200-280 mots). Commence par un chiffre ou fait marquant. Expert, pas promotionnel. 3-4 hashtags pro à la fin.",
+  "facebook": "Post Facebook sérieux et accessible (150-220 mots). Ton expert vulgarisé. Question de fond pour engager le débat. Pas de clickbait.",
+  "newsletter": "Extrait newsletter (80-120 mots). Direct, factuel, sans fioritures. Pour audience professionnelle santé & tech."
+}`;
+
+  let rawResponse = '';
+  try {
+    const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + encodeURIComponent(apiKey), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        system_instruction: { parts: [{ text: systemPrompt }] },
+        contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
+        generationConfig: { maxOutputTokens: 16384, temperature: 0.45 }
+      })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error('API : ' + data.error.message);
+    if (!data.candidates?.length) throw new Error('Réponse API vide.');
+    rawResponse = data.candidates.map(c => c.content?.parts?.map(p => p.text||'').join('')||'').join('');
+    const parsed = safeParseJSON(rawResponse);
+
+    store.rapport = 'RAPPORT VEILLE — ' + today + '\n' + (parsed.titre_rapport||'') +
+      '\n\nSYNTHÈSE\n' + (parsed.synthese||'') +
+      '\n\nPOINTS CLÉS\n' + (parsed.points_cles||[]).map((p,i) => (i+1)+'. '+p).join('\n') +
+      '\n\nLINKEDIN\n' + (parsed.linkedin||'') +
+      '\n\nFACEBOOK\n' + (parsed.facebook||'') +
+      '\n\nNEWSLETTER\n' + (parsed.newsletter||'');
+    store.rapport_linkedin = parsed.linkedin || '';
+    store.rapport_facebook = parsed.facebook || '';
+    store.rapport_newsletter = parsed.newsletter || '';
+
+    const rapportHtml = `<div class="rapport-meta">📅 ${escHtml(today)} &nbsp;·&nbsp; ${articles.length} source${articles.length>1?'s':''} analysée${articles.length>1?'s':''}</div>
+<div style="margin-bottom:18px">
+  <div class="rapport-sec-title">📊 Synthèse exécutive</div>
+  <div style="font-size:13px;line-height:1.8;color:var(--t);font-family:'Manrope',sans-serif;white-space:pre-wrap">${escHtml(parsed.synthese||'')}</div>
+</div>
+${(parsed.points_cles||[]).length ? `<div style="margin-bottom:18px">
+  <div class="rapport-sec-title">⚡ Points clés</div>
+  ${parsed.points_cles.map(p=>`<div class="citem"><div class="ctxt">${escHtml(p)}</div></div>`).join('')}
+</div>` : ''}
+<div style="margin-bottom:18px">
+  <div class="rapport-sec-title">💼 LinkedIn <button class="bcopy" onclick="copy('rapport_linkedin',this)">📋 Copier</button></div>
+  <div class="rapport-social"><div class="rapport-social-body">${escHtml(parsed.linkedin||'')}</div></div>
+</div>
+<div style="margin-bottom:18px">
+  <div class="rapport-sec-title">📘 Facebook Pro <button class="bcopy" onclick="copy('rapport_facebook',this)">📋 Copier</button></div>
+  <div class="rapport-social"><div class="rapport-social-body">${escHtml(parsed.facebook||'')}</div></div>
+</div>
+<div style="margin-bottom:18px">
+  <div class="rapport-sec-title">✉️ Newsletter <button class="bcopy" onclick="copy('rapport_newsletter',this)">📋 Copier</button></div>
+  <div class="rapport-social"><div class="rapport-social-body">${escHtml(parsed.newsletter||'')}</div></div>
+</div>
+<div style="margin-bottom:6px">
+  <div class="rapport-sec-title">📰 Sources analysées</div>
+  ${articles.map(a=>`<div class="rapport-art"><div class="rapport-art-title">${escHtml(a.title)}</div><div class="rapport-art-body">${escHtml(a.desc||'')}</div><div class="rapport-art-src">${a.icon} ${escHtml(a.source)}</div></div>`).join('')}
+</div>`;
+
+    document.getElementById('c-rapport').innerHTML = rapportHtml;
+    localStorage.setItem('mss_rapport_date', new Date().toDateString());
+
+    // Restore labels
+    document.querySelector('.loader h3').textContent = 'L\'agent rédige votre contenu…';
+    document.querySelector('.loader p').textContent = 'Génération en cours (30-60 sec)';
+    document.getElementById('loader').classList.remove('on');
+    document.getElementById('veilleCard').style.display = 'block';
+    document.getElementById('results').classList.add('on');
+    updateFAB();
+    tab('rapport');
+
+    histAdd({
+      id: Date.now().toString(36),
+      date: new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}),
+      sujet: parsed.titre_rapport || 'Rapport Veille',
+      silo: '📡 Veille IA & Santé',
+      format: 'Rapport quotidien',
+      seoPreview: (parsed.points_cles||[]).slice(0,2).join(' · '),
+      conseils: {},
+      store: { html:'', seo:'', fb_text: store.rapport_facebook||'', fb_link:'', fbHtml:'', insta_caption:'' }
+    });
+    updateHistBadge();
+    showToast('✅ Rapport de veille généré !', 3000);
+
+  } catch(err) {
+    console.error('Rapport error:', err);
+    document.querySelector('.loader h3').textContent = 'L\'agent rédige votre contenu…';
+    document.querySelector('.loader p').textContent = 'Génération en cours (30-60 sec)';
+    document.getElementById('loader').classList.remove('on');
+    document.getElementById('formCard').style.display = 'block';
+    document.getElementById('veilleCard').style.display = 'block';
+    showErr(err.message, rawResponse);
+    document.querySelectorAll('.ls').forEach(s => s.classList.remove('on'));
+  }
+}
+
+// ── Notification 21h ──────────────────────────────────────────────
+function checkDailyNotif() {
+  const lastDate = localStorage.getItem('mss_rapport_date');
+  if (lastDate === new Date().toDateString()) return; // rapport déjà fait aujourd'hui
+  const now = new Date();
+  const target = new Date();
+  target.setHours(21, 0, 0, 0);
+  if (now >= target) {
+    showNotifBar();
+  } else {
+    const delay = target.getTime() - now.getTime();
+    setTimeout(() => {
+      showNotifBar();
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification('MySentinelSolutions — Rapport 21h', {
+          body: 'Votre rapport de veille IA & Santé Connectée est prêt à générer.',
+        });
+      }
+    }, delay);
+  }
+  // Demande permission notif navigateur silencieusement au chargement
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+}
+
+function showNotifBar() {
+  document.getElementById('notifBar').classList.add('on');
+}
+
+function closeNotif() {
+  document.getElementById('notifBar').classList.remove('on');
+}
 
 init();
 </script>
