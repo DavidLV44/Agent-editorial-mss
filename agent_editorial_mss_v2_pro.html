@@ -321,9 +321,12 @@
 <!-- VEILLE RSS -->
 <div class="veille-card" id="veilleCard">
   <div class="veille-hdr">
-    <div class="veille-title">📡 Veille IA &amp; Santé Connectée <span class="veille-live">Live</span></div>
+    <div>
+      <div class="veille-title">📡 Veille IA &amp; Santé Connectée <span class="veille-live">Live</span></div>
+      <div id="veilleTimestamp" style="font-size:10px;color:var(--m);font-family:'Manrope',sans-serif;margin-top:3px"></div>
+    </div>
     <div class="veille-controls">
-      <button class="btn-veille sec" onclick="loadVeille()" id="btnRefresh">🔄 Actualiser</button>
+      <button class="btn-veille sec" onclick="loadVeille(true)" id="btnRefresh">🔄 Actualiser</button>
       <button class="btn-veille pri" onclick="startRapportAuto()" id="btnRapport21">📰 Rapport 21h</button>
     </div>
   </div>
@@ -663,6 +666,12 @@ function init(){
     });
   });
   document.getElementById('topicInput').addEventListener('keydown',e=>{ if(e.key==='Enter') generate(); });
+
+  // Auto-chargement du cache veille au démarrage
+  loadVeille(false);
+
+  // Auto-refresh veille toutes les 3 heures
+  setInterval(() => loadVeille(true), VEILLE_CACHE_TTL);
 }
 
 function renderProds(){
@@ -763,8 +772,16 @@ async function generate(){
   document.getElementById('results').classList.remove('on');
   [400,1500,2800,4000,5400].forEach((d,i)=>setTimeout(()=>lstep(i+1),d));
 
-  // Prompt simplifié pour réduire la taille de réponse et éviter les troncatures
-  const systemPrompt=`Tu es l'agent éditorial de MySentinelSolutions.com, site premium santé tech français. Ton ton est accessible, enthousiaste, transparent.
+  // Prompt de génération de contenu éditorial MSS
+  const systemPrompt=`Tu es le rédacteur senior de MySentinelSolutions.com, média de référence en santé tech et innovation médicale français.
+
+CHARTE ÉDITORIALE MSS :
+- Ton : sérieux, expert, factuel — jamais promotionnel ni sensationnaliste
+- Crédibilité : cite toujours des études ou sources nommées, donne des chiffres précis
+- Facebook & Instagram : accessible mais jamais racoleur — ton de vulgarisation scientifique (style Sciences & Avenir)
+- Aucun clickbait, aucune formule vide ("révolutionnaire", "incroyable", "tu ne croiras pas")
+- Accroche : fait concret ou chiffre, jamais une question rhétorique creuse
+- CTA : sobres et honnêtes ("Lire l'analyse complète →", "Notre guide expert →")
 
 RÈGLE ABSOLUE : Réponds UNIQUEMENT avec du JSON brut. Zéro texte avant ou après. Zéro balise markdown. La réponse doit commencer par { et se terminer par }.
 
@@ -772,34 +789,34 @@ Classes CSS disponibles (Divi) : section.hero .hero-content .pill h1 p .hero-act
 Polices : Outfit (titres), Manrope (corps). Placeholders : [IMG:hero] [IMG:product1] [IMG:product2].
 Affiliation : Amazon href="#amazon-NOM", AWIN href="#awin-NOM". Ajouter note affiliée dans .mss-insight.
 
-INSTRUCTIONS IMAGES (les prompts seront envoyés à Google Imagen 3) :
+INSTRUCTIONS IMAGES (prompts envoyés à Google Imagen 3) :
 - Rédige les prompts imagePrompt en anglais uniquement.
 - Style : photorealistic, premium lifestyle photography, cinematic lighting, shallow depth of field.
 - Évite : texte, logos, watermarks, visages flous, arrière-plans chargés.
 - Article hero (16:9) : cadrage large, ambiance premium, produit en contexte lifestyle.
 - Product images (16:9) : produit sur fond neutre épuré, studio shot, détail net.
-- Instagram slides (1:1) : composition centrée, couleurs vives mais harmonieuses, sujet unique.
+- Instagram slides (1:1) : composition centrée, couleurs sobres et harmonieuses, sujet unique.
 
 FORMAT JSON EXACT :
 {
   "html": "<section class=\\"hero\\">...</section><section class=\\"section\\">...</section>",
   "facebook": {
-    "texte": "Post Facebook complet (200-400 mots). Commence par un emoji accrocheur. Paragraphes courts. Storytelling personnel. Termine par une question ouverte pour engager.",
+    "texte": "Post Facebook expert-vulgarisé (200-320 mots). Accroche : chiffre ou constat factuel (pas de question rhétorique). Corps : 3 paragraphes clairs, ton sérieux et accessible. Chiffre clé en évidence. Conclusion : question de fond ou invitation à lire (sobre). Aucun emoji excessif — 1-2 max si pertinents.",
     "lien": "https://mysentinelsolutions.com/slug-de-larticle",
-    "titre_lien": "Titre accrocheur de l'article pour la preview Facebook",
-    "cta": "Texte du bouton CTA (ex: Lire le guide complet →)"
+    "titre_lien": "Titre factuel et professionnel de l'article (pas de clickbait)",
+    "cta": "CTA sobre (ex: Lire l'analyse complète → / Accéder au guide expert →)"
   },
   "instagram": {
     "slides": [
-      {"titre": "Titre slide 1 (court, percutant)", "texte": "2 à 4 lignes max. Accroche forte.", "imagePrompt": "prompt anglais pour image IA carrée 1:1"},
-      {"titre": "Titre slide 2", "texte": "2 à 4 lignes. Chiffre ou fait marquant.", "imagePrompt": "prompt image IA 1:1"},
-      {"titre": "Titre slide 3", "texte": "2 à 4 lignes. Avantage clé.", "imagePrompt": "prompt image IA 1:1"},
-      {"titre": "Titre slide 4", "texte": "2 à 4 lignes. Preuve ou étude.", "imagePrompt": "prompt image IA 1:1"},
-      {"titre": "Titre slide 5 — CTA", "texte": "Appel à l'action clair. Lien en bio.", "imagePrompt": "prompt image IA 1:1 avec ambiance premium"}
+      {"titre": "Titre slide 1 — constat factuel court", "texte": "2-3 lignes. Chiffre ou fait clé. Ton expert.", "imagePrompt": "prompt anglais pour image IA carrée 1:1"},
+      {"titre": "Titre slide 2", "texte": "2-3 lignes. Explication scientifique concise.", "imagePrompt": "prompt image IA 1:1"},
+      {"titre": "Titre slide 3", "texte": "2-3 lignes. Étude ou preuve référencée.", "imagePrompt": "prompt image IA 1:1"},
+      {"titre": "Titre slide 4", "texte": "2-3 lignes. Nuance ou limite honnête.", "imagePrompt": "prompt image IA 1:1"},
+      {"titre": "Titre slide 5 — Pour aller plus loin", "texte": "Guide complet sur le site. Lien en bio.", "imagePrompt": "prompt image IA 1:1 ambiance premium sobre"}
     ],
-    "legende": "Légende complète Instagram (émojis, 3-5 phrases, hashtags à la fin)"
+    "legende": "Légende Instagram sérieuse (3-4 phrases factuelles, 8-12 hashtags sectoriels pertinents)"
   },
-  "seo": "Titre SEO | meta description | mot-clé principal",
+  "seo": "Titre SEO (60 car max) | meta description (155 car max) | mot-clé principal",
   "conseils": {"seo":"conseil","conversion":"conseil","ux":"conseil","prochaine_idee":"idée"},
   "images": [{"id":"hero","prompt":"photorealistic luxury health technology 16:9"},{"id":"product1","prompt":"premium wellness device white background"},{"id":"product2","prompt":"person using health tech device"}]
 }`;
@@ -1313,14 +1330,24 @@ document.addEventListener('keydown', e=>{ if(e.key==='Escape') closePreview(); }
 
 // ── VEILLE RSS MODULE ─────────────────────────────────────────────
 const RSS_FEEDS = [
-  { label:'MIT Tech Review',  url:'https://www.technologyreview.com/feed/',                                           tag:'ia',    icon:'🔬' },
-  { label:'The Verge – AI',   url:'https://www.theverge.com/rss/ai-artificial-intelligence/index.xml',               tag:'ia',    icon:'🤖' },
-  { label:'TechCrunch Health',url:'https://techcrunch.com/tag/health/feed/',                                          tag:'sante', icon:'❤️' },
-  { label:'Wired Health',     url:'https://www.wired.com/feed/tag/health/rss',                                        tag:'sante', icon:'💊' },
-  { label:'Science Daily AI', url:'https://www.sciencedaily.com/rss/computers_math/artificial_intelligence.xml',     tag:'ia',    icon:'🧠' },
-  { label:'Healthline News',  url:'https://www.healthline.com/rss/news',                                              tag:'sante', icon:'🏥' },
-  { label:'VentureBeat AI',   url:'https://venturebeat.com/category/ai/feed/',                                        tag:'ia',    icon:'💡' },
+  // IA & Machine Learning
+  { label:'MIT Tech Review',    url:'https://www.technologyreview.com/feed/',                                          tag:'ia',    icon:'🔬' },
+  { label:'The Verge – AI',     url:'https://www.theverge.com/rss/ai-artificial-intelligence/index.xml',              tag:'ia',    icon:'🤖' },
+  { label:'VentureBeat AI',     url:'https://venturebeat.com/category/ai/feed/',                                       tag:'ia',    icon:'💡' },
+  { label:'Science Daily AI',   url:'https://www.sciencedaily.com/rss/computers_math/artificial_intelligence.xml',    tag:'ia',    icon:'🧠' },
+  { label:'STAT News – AI',     url:'https://www.statnews.com/feed/',                                                  tag:'ia',    icon:'📡' },
+  // Santé & Médecine numérique
+  { label:'TechCrunch Health',  url:'https://techcrunch.com/tag/health/feed/',                                         tag:'sante', icon:'❤️' },
+  { label:'Wired Health',       url:'https://www.wired.com/feed/tag/health/rss',                                       tag:'sante', icon:'💊' },
+  { label:'Healthline News',    url:'https://www.healthline.com/rss/news',                                             tag:'sante', icon:'🏥' },
+  { label:'MobiHealthNews',     url:'https://www.mobihealthnews.com/rss.xml',                                          tag:'sante', icon:'📲' },
+  // Health Tech / Innovation
+  { label:'MedCity News',       url:'https://medcitynews.com/feed/',                                                   tag:'tech',  icon:'🏗️' },
+  { label:'Fierce Healthcare',  url:'https://www.fiercehealthcare.com/rss/xml',                                        tag:'tech',  icon:'⚡' },
+  { label:'Digital Health Buzz',url:'https://www.digitalhealthbuzz.com/feed/',                                         tag:'tech',  icon:'📱' },
 ];
+
+const VEILLE_CACHE_TTL = 3 * 60 * 60 * 1000; // 3 heures en ms
 
 let veilleArticles = [];
 let selectedArticles = new Set();
@@ -1328,30 +1355,76 @@ let currentFeedFilter = 'all';
 
 async function fetchFeedProxy(feedDef) {
   const proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(feedDef.url);
-  const res = await fetch(proxyUrl);
+  const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(12000) });
   if (!res.ok) throw new Error('HTTP ' + res.status);
   const data = await res.json();
   if (!data.contents) throw new Error('Empty response');
   const parser = new DOMParser();
   const xml = parser.parseFromString(data.contents, 'text/xml');
   const items = xml.querySelectorAll('item, entry');
-  return Array.from(items).slice(0, 6).map(item => {
+  return Array.from(items).slice(0, 8).map(item => {
     const title = item.querySelector('title')?.textContent?.trim() || '';
     const rawDesc = item.querySelector('description, summary, content')?.textContent || '';
-    const desc = rawDesc.replace(/<[^>]+>/g,'').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&nbsp;/g,' ').trim().substring(0,280);
+    const desc = rawDesc.replace(/<[^>]+>/g,'').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&nbsp;/g,' ').trim().substring(0,300);
     const linkEl = item.querySelector('link');
     const link = linkEl?.textContent?.trim() || linkEl?.getAttribute('href') || '';
     const pubRaw = item.querySelector('pubDate, published, updated')?.textContent?.trim() || '';
     const d = pubRaw ? new Date(pubRaw) : null;
-    const dateStr = d && !isNaN(d) ? d.toLocaleDateString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
-    return { title, desc, link, dateStr, tag: feedDef.tag, source: feedDef.label, icon: feedDef.icon, id: Math.random().toString(36).slice(2) };
+    const ts = d && !isNaN(d) ? d.getTime() : 0;
+    const dateStr = ts ? new Date(ts).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
+    return { title, desc, link, dateStr, ts, tag: feedDef.tag, source: feedDef.label, icon: feedDef.icon, id: Math.random().toString(36).slice(2) };
   }).filter(a => a.title);
 }
 
-async function loadVeille() {
+// ── Cache veille ──────────────────────────────────────────────────
+function saveVeilleCache(articles) {
+  try {
+    localStorage.setItem('mss_veille_cache', JSON.stringify({ ts: Date.now(), articles }));
+    localStorage.setItem('mss_veille_last', new Date().toISOString());
+  } catch(e) { console.warn('Cache save failed', e); }
+}
+
+function loadVeilleCache() {
+  try {
+    const raw = localStorage.getItem('mss_veille_cache');
+    if (!raw) return null;
+    const { ts, articles } = JSON.parse(raw);
+    if (!articles?.length) return null;
+    if (Date.now() - ts > VEILLE_CACHE_TTL) return null; // expiré
+    return { articles, ts };
+  } catch(e) { return null; }
+}
+
+function updateVeilleTimestamp(ts) {
+  const el = document.getElementById('veilleTimestamp');
+  if (!el) return;
+  const d = new Date(ts);
+  const diffMin = Math.round((Date.now() - ts) / 60000);
+  const ago = diffMin < 1 ? 'à l\'instant' : diffMin < 60 ? `il y a ${diffMin} min` : `il y a ${Math.round(diffMin/60)}h`;
+  el.textContent = `Mis à jour ${ago} · ${d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}`;
+}
+
+async function loadVeille(forceRefresh = true) {
   const btnR = document.getElementById('btnRefresh');
   const status = document.getElementById('feedStatus');
   const itemsEl = document.getElementById('feedItems');
+
+  // Si pas un refresh forcé, essayer le cache
+  if (!forceRefresh) {
+    const cached = loadVeilleCache();
+    if (cached) {
+      veilleArticles = cached.articles;
+      selectedArticles.clear();
+      updateSelBar();
+      status.style.display = 'none';
+      itemsEl.style.display = 'flex';
+      renderFeedItems();
+      updateVeilleTimestamp(cached.ts);
+      showToast('📦 ' + veilleArticles.length + ' articles restaurés (cache)');
+      return;
+    }
+  }
+
   btnR.disabled = true;
   btnR.textContent = '⏳ Chargement…';
   status.style.display = 'block';
@@ -1361,11 +1434,15 @@ async function loadVeille() {
   selectedArticles.clear();
   updateSelBar();
 
+  let loaded = 0;
   const results = await Promise.allSettled(RSS_FEEDS.map(f => fetchFeedProxy(f)));
   results.forEach((r, i) => {
-    if (r.status === 'fulfilled') veilleArticles.push(...r.value);
+    if (r.status === 'fulfilled') { veilleArticles.push(...r.value); loaded++; }
     else console.warn('Feed', RSS_FEEDS[i].label, 'failed:', r.reason?.message);
   });
+
+  // Tri par date décroissante (articles les plus récents en premier)
+  veilleArticles.sort((a, b) => (b.ts || 0) - (a.ts || 0));
 
   btnR.disabled = false;
   btnR.textContent = '🔄 Actualiser';
@@ -1377,8 +1454,9 @@ async function loadVeille() {
   status.style.display = 'none';
   itemsEl.style.display = 'flex';
   renderFeedItems();
-  localStorage.setItem('mss_veille_last', new Date().toISOString());
-  showToast('✅ ' + veilleArticles.length + ' articles chargés');
+  saveVeilleCache(veilleArticles);
+  updateVeilleTimestamp(Date.now());
+  showToast(`✅ ${veilleArticles.length} articles chargés (${loaded}/${RSS_FEEDS.length} sources)`);
 }
 
 function renderFeedItems() {
@@ -1462,23 +1540,27 @@ async function generateRapport(articles) {
     `${i+1}. [${a.source}] ${a.title}\n${a.desc||'(pas de résumé disponible)'}`
   ).join('\n\n');
 
-  const systemPrompt = `Tu es l'analyste senior de MySentinelSolutions.com, expert reconnu en IA & Santé Connectée.
-TON : professionnel, sérieux, factuel. Pas de marketing. Synthèses claires avec implications concrètes pour le secteur.
+  const systemPrompt = `Tu es l'analyste senior de MySentinelSolutions.com, expert reconnu en IA médicale et Santé Connectée.
+POSTURE : analyste institutionnel — ton neutre, rigoureux, sans promotion ni sensationnalisme. Tu cites les faits, tu mesures les implications, tu identifies les signaux faibles.
+STYLE : phrases directes, vocabulaire sectoriel précis, structure journalistique (pyramide inversée). Zéro jargon marketing.
 RÈGLE ABSOLUE : Réponds UNIQUEMENT avec du JSON brut. Commence par { et termine par }.`;
 
   const userPrompt = `Date du jour : ${today}
+Sources analysées : ${articles.length} article${articles.length > 1 ? 's' : ''} (${[...new Set(articles.map(a => a.tag))].join(', ')})
 
 ARTICLES EN VEILLE :
 ${articlesText}
 
-Génère un rapport de veille quotidien professionnel. FORMAT JSON EXACT :
+Génère un rapport de veille quotidien professionnel structuré. FORMAT JSON EXACT :
 {
-  "titre_rapport": "Titre factuel du rapport du jour (ex: Veille IA & Santé — 3 tendances clés du ${today})",
-  "synthese": "Synthèse exécutive en 4-6 paragraphes. Langage expert, factuel. Liens entre les actualités. Implications pour le secteur santé connectée & IA médicale. 5-10 minutes de lecture.",
-  "points_cles": ["Point clé 1 (fact + implication)", "Point clé 2", "Point clé 3"],
-  "linkedin": "Post LinkedIn professionnel (200-280 mots). Commence par un chiffre ou fait marquant. Expert, pas promotionnel. 3-4 hashtags pro à la fin.",
-  "facebook": "Post Facebook sérieux et accessible (150-220 mots). Ton expert vulgarisé. Question de fond pour engager le débat. Pas de clickbait.",
-  "newsletter": "Extrait newsletter (80-120 mots). Direct, factuel, sans fioritures. Pour audience professionnelle santé & tech."
+  "titre_rapport": "Veille IA & Santé Connectée — [2-4 mots résumant la tendance dominante] · ${today}",
+  "highlights": ["🔬 Signal fort : [fait précis en 12 mots max]", "⚡ À surveiller : [fait précis]", "💡 Implication clé : [fait précis]"],
+  "synthese": "Analyse en 5-7 paragraphes structurés. Paragraphe 1 : contexte et tendance dominante. Paragraphes 2-5 : analyse thématique croisée des articles (IA diagnostique, wearables, réglementation, marchés). Paragraphe 6 : signaux faibles et perspectives 6-12 mois. Paragraphe 7 : implications opérationnelles pour les acteurs du secteur. Ton analytique, factuel, citations précises des sources. Environ 5-8 min de lecture.",
+  "points_cles": ["Fait marquant 1 avec chiffre ou référence source", "Fait marquant 2 — implication sectorielle", "Fait marquant 3 — signal ou rupture identifiée"],
+  "linkedin": "Post LinkedIn expert (220-300 mots). Accroche : chiffre ou constat contre-intuitif. Corps : 3 paragraphes analytiques sans formules creuses. Conclusion : perspective ou question stratégique ouverte. 3-4 hashtags sectoriels (#SantéNumérique #HealthTech #IA #MedTech). Zéro emoji sauf si pertinent. Ton directeur médical ou analyste senior.",
+  "facebook": "Post Facebook expert-vulgarisé (160-230 mots). Accroche factuelle (pas de clickbait). Explication claire pour audience cultivée non-spécialiste. Chiffre clé mis en valeur. Question de fond pour débat sérieux. 2-3 hashtags grand public.",
+  "twitter": "Thread X/Twitter (4 tweets). Tweet 1 (accroche + chiffre, 240 car max). Tweet 2 (fait clé 1, 240 car). Tweet 3 (fait clé 2, 240 car). Tweet 4 (implication + CTA sobre, 240 car). Format : chaque tweet sur une ligne séparée par \\n---\\n",
+  "newsletter": "Extrait newsletter B2B (100-140 mots). Titre court. Corps : 3 points synthétiques en gras + explication 1 ligne. Signature sobre. Audience : DSI santé, directeurs innovation, investisseurs MedTech."
 }`;
 
   let rawResponse = '';
@@ -1498,40 +1580,59 @@ Génère un rapport de veille quotidien professionnel. FORMAT JSON EXACT :
     rawResponse = data.candidates.map(c => c.content?.parts?.map(p => p.text||'').join('')||'').join('');
     const parsed = safeParseJSON(rawResponse);
 
-    store.rapport = 'RAPPORT VEILLE — ' + today + '\n' + (parsed.titre_rapport||'') +
-      '\n\nSYNTHÈSE\n' + (parsed.synthese||'') +
-      '\n\nPOINTS CLÉS\n' + (parsed.points_cles||[]).map((p,i) => (i+1)+'. '+p).join('\n') +
-      '\n\nLINKEDIN\n' + (parsed.linkedin||'') +
-      '\n\nFACEBOOK\n' + (parsed.facebook||'') +
-      '\n\nNEWSLETTER\n' + (parsed.newsletter||'');
     store.rapport_linkedin = parsed.linkedin || '';
     store.rapport_facebook = parsed.facebook || '';
+    store.rapport_twitter  = parsed.twitter  || '';
     store.rapport_newsletter = parsed.newsletter || '';
+    store.rapport = 'RAPPORT VEILLE — ' + today + '\n' + (parsed.titre_rapport||'') +
+      '\n\nHIGHLIGHTS\n' + (parsed.highlights||[]).join('\n') +
+      '\n\nSYNTHÈSE\n' + (parsed.synthese||'') +
+      '\n\nPOINTS CLÉS\n' + (parsed.points_cles||[]).map((p,i) => (i+1)+'. '+p).join('\n') +
+      '\n\nLINKEDIN\n' + store.rapport_linkedin +
+      '\n\nFACEBOOK\n' + store.rapport_facebook +
+      '\n\nX / TWITTER\n' + store.rapport_twitter +
+      '\n\nNEWSLETTER\n' + store.rapport_newsletter;
 
-    const rapportHtml = `<div class="rapport-meta">📅 ${escHtml(today)} &nbsp;·&nbsp; ${articles.length} source${articles.length>1?'s':''} analysée${articles.length>1?'s':''}</div>
+    // Estimation du temps de lecture
+    const wordCount = (parsed.synthese||'').split(/\s+/).length;
+    const readMin = Math.max(5, Math.round(wordCount / 200));
+
+    const rapportHtml = `
+<div class="rapport-meta">📅 ${escHtml(today)} &nbsp;·&nbsp; ${articles.length} source${articles.length>1?'s':''} analysée${articles.length>1?'s':''} &nbsp;·&nbsp; ⏱ ~${readMin} min de lecture</div>
+
+${(parsed.highlights||[]).length ? `<div style="display:flex;flex-direction:column;gap:7px;margin-bottom:18px">
+  ${parsed.highlights.map(h=>`<div style="background:linear-gradient(135deg,var(--pl),#f0fafb);border-left:3px solid var(--p);border-radius:0 10px 10px 0;padding:9px 14px;font-size:13px;font-weight:600;color:var(--pd);font-family:'Outfit',sans-serif">${escHtml(h)}</div>`).join('')}
+</div>` : ''}
+
 <div style="margin-bottom:18px">
-  <div class="rapport-sec-title">📊 Synthèse exécutive</div>
-  <div style="font-size:13px;line-height:1.8;color:var(--t);font-family:'Manrope',sans-serif;white-space:pre-wrap">${escHtml(parsed.synthese||'')}</div>
+  <div class="rapport-sec-title">📊 Analyse — ${readMin} min de lecture</div>
+  <div style="font-size:13px;line-height:1.85;color:var(--t);font-family:'Manrope',sans-serif;white-space:pre-wrap">${escHtml(parsed.synthese||'')}</div>
 </div>
+
 ${(parsed.points_cles||[]).length ? `<div style="margin-bottom:18px">
-  <div class="rapport-sec-title">⚡ Points clés</div>
+  <div class="rapport-sec-title">⚡ Faits marquants</div>
   ${parsed.points_cles.map(p=>`<div class="citem"><div class="ctxt">${escHtml(p)}</div></div>`).join('')}
 </div>` : ''}
+
 <div style="margin-bottom:18px">
   <div class="rapport-sec-title">💼 LinkedIn <button class="bcopy" onclick="copy('rapport_linkedin',this)">📋 Copier</button></div>
   <div class="rapport-social"><div class="rapport-social-body">${escHtml(parsed.linkedin||'')}</div></div>
 </div>
 <div style="margin-bottom:18px">
-  <div class="rapport-sec-title">📘 Facebook Pro <button class="bcopy" onclick="copy('rapport_facebook',this)">📋 Copier</button></div>
+  <div class="rapport-sec-title">📘 Facebook <button class="bcopy" onclick="copy('rapport_facebook',this)">📋 Copier</button></div>
   <div class="rapport-social"><div class="rapport-social-body">${escHtml(parsed.facebook||'')}</div></div>
 </div>
 <div style="margin-bottom:18px">
-  <div class="rapport-sec-title">✉️ Newsletter <button class="bcopy" onclick="copy('rapport_newsletter',this)">📋 Copier</button></div>
+  <div class="rapport-sec-title">𝕏 Thread Twitter/X <button class="bcopy" onclick="copy('rapport_twitter',this)">📋 Copier</button></div>
+  <div class="rapport-social"><div class="rapport-social-body" style="font-size:12px">${escHtml(parsed.twitter||'').replace(/---/g,'──────────')}</div></div>
+</div>
+<div style="margin-bottom:18px">
+  <div class="rapport-sec-title">✉️ Newsletter B2B <button class="bcopy" onclick="copy('rapport_newsletter',this)">📋 Copier</button></div>
   <div class="rapport-social"><div class="rapport-social-body">${escHtml(parsed.newsletter||'')}</div></div>
 </div>
 <div style="margin-bottom:6px">
-  <div class="rapport-sec-title">📰 Sources analysées</div>
-  ${articles.map(a=>`<div class="rapport-art"><div class="rapport-art-title">${escHtml(a.title)}</div><div class="rapport-art-body">${escHtml(a.desc||'')}</div><div class="rapport-art-src">${a.icon} ${escHtml(a.source)}</div></div>`).join('')}
+  <div class="rapport-sec-title">📰 Sources analysées (${articles.length})</div>
+  ${articles.map(a=>`<div class="rapport-art"><div class="rapport-art-title">${escHtml(a.title)}</div><div class="rapport-art-body">${escHtml(a.desc||'')}</div><div class="rapport-art-src">${a.icon} ${escHtml(a.source)}${a.dateStr ? ' · '+a.dateStr : ''}</div></div>`).join('')}
 </div>`;
 
     document.getElementById('c-rapport').innerHTML = rapportHtml;
