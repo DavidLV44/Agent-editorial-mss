@@ -416,6 +416,7 @@
     <button class="tbtn active" onclick="tab('html')">🌐 HTML</button>
     <button class="tbtn" onclick="tab('images')">🖼️ Images</button>
     <button class="tbtn" onclick="tab('facebook')">📘 FB</button>
+    <button class="tbtn" onclick="tab('linkedin')">💼 LinkedIn</button>
     <button class="tbtn" onclick="tab('instagram')">📸 Insta</button>
     <button class="tbtn" onclick="tab('seo')">🔑 SEO</button>
     <button class="tbtn" onclick="tab('conseils')">💡 Conseils</button>
@@ -438,6 +439,10 @@
       <button class="fb-copy-btn" onclick="copy('fb_link',this)">🔗 Copier le lien</button>
     </div>
     <div class="fb-mock" id="c-facebook"></div>
+  </div>
+  <div class="panel ocard" id="panel-linkedin">
+    <div class="ohead"><span class="otitle">💼 Post LinkedIn</span><button class="bcopy" onclick="copy('linkedin',this)">📋 Copier</button></div>
+    <div class="obody" id="c-linkedin"></div>
   </div>
   <div class="panel ocard" id="panel-instagram">
     <div class="ohead"><span class="otitle">📸 Carrousel Instagram</span><button class="bcopy" onclick="copy('insta_caption',this)">📋 Légende</button></div>
@@ -711,7 +716,7 @@ function bindAngleChips(){
 }
 
 function tab(name){
-  const names=['html','images','facebook','instagram','seo','conseils','sources','rapport'];
+  const names=['html','images','facebook','linkedin','instagram','seo','conseils','sources','rapport'];
   document.querySelectorAll('.tbtn').forEach((b,i)=>b.classList.toggle('active',names[i]===name));
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('panel-'+name).classList.add('active');
@@ -747,6 +752,7 @@ function reset(){
   document.getElementById('insta-carousel').innerHTML='';
   document.getElementById('insta-caption').textContent='';
   document.getElementById('c-facebook').innerHTML='';
+  document.getElementById('c-linkedin').textContent='';
   document.getElementById('img-grid').innerHTML='';
   store={};
   hideErr();
@@ -757,7 +763,7 @@ async function generate(){
   hideErr();
   const apiKey=getKey();
   if(!apiKey){
-    showErr('Clé API manquante. Saisissez votre clé Anthropic en haut de la page.','');
+    showErr('Clé API manquante. Saisissez votre clé Google AI Studio en haut de la page.','');
     return;
   }
   const topic=document.getElementById('topicInput').value.trim();
@@ -816,6 +822,7 @@ FORMAT JSON EXACT :
     ],
     "legende": "Légende Instagram sérieuse (3-4 phrases factuelles, 8-12 hashtags sectoriels pertinents)"
   },
+  "linkedin": "Post LinkedIn professionnel (200-280 mots). Accroche : fait sectoriel précis ou chiffre concret — zéro formule rhétorique. Corps : 3 paragraphes analytiques, ton directeur médical ou expert reconnu, données chiffrées obligatoires. Conclusion : perspective stratégique ou question ouverte sur l'impact du secteur. 3-5 hashtags sectoriels (#SantéNumérique #HealthTech #IA #MedTech #Longévité). Zéro emoji superflu — 1 max si pertinent. Zéro clickbait.",
   "seo": "Titre SEO (60 car max) | meta description (155 car max) | mot-clé principal",
   "conseils": {"seo":"conseil","conversion":"conseil","ux":"conseil","prochaine_idee":"idée"},
   "images": [{"id":"hero","prompt":"photorealistic luxury health technology 16:9"},{"id":"product1","prompt":"premium wellness device white background"},{"id":"product2","prompt":"person using health tech device"}]
@@ -870,6 +877,10 @@ Génère maintenant. Commence par { directement.`;
     store.fb_text = fb.texte||'';
     store.fb_link = fb.lien||'';
     buildFacebook(fb);
+
+    // ── LinkedIn ──
+    store.linkedin = parsed.linkedin || '';
+    document.getElementById('c-linkedin').textContent = parsed.linkedin || '(vide)';
 
     // ── Instagram ──
     const ig = parsed.instagram||{};
@@ -957,7 +968,8 @@ Génère maintenant. Commence par { directement.`;
         fb_text: store.fb_text||'',
         fb_link: store.fb_link||'',
         fbHtml: document.getElementById('c-facebook').innerHTML,
-        insta_caption: store.insta_caption||''
+        insta_caption: store.insta_caption||'',
+        linkedin: store.linkedin||''
       }
     });
     updateHistBadge();
@@ -1201,6 +1213,7 @@ function histRestore(id){
   document.getElementById('c-html').textContent = store.html||'';
   document.getElementById('c-seo').textContent = store.seo||'';
   document.getElementById('c-facebook').innerHTML = store.fbHtml||'';
+  document.getElementById('c-linkedin').textContent = store.linkedin||'';
   document.getElementById('insta-caption').textContent = store.insta_caption||'';
   document.getElementById('insta-carousel').innerHTML = '';
   document.getElementById('img-grid').innerHTML = '<div style="padding:14px;font-size:12px;color:var(--m)">Images non restaurées — régénérez pour les obtenir.</div>';
@@ -1345,6 +1358,12 @@ const RSS_FEEDS = [
   { label:'MedCity News',       url:'https://medcitynews.com/feed/',                                                   tag:'tech',  icon:'🏗️' },
   { label:'Fierce Healthcare',  url:'https://www.fiercehealthcare.com/rss/xml',                                        tag:'tech',  icon:'⚡' },
   { label:'Digital Health Buzz',url:'https://www.digitalhealthbuzz.com/feed/',                                         tag:'tech',  icon:'📱' },
+  // Sources françaises — IA & Santé
+  { label:'Numerama – Tech',     url:'https://www.numerama.com/feed/',                                                  tag:'ia',    icon:'🇫🇷' },
+  { label:'Futura Sciences',     url:'https://www.futura-sciences.com/rss/actualites.xml',                              tag:'tech',  icon:'🔭' },
+  { label:'Sciences & Avenir',   url:'https://www.sciencesetavenir.fr/rss.xml',                                         tag:'sante', icon:'🧪' },
+  { label:'Le Monde – Sciences', url:'https://www.lemonde.fr/sciences/rss_full.xml',                                    tag:'tech',  icon:'📰' },
+  { label:'01net – IA',          url:'https://www.01net.com/rss/',                                                      tag:'ia',    icon:'💻' },
 ];
 
 const VEILLE_CACHE_TTL = 3 * 60 * 60 * 1000; // 3 heures en ms
