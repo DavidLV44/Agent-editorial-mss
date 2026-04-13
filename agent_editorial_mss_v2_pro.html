@@ -338,6 +338,10 @@
   </div>
   <div id="feedStatus" class="feed-status-txt">Cliquez sur "Actualiser" pour charger les dernières actualités IA &amp; Santé.</div>
   <div class="feed-items" id="feedItems" style="display:none"></div>
+  <div style="display:flex;gap:7px;margin-bottom:8px">
+    <button class="btn-veille sec" onclick="selectAllArticles()" style="flex:1;font-size:11px;padding:7px 10px">☑️ Tout sélectionner</button>
+    <button class="btn-veille sec" onclick="deselectAllArticles()" style="flex:1;font-size:11px;padding:7px 10px">☐ Tout déselectionner</button>
+  </div>
   <div class="feed-sel-bar" id="feedSelBar">
     <span class="feed-sel-txt" id="feedSelTxt">0 article sélectionné</span>
     <button class="btn-veille pri" onclick="generateRapportFromSelection()" style="padding:6px 12px;font-size:11px">📰 Générer le rapport →</button>
@@ -418,6 +422,8 @@
     <button class="tbtn" onclick="tab('facebook')">📘 FB</button>
     <button class="tbtn" onclick="tab('linkedin')">💼 LinkedIn</button>
     <button class="tbtn" onclick="tab('instagram')">📸 Insta</button>
+    <button class="tbtn" onclick="tab('twitter')">𝕏 Twitter</button>
+    <button class="tbtn" onclick="tab('newsletter')">✉️ Newsletter</button>
     <button class="tbtn" onclick="tab('seo')">🔑 SEO</button>
     <button class="tbtn" onclick="tab('conseils')">💡 Conseils</button>
     <button class="tbtn" onclick="tab('sources')">📚 Sources</button>
@@ -453,6 +459,14 @@
       <div class="insta-caption-text" id="insta-caption"></div>
     </div>
   </div>
+  <div class="panel ocard" id="panel-twitter">
+    <div class="ohead"><span class="otitle">𝕏 Thread Twitter / X</span><button class="bcopy" onclick="copy('twitter',this)">📋 Copier</button></div>
+    <div class="obody" id="c-twitter" style="white-space:pre-wrap"></div>
+  </div>
+  <div class="panel ocard" id="panel-newsletter">
+    <div class="ohead"><span class="otitle">✉️ Newsletter B2B</span><button class="bcopy" onclick="copy('newsletter',this)">📋 Copier</button></div>
+    <div class="obody" id="c-newsletter"></div>
+  </div>
   <div class="panel ocard" id="panel-seo">
     <div class="ohead"><span class="otitle">🔑 Stratégie SEO</span><button class="bcopy" onclick="copy('seo',this)">📋 Copier</button></div>
     <div class="obody" id="c-seo"></div>
@@ -467,7 +481,7 @@
   </div>
 
   <div class="panel ocard" id="panel-rapport">
-    <div class="ohead"><span class="otitle">📰 Rapport de Veille</span><button class="bcopy" onclick="copy('rapport',this)">📋 Copier tout</button></div>
+    <div class="ohead"><span class="otitle">📰 Rapport de Veille</span><div style="display:flex;gap:7px"><button class="btn-preview" onclick="exportRapportEmail()">✉️ Email</button><button class="bcopy" onclick="copy('rapport',this)">📋 Copier tout</button></div></div>
     <div class="obody" id="c-rapport" style="max-height:none;padding:18px">
       <div style="text-align:center;color:var(--m);font-size:12px;font-family:'Manrope',sans-serif;padding:20px 0">Sélectionnez des articles dans le module Veille ci-dessus et cliquez sur "Générer le rapport".</div>
     </div>
@@ -716,7 +730,7 @@ function bindAngleChips(){
 }
 
 function tab(name){
-  const names=['html','images','facebook','linkedin','instagram','seo','conseils','sources','rapport'];
+  const names=['html','images','facebook','linkedin','instagram','twitter','newsletter','seo','conseils','sources','rapport'];
   document.querySelectorAll('.tbtn').forEach((b,i)=>b.classList.toggle('active',names[i]===name));
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('panel-'+name).classList.add('active');
@@ -753,6 +767,8 @@ function reset(){
   document.getElementById('insta-caption').textContent='';
   document.getElementById('c-facebook').innerHTML='';
   document.getElementById('c-linkedin').textContent='';
+  document.getElementById('c-twitter').textContent='';
+  document.getElementById('c-newsletter').textContent='';
   document.getElementById('img-grid').innerHTML='';
   store={};
   hideErr();
@@ -824,6 +840,8 @@ FORMAT JSON EXACT :
   },
   "linkedin": "Post LinkedIn professionnel (200-280 mots). Accroche : fait sectoriel précis ou chiffre concret — zéro formule rhétorique. Corps : 3 paragraphes analytiques, ton directeur médical ou expert reconnu, données chiffrées obligatoires. Conclusion : perspective stratégique ou question ouverte sur l'impact du secteur. 3-5 hashtags sectoriels (#SantéNumérique #HealthTech #IA #MedTech #Longévité). Zéro emoji superflu — 1 max si pertinent. Zéro clickbait.",
   "seo": "Titre SEO (60 car max) | meta description (155 car max) | mot-clé principal",
+  "twitter": "Thread X/Twitter (4 tweets). Tweet 1 (accroche + chiffre, 240 car max). Tweet 2 (fait clé 1, 240 car). Tweet 3 (fait clé 2 + preuve, 240 car). Tweet 4 (conclusion sobre + CTA, 240 car). Chaque tweet séparé par \\n---\\n. Ton expert, zéro clickbait, 1-2 hashtags max.",
+  "newsletter": "Extrait newsletter B2B (80-120 mots). Titre court factuel. Corps : 3 points synthétiques en gras + 1 ligne d'explication chacun. Audience : professionnels de santé, DSI, investisseurs MedTech. Signature : 'L'équipe MySentinelSolutions'. Ton rigoureux, aucun jargon marketing.",
   "conseils": {"seo":"conseil","conversion":"conseil","ux":"conseil","prochaine_idee":"idée"},
   "images": [{"id":"hero","prompt":"photorealistic luxury health technology 16:9"},{"id":"product1","prompt":"premium wellness device white background"},{"id":"product2","prompt":"person using health tech device"}]
 }`;
@@ -881,6 +899,14 @@ Génère maintenant. Commence par { directement.`;
     // ── LinkedIn ──
     store.linkedin = parsed.linkedin || '';
     document.getElementById('c-linkedin').textContent = parsed.linkedin || '(vide)';
+
+    // ── Twitter / X ──
+    store.twitter = parsed.twitter || '';
+    document.getElementById('c-twitter').textContent = (parsed.twitter || '(vide)').replace(/---/g, '──────────');
+
+    // ── Newsletter B2B ──
+    store.newsletter = parsed.newsletter || '';
+    document.getElementById('c-newsletter').textContent = parsed.newsletter || '(vide)';
 
     // ── Instagram ──
     const ig = parsed.instagram||{};
@@ -969,7 +995,9 @@ Génère maintenant. Commence par { directement.`;
         fb_link: store.fb_link||'',
         fbHtml: document.getElementById('c-facebook').innerHTML,
         insta_caption: store.insta_caption||'',
-        linkedin: store.linkedin||''
+        linkedin: store.linkedin||'',
+        twitter: store.twitter||'',
+        newsletter: store.newsletter||''
       }
     });
     updateHistBadge();
@@ -1214,6 +1242,8 @@ function histRestore(id){
   document.getElementById('c-seo').textContent = store.seo||'';
   document.getElementById('c-facebook').innerHTML = store.fbHtml||'';
   document.getElementById('c-linkedin').textContent = store.linkedin||'';
+  document.getElementById('c-twitter').textContent = (store.twitter||'').replace(/---/g,'──────────');
+  document.getElementById('c-newsletter').textContent = store.newsletter||'';
   document.getElementById('insta-caption').textContent = store.insta_caption||'';
   document.getElementById('insta-carousel').innerHTML = '';
   document.getElementById('img-grid').innerHTML = '<div style="padding:14px;font-size:12px;color:var(--m)">Images non restaurées — régénérez pour les obtenir.</div>';
@@ -1359,11 +1389,19 @@ const RSS_FEEDS = [
   { label:'Fierce Healthcare',  url:'https://www.fiercehealthcare.com/rss/xml',                                        tag:'tech',  icon:'⚡' },
   { label:'Digital Health Buzz',url:'https://www.digitalhealthbuzz.com/feed/',                                         tag:'tech',  icon:'📱' },
   // Sources françaises — IA & Santé
-  { label:'Numerama – Tech',     url:'https://www.numerama.com/feed/',                                                  tag:'ia',    icon:'🇫🇷' },
-  { label:'Futura Sciences',     url:'https://www.futura-sciences.com/rss/actualites.xml',                              tag:'tech',  icon:'🔭' },
-  { label:'Sciences & Avenir',   url:'https://www.sciencesetavenir.fr/rss.xml',                                         tag:'sante', icon:'🧪' },
-  { label:'Le Monde – Sciences', url:'https://www.lemonde.fr/sciences/rss_full.xml',                                    tag:'tech',  icon:'📰' },
-  { label:'01net – IA',          url:'https://www.01net.com/rss/',                                                      tag:'ia',    icon:'💻' },
+  { label:'Numerama – Tech',      url:'https://www.numerama.com/feed/',                                                 tag:'ia',    icon:'🇫🇷' },
+  { label:'Futura Sciences',      url:'https://www.futura-sciences.com/rss/actualites.xml',                             tag:'tech',  icon:'🔭' },
+  { label:'Sciences & Avenir',    url:'https://www.sciencesetavenir.fr/rss.xml',                                        tag:'sante', icon:'🧪' },
+  { label:'Le Monde – Sciences',  url:'https://www.lemonde.fr/sciences/rss_full.xml',                                   tag:'tech',  icon:'📰' },
+  { label:'01net – IA',           url:'https://www.01net.com/rss/',                                                     tag:'ia',    icon:'💻' },
+  // Santé numérique française spécialisée
+  { label:'TICsanté',             url:'https://www.ticsante.com/rss.xml',                                               tag:'sante', icon:'🏥' },
+  { label:'e-santé.fr',           url:'https://www.e-sante.fr/flux-rss',                                                tag:'sante', icon:'💉' },
+  { label:'Santé Magazine',       url:'https://www.santemagazine.fr/rss.xml',                                           tag:'sante', icon:'📋' },
+  { label:'Medscape France',      url:'https://francais.medscape.com/rss/imedscape.xml',                                tag:'sante', icon:'🩺' },
+  { label:'Usine Digitale – IA',  url:'https://www.usine-digitale.fr/rss/article/0/intelligence-artificielle.xml',     tag:'ia',    icon:'🏭' },
+  { label:'Le Figaro Santé',      url:'https://sante.lefigaro.fr/rss/Sante.xml',                                       tag:'sante', icon:'🔬' },
+  { label:'CNET France – IA',     url:'https://www.cnetfrance.fr/feeds/rss/news/intelligence-artificielle/',            tag:'ia',    icon:'📡' },
 ];
 
 const VEILLE_CACHE_TTL = 3 * 60 * 60 * 1000; // 3 heures en ms
@@ -1519,6 +1557,21 @@ function filterFeed(tag, btn) {
   document.querySelectorAll('.feed-fbtn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   renderFeedItems();
+}
+
+function selectAllArticles() {
+  const filtered = currentFeedFilter === 'all' ? veilleArticles : veilleArticles.filter(a => a.tag === currentFeedFilter);
+  filtered.forEach(a => selectedArticles.add(a.id));
+  renderFeedItems();
+  updateSelBar();
+  showToast(`☑️ ${selectedArticles.size} articles sélectionnés`);
+}
+
+function deselectAllArticles() {
+  selectedArticles.clear();
+  renderFeedItems();
+  updateSelBar();
+  showToast('☐ Sélection effacée');
 }
 
 async function generateRapportFromSelection() {
@@ -1715,6 +1768,18 @@ function checkDailyNotif() {
   if ('Notification' in window && Notification.permission === 'default') {
     Notification.requestPermission();
   }
+}
+
+function exportRapportEmail() {
+  const rapport = store.rapport || '';
+  if (!rapport) { showToast('Aucun rapport à exporter'); return; }
+  const today = new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const subject = encodeURIComponent('Rapport Veille IA & Santé Connectée — ' + today);
+  const body = encodeURIComponent(rapport.substring(0, 1800)); // mailto limit
+  const link = document.createElement('a');
+  link.href = 'mailto:?subject=' + subject + '&body=' + body;
+  link.click();
+  showToast('✉️ Client email ouvert');
 }
 
 function showNotifBar() {
