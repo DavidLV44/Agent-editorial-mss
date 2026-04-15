@@ -158,6 +158,77 @@
   .err-raw{font-size:10px;color:#7f1d1d;font-family:'Courier New',monospace;white-space:pre-wrap;background:#fde8e8;padding:8px;border-radius:6px;max-height:120px;overflow-y:auto;word-break:break-all}
   ::-webkit-scrollbar{width:4px;height:4px}
   ::-webkit-scrollbar-thumb{background:var(--pm);border-radius:3px}
+  /* ── Ton éditorial ── */
+  .tone-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+  .tone-chip{padding:7px 14px;border-radius:50px;border:1.5px solid var(--b);background:var(--bga);font-size:12px;font-weight:600;color:var(--m);cursor:pointer;transition:all .2s;font-family:'Manrope',sans-serif;user-select:none;min-height:40px;display:inline-flex;align-items:center}
+  .tone-chip.active{background:#0f172a;border-color:#0f172a;color:#fff}
+  .tone-chip:hover:not(.active){border-color:var(--p);color:var(--p)}
+  /* ── Veille IA & Santé Connectée ── */
+  .veille-card{background:var(--bg);border-radius:var(--r16);box-shadow:var(--s2);border:1px solid var(--b);overflow:hidden;margin-bottom:14px}
+  .veille-head{padding:13px 18px;background:linear-gradient(135deg,#1e3a5f 0%,#0c3b5e 100%);display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none}
+  .veille-head-title{font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px}
+  .veille-badge{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:50px;padding:2px 10px;font-size:10px;font-weight:700;color:#fff;font-family:'Outfit',sans-serif}
+  .veille-body{padding:14px;display:none}
+  .veille-body.open{display:block}
+  .veille-source-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+  .veille-source-tag{padding:5px 12px;border-radius:50px;border:1.5px solid var(--b);background:var(--bga);font-size:11px;font-weight:700;color:var(--m);cursor:pointer;transition:all .2s;font-family:'Outfit',sans-serif;min-height:36px;display:inline-flex;align-items:center}
+  .veille-source-tag.active{background:#1e3a5f;border-color:#1e3a5f;color:#fff}
+  .veille-feed{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+  .veille-item{background:var(--bga);border:1px solid var(--b);border-radius:var(--r12);padding:10px 13px;display:flex;gap:10px;align-items:flex-start}
+  .veille-item-cat{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:2px 7px;border-radius:4px;font-family:'Outfit',sans-serif;flex-shrink:0;margin-top:2px;white-space:nowrap}
+  .veille-item-title{font-size:12.5px;font-weight:700;color:var(--t);font-family:'Outfit',sans-serif;margin-bottom:3px;line-height:1.3}
+  .veille-item-summary{font-size:11px;color:var(--m);line-height:1.5;font-family:'Manrope',sans-serif}
+  .veille-item-meta{font-size:10px;color:var(--m);margin-top:4px;font-family:'Outfit',sans-serif}
+  .veille-actions{display:flex;gap:8px;flex-wrap:wrap}
+  .veille-btn{padding:9px 16px;border-radius:var(--r12);border:none;font-family:'Outfit',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;min-height:40px}
+  .veille-btn.primary{background:#1e3a5f;color:#fff}
+  .veille-btn.primary:hover{background:#162d4a}
+  .veille-btn.secondary{background:var(--bga);color:var(--p);border:1.5px solid var(--pm)}
+  .veille-btn.secondary:hover{background:var(--pl)}
+  .veille-loader{text-align:center;padding:20px;color:var(--m);font-size:12px;font-family:'Manrope',sans-serif;display:none}
+  .veille-loader.on{display:block}
+  /* ── Rapport Quotidien Banner ── */
+  .rapport-banner{background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);border-radius:var(--r16);padding:14px 18px;margin-bottom:14px;display:none;align-items:center;gap:12px;flex-wrap:wrap}
+  .rapport-banner.on{display:flex}
+  .rapport-banner-text{flex:1;font-family:'Manrope',sans-serif}
+  .rapport-banner-title{font-size:13px;font-weight:700;color:#fff;margin-bottom:2px;font-family:'Outfit',sans-serif}
+  .rapport-banner-sub{font-size:11px;color:rgba(255,255,255,.55)}
+  .rapport-btn{padding:9px 16px;background:var(--p);color:#fff;border:none;border-radius:10px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .2s;min-height:40px}
+  .rapport-btn:hover{background:var(--pd)}
+  /* ── Rapport Quotidien Modal ── */
+  .rapport-modal{display:none;position:fixed;inset:0;z-index:250;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:16px}
+  .rapport-modal.on{display:flex}
+  .rapport-box{background:var(--bg);border-radius:var(--r24);box-shadow:0 20px 60px rgba(0,0,0,.3);width:100%;max-width:680px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden}
+  .rapport-header{padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.1);background:#0f172a;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+  .rapport-header-title{font-family:'Outfit',sans-serif;font-size:15px;font-weight:800;color:#fff}
+  .rapport-header-date{font-size:11px;color:rgba(255,255,255,.45);font-family:'Manrope',sans-serif;margin-top:2px}
+  .rapport-close{width:32px;height:32px;background:rgba(255,255,255,.1);border:none;border-radius:8px;font-size:16px;cursor:pointer;color:#fff;display:flex;align-items:center;justify-content:center}
+  .rapport-content{flex:1;overflow-y:auto;padding:20px}
+  .rapport-section{margin-bottom:20px}
+  .rapport-section-title{font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--p);margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid var(--pl)}
+  .rapport-item{background:var(--bga);border-radius:var(--r12);padding:12px 14px;margin-bottom:8px;border-left:3px solid var(--p)}
+  .rapport-item-title{font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;color:var(--t);margin-bottom:5px}
+  .rapport-item-body{font-size:12.5px;color:var(--m);line-height:1.65;font-family:'Manrope',sans-serif}
+  .rapport-footer{padding:14px 20px;border-top:1px solid var(--b);display:flex;gap:8px;flex-shrink:0;background:var(--bga)}
+  /* ── LinkedIn ── */
+  .li-mock{padding:14px}
+  .li-post{background:#fff;border:1px solid #e0dfdc;border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.1)}
+  .li-header{display:flex;align-items:center;gap:10px;padding:12px 14px 8px}
+  .li-avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#0077b5,#005885);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;font-family:'Outfit',sans-serif;flex-shrink:0}
+  .li-page-info{flex:1}
+  .li-page-name{font-size:14px;font-weight:700;color:#000;font-family:'Manrope',sans-serif;line-height:1.2}
+  .li-page-meta{font-size:11px;color:#666;font-family:'Manrope',sans-serif}
+  .li-follow-btn{padding:5px 14px;border:1.5px solid #0077b5;border-radius:50px;font-size:12px;font-weight:700;color:#0077b5;font-family:'Outfit',sans-serif;cursor:default;white-space:nowrap}
+  .li-body-text{padding:0 14px 10px;font-size:13.5px;color:#000;line-height:1.65;font-family:'Manrope',sans-serif;white-space:pre-wrap;word-break:break-word}
+  .li-img-wrap{margin:0 14px 12px;border-radius:8px;overflow:hidden;background:linear-gradient(135deg,var(--pl),var(--pm));height:180px;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--m)}
+  .li-img-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+  .li-reactions{display:flex;align-items:center;gap:4px;padding:6px 14px;border-top:1px solid #e0dfdc}
+  .li-react-count{font-size:12px;color:#666;font-family:'Manrope',sans-serif;margin-left:4px}
+  .li-actions{display:flex;border-top:1px solid #e0dfdc}
+  .li-action{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;padding:8px;font-size:12px;font-weight:700;color:#666;font-family:'Manrope',sans-serif;border:none;background:none;cursor:default}
+  .li-copy-row{display:flex;gap:8px;padding:12px 14px 0;flex-wrap:wrap}
+  .li-copy-btn{flex:1;padding:9px;background:var(--bga);border:1.5px solid var(--b);border-radius:var(--r12);font-size:12px;font-weight:700;color:#0077b5;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .2s;text-align:center}
+  .li-copy-btn:hover{background:#e7f3f8;border-color:#b3d4e6}
   .src-block{background:var(--bga);border:1px solid var(--b);border-radius:var(--r12);padding:10px 14px;margin-bottom:14px}
   .src-title{font-size:11px;font-weight:700;color:var(--pd);margin-bottom:8px;font-family:'Outfit',sans-serif}
   .src-list{display:flex;flex-direction:column;gap:5px}
@@ -303,6 +374,43 @@
   <button class="hist-btn" onclick="openHist()">📋 Historique <span class="hist-badge" id="histCount">0</span></button>
 </div>
 
+<!-- VEILLE IA & SANTÉ CONNECTÉE -->
+<div class="veille-card" id="veilleCard">
+  <div class="veille-head" onclick="toggleVeille()">
+    <span class="veille-head-title">
+      📡 Veille IA &amp; Santé Connectée
+      <span class="veille-badge" id="veilleBadge">–</span>
+    </span>
+    <span id="veilleChevron" style="color:#fff;font-size:12px;transition:transform .25s">▼</span>
+  </div>
+  <div class="veille-body" id="veilleBody">
+    <div class="veille-source-row" id="veilleSourceRow">
+      <div class="veille-source-tag active" data-feed="all">Tout</div>
+      <div class="veille-source-tag" data-feed="IA">🤖 IA</div>
+      <div class="veille-source-tag" data-feed="sante">🏥 Santé</div>
+      <div class="veille-source-tag" data-feed="wearable">⌚ Wearables</div>
+      <div class="veille-source-tag" data-feed="longevite">🧬 Longévité</div>
+    </div>
+    <div class="veille-loader on" id="veilleLoader">Clé API requise — sauvegardez votre clé ci-dessous pour activer la veille</div>
+    <div class="veille-feed" id="veilleFeed" style="display:none"></div>
+    <div class="veille-actions">
+      <button class="veille-btn primary" onclick="refreshVeille()">🔄 Actualiser</button>
+      <button class="veille-btn secondary" onclick="genRapportQuotidien()">📋 Rapport du jour</button>
+    </div>
+  </div>
+</div>
+
+<!-- RAPPORT QUOTIDIEN BANNER -->
+<div class="rapport-banner" id="rapportBanner">
+  <span style="font-size:22px">🌙</span>
+  <div class="rapport-banner-text">
+    <div class="rapport-banner-title">Compte rendu de 21h disponible</div>
+    <div class="rapport-banner-sub">Synthèse IA &amp; Santé Connectée — 5 à 10 min de lecture</div>
+  </div>
+  <button class="rapport-btn" onclick="genRapportQuotidien()">Générer →</button>
+  <button onclick="dismissRapportBanner()" style="background:none;border:none;color:rgba(255,255,255,.45);cursor:pointer;font-size:18px;padding:4px 6px">✕</button>
+</div>
+
 <!-- API KEY -->
 <div class="apikey-card" id="apikeyCard">
   <span class="apikey-label">🔑 Clé API Google AI Studio</span>
@@ -386,6 +494,13 @@
     <div class="angle-chip" data-angle="comparatif">⚖️ Comparatif expert</div>
   </div>
 
+  <label class="flabel">🎙️ Ton éditorial</label>
+  <div class="tone-chips" id="toneChips">
+    <div class="tone-chip active" data-tone="enthusiast">✨ Accessible &amp; Enthousiaste</div>
+    <div class="tone-chip" data-tone="pro">💼 Sérieux &amp; Professionnel</div>
+    <div class="tone-chip" data-tone="pedagogique">📚 Pédagogique &amp; Expert</div>
+  </div>
+
   <label class="flabel">💬 Sujet / produit précis</label>
   <input type="text" id="topicInput" placeholder="Ex : Bon Charge red light panel, Normatec 3…" />
   <p class="hint">Laisse vide pour laisser l'agent choisir le meilleur sujet</p>
@@ -447,8 +562,11 @@
     <div class="fb-mock" id="c-facebook"></div>
   </div>
   <div class="panel ocard" id="panel-linkedin">
-    <div class="ohead"><span class="otitle">💼 Post LinkedIn</span><button class="bcopy" onclick="copy('linkedin',this)">📋 Copier</button></div>
-    <div class="obody" id="c-linkedin"></div>
+    <div class="ohead"><span class="otitle">💼 Post LinkedIn</span><button class="bcopy" onclick="copy('li_text',this)">📋 Copier</button></div>
+    <div class="li-copy-row">
+      <button class="li-copy-btn" onclick="copy('li_text',this)">📋 Copier le texte complet</button>
+    </div>
+    <div class="li-mock" id="c-linkedin"></div>
   </div>
   <div class="panel ocard" id="panel-instagram">
     <div class="ohead"><span class="otitle">📸 Carrousel Instagram</span><button class="bcopy" onclick="copy('insta_caption',this)">📋 Légende</button></div>
@@ -510,6 +628,26 @@
       </div>
     </div>
     <div class="hist-list" id="histList"></div>
+  </div>
+</div>
+
+<!-- RAPPORT QUOTIDIEN MODAL -->
+<div class="rapport-modal" id="rapportModal" onclick="closeRapportOnBg(event)">
+  <div class="rapport-box">
+    <div class="rapport-header">
+      <div>
+        <div class="rapport-header-title">📋 Compte Rendu Quotidien</div>
+        <div class="rapport-header-date" id="rapportDate"></div>
+      </div>
+      <button class="rapport-close" onclick="closeRapport()">✕</button>
+    </div>
+    <div class="rapport-content" id="rapportContent">
+      <div style="text-align:center;padding:40px;color:var(--m);font-size:13px;font-family:'Manrope',sans-serif">Génération en cours…</div>
+    </div>
+    <div class="rapport-footer">
+      <button class="bcopy" onclick="copyRapport(this)" style="padding:10px 18px">📋 Copier</button>
+      <button class="btn-reset" onclick="closeRapport()" style="margin-top:0;flex:1;padding:10px">Fermer</button>
+    </div>
   </div>
 </div>
 
@@ -627,7 +765,14 @@ const ANGLES={
   comparatif:"Angle comparatif expert : tableau clair, critères objectifs, verdict par profil."
 };
 
-let selSilo='recovery',selProd='',selFmt='article',selAngle='test',store={};
+let selSilo='recovery',selProd='',selFmt='article',selAngle='test',selTone='enthusiast',store={};
+let veilleData=[],veilleFilter='all';
+
+const TONES={
+  enthusiast:'Ton accessible, enthousiaste, transparent. Storytelling personnel. Vocabulaire simple mais précis. Emojis bienvenus.',
+  pro:'Ton sérieux, professionnel, factuel. Vocabulaire d\'expert. Chiffres et études en avant. Style rapport / LinkedIn B2B. Pas d\'émojis excessifs.',
+  pedagogique:'Ton pédagogique, expert, bienveillant. Explications progressives. Analogies concrètes. Vulgarisation de qualité sans sacrifier la rigueur.'
+};
 
 function saveKey(){
   const key=document.getElementById('apiKeyInput').value.trim();
@@ -677,6 +822,13 @@ function init(){
   renderProds(); renderKW();
   bindChips('#fmtChips', v => selFmt=v);
   bindAngleChips();
+  bindToneChips();
+  // Veille source filter buttons
+  document.querySelectorAll('#veilleSourceRow .veille-source-tag').forEach(t=>{
+    t.addEventListener('click',()=>filterVeille(t.dataset.feed));
+  });
+  setupDailyReport();
+  fetchVeille();
   document.querySelectorAll('#siloGroup .silo-btn').forEach(b=>{
     b.addEventListener('click',()=>{
       document.querySelectorAll('#siloGroup .silo-btn').forEach(x=>x.classList.remove('active'));
@@ -766,7 +918,7 @@ function reset(){
   document.getElementById('insta-carousel').innerHTML='';
   document.getElementById('insta-caption').textContent='';
   document.getElementById('c-facebook').innerHTML='';
-  document.getElementById('c-linkedin').textContent='';
+  document.getElementById('c-linkedin').innerHTML='';
   document.getElementById('c-twitter').textContent='';
   document.getElementById('c-newsletter').textContent='';
   document.getElementById('img-grid').innerHTML='';
@@ -794,13 +946,11 @@ async function generate(){
   document.getElementById('results').classList.remove('on');
   [400,1500,2800,4000,5400].forEach((d,i)=>setTimeout(()=>lstep(i+1),d));
 
-  // Prompt de génération de contenu éditorial MSS
-  const systemPrompt=`Tu es le rédacteur senior de MySentinelSolutions.com, média de référence en santé tech et innovation médicale français.
+  const systemPrompt=`Tu es le rédacteur senior de MySentinelSolutions.com, média de référence en santé tech et innovation médicale français. ${TONES[selTone]||TONES.enthusiast}
 
 CHARTE ÉDITORIALE MSS :
-- Ton : sérieux, expert, factuel — jamais promotionnel ni sensationnaliste
 - Crédibilité : cite toujours des études ou sources nommées, donne des chiffres précis
-- Facebook & Instagram : accessible mais jamais racoleur — ton de vulgarisation scientifique (style Sciences & Avenir)
+- Facebook & Instagram : accessible mais jamais racoleur — vulgarisation scientifique (style Sciences & Avenir)
 - Aucun clickbait, aucune formule vide ("révolutionnaire", "incroyable", "tu ne croiras pas")
 - Accroche : fait concret ou chiffre, jamais une question rhétorique creuse
 - CTA : sobres et honnêtes ("Lire l'analyse complète →", "Notre guide expert →")
@@ -838,10 +988,13 @@ FORMAT JSON EXACT :
     ],
     "legende": "Légende Instagram sérieuse (3-4 phrases factuelles, 8-12 hashtags sectoriels pertinents)"
   },
-  "linkedin": "Post LinkedIn professionnel (200-280 mots). Accroche : fait sectoriel précis ou chiffre concret — zéro formule rhétorique. Corps : 3 paragraphes analytiques, ton directeur médical ou expert reconnu, données chiffrées obligatoires. Conclusion : perspective stratégique ou question ouverte sur l'impact du secteur. 3-5 hashtags sectoriels (#SantéNumérique #HealthTech #IA #MedTech #Longévité). Zéro emoji superflu — 1 max si pertinent. Zéro clickbait.",
+  "linkedin": {
+    "texte": "Post LinkedIn professionnel (200-320 mots). Accroche : fait sectoriel précis ou chiffre concret — une seule ligne, puis saut de ligne. Corps : blocs courts (2-3 lignes max), données chiffrées obligatoires, 3-4 points clés numérotés. Conclusion sobre + CTA expert. Adapte l'intensité au ton éditorial sélectionné.",
+    "hashtags": "#SantéNumérique #HealthTech #IA #MedTech #Longévité"
+  },
   "seo": "Titre SEO (60 car max) | meta description (155 car max) | mot-clé principal",
   "twitter": "Thread X/Twitter (4 tweets). Tweet 1 (accroche + chiffre, 240 car max). Tweet 2 (fait clé 1, 240 car). Tweet 3 (fait clé 2 + preuve, 240 car). Tweet 4 (conclusion sobre + CTA, 240 car). Chaque tweet séparé par \\n---\\n. Ton expert, zéro clickbait, 1-2 hashtags max.",
-  "newsletter": "Extrait newsletter B2B (80-120 mots). Titre court factuel. Corps : 3 points synthétiques en gras + 1 ligne d'explication chacun. Audience : professionnels de santé, DSI, investisseurs MedTech. Signature : 'L'équipe MySentinelSolutions'. Ton rigoureux, aucun jargon marketing.",
+  "newsletter": "Extrait newsletter B2B (80-120 mots). Titre court factuel. Corps : 3 points en gras + 1 ligne d'explication chacun. Audience : professionnels de santé, DSI, investisseurs MedTech. Signature : 'L'équipe MySentinelSolutions'. Ton rigoureux, aucun jargon marketing.",
   "conseils": {"seo":"conseil","conversion":"conseil","ux":"conseil","prochaine_idee":"idée"},
   "images": [{"id":"hero","prompt":"photorealistic luxury health technology 16:9"},{"id":"product1","prompt":"premium wellness device white background"},{"id":"product2","prompt":"person using health tech device"}]
 }`;
@@ -897,8 +1050,9 @@ Génère maintenant. Commence par { directement.`;
     buildFacebook(fb);
 
     // ── LinkedIn ──
-    store.linkedin = parsed.linkedin || '';
-    document.getElementById('c-linkedin').textContent = parsed.linkedin || '(vide)';
+    const li = typeof parsed.linkedin === 'object' ? parsed.linkedin : {texte: parsed.linkedin||'', hashtags:''};
+    buildLinkedIn(li);
+    buildLinkedInImage();
 
     // ── Twitter / X ──
     store.twitter = parsed.twitter || '';
@@ -994,8 +1148,9 @@ Génère maintenant. Commence par { directement.`;
         fb_text: store.fb_text||'',
         fb_link: store.fb_link||'',
         fbHtml: document.getElementById('c-facebook').innerHTML,
+        li_text: store.li_text||'',
+        liHtml: document.getElementById('c-linkedin').innerHTML,
         insta_caption: store.insta_caption||'',
-        linkedin: store.linkedin||'',
         twitter: store.twitter||'',
         newsletter: store.newsletter||''
       }
@@ -1241,7 +1396,7 @@ function histRestore(id){
   document.getElementById('c-html').textContent = store.html||'';
   document.getElementById('c-seo').textContent = store.seo||'';
   document.getElementById('c-facebook').innerHTML = store.fbHtml||'';
-  document.getElementById('c-linkedin').textContent = store.linkedin||'';
+  document.getElementById('c-linkedin').innerHTML = store.liHtml||'';
   document.getElementById('c-twitter').textContent = (store.twitter||'').replace(/---/g,'──────────');
   document.getElementById('c-newsletter').textContent = store.newsletter||'';
   document.getElementById('insta-caption').textContent = store.insta_caption||'';
@@ -1369,7 +1524,316 @@ function setDevice(mode, btn){
   document.getElementById('previewWrap').classList.toggle('mobile', mode==='mobile');
 }
 
-document.addEventListener('keydown', e=>{ if(e.key==='Escape') closePreview(); });
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape'){ closePreview(); closeRapport(); }
+});
+
+// ── Ton éditorial ──────────────────────────────────────────────────
+function bindToneChips(){
+  document.querySelectorAll('#toneChips .tone-chip').forEach(c=>{
+    c.addEventListener('click',()=>{
+      document.querySelectorAll('#toneChips .tone-chip').forEach(x=>x.classList.remove('active'));
+      c.classList.add('active'); selTone=c.dataset.tone;
+    });
+  });
+}
+
+// ── LinkedIn ───────────────────────────────────────────────────────
+function buildLinkedIn(li){
+  const texte = li.texte||'(vide)';
+  const hashtags = li.hashtags||'';
+  store.li_text = texte + (hashtags ? '\n\n'+hashtags : '');
+  document.getElementById('c-linkedin').innerHTML=`
+    <div class="li-post">
+      <div class="li-header">
+        <div class="li-avatar">M</div>
+        <div class="li-page-info">
+          <div class="li-page-name">MySentinelSolutions</div>
+          <div class="li-page-meta">Health Tech · Innovation Santé · 1,2 k abonnés</div>
+        </div>
+        <div class="li-follow-btn">+ Suivre</div>
+      </div>
+      <div class="li-body-text">${escHtml(texte)}${hashtags?'\n\n'+escHtml(hashtags):''}</div>
+      <div class="li-img-wrap" id="li-img-wrap">⏳ Image en cours…</div>
+      <div class="li-reactions">
+        <span style="font-size:14px">👍 💡 🔥</span>
+        <span class="li-react-count">Soyez le premier à réagir</span>
+      </div>
+      <div class="li-actions">
+        <div class="li-action">👍 J'aime</div>
+        <div class="li-action">💬 Commenter</div>
+        <div class="li-action">🔁 Republier</div>
+        <div class="li-action">↗️ Envoyer</div>
+      </div>
+    </div>`;
+}
+
+async function buildLinkedInImage(){
+  const wrap = document.getElementById('li-img-wrap');
+  if(!wrap) return;
+  try{
+    const prompt='professional health technology innovation, data visualization dashboard, modern corporate setting, clean minimal background, no text, no watermark, cinematic lighting';
+    const webpUrl = await generateImageGemini(prompt, '16:9');
+    store.webp = store.webp||{};
+    store.webp['li-cover'] = webpUrl;
+    const img = document.createElement('img');
+    img.src = webpUrl; img.alt = 'LinkedIn cover';
+    wrap.innerHTML=''; wrap.appendChild(img);
+  }catch(e){
+    console.warn('LinkedIn image failed:', e.message);
+    if(wrap){ wrap.style.background='linear-gradient(135deg,#e7f3f8,#cce4f0)'; wrap.textContent=''; }
+  }
+}
+
+// ── Veille IA & Santé Connectée ────────────────────────────────────
+function toggleVeille(){
+  const body=document.getElementById('veilleBody');
+  const chevron=document.getElementById('veilleChevron');
+  body.classList.toggle('open');
+  chevron.style.transform = body.classList.contains('open') ? 'rotate(180deg)' : '';
+}
+
+function loadVeilleCache(){
+  try{
+    const raw=localStorage.getItem('mss_veille');
+    if(!raw) return null;
+    const obj=JSON.parse(raw);
+    if(Date.now()-obj.ts > 4*3600*1000) return null; // cache 4h
+    return obj.data;
+  }catch(e){ return null; }
+}
+
+function saveVeilleCache(data){
+  localStorage.setItem('mss_veille',JSON.stringify({ts:Date.now(),data}));
+}
+
+async function fetchVeille(){
+  const cached=loadVeilleCache();
+  if(cached){ veilleData=cached; renderVeille(); return; }
+  const key=getKey();
+  if(!key){ document.getElementById('veilleLoader').textContent='🔑 Clé API requise — sauvegardez votre clé pour activer la veille'; document.getElementById('veilleLoader').classList.add('on'); return; }
+  await genVeilleWithGemini();
+}
+
+async function refreshVeille(){
+  localStorage.removeItem('mss_veille');
+  veilleData=[];
+  const loader=document.getElementById('veilleLoader');
+  loader.textContent='⏳ Actualisation en cours…';
+  loader.classList.add('on');
+  document.getElementById('veilleFeed').style.display='none';
+  if(!document.getElementById('veilleBody').classList.contains('open')) toggleVeille();
+  await genVeilleWithGemini();
+}
+
+async function genVeilleWithGemini(){
+  const key=getKey();
+  if(!key){ document.getElementById('veilleLoader').textContent='🔑 Clé API requise.'; document.getElementById('veilleLoader').classList.add('on'); return; }
+  const today=new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  try{
+    const prompt=`Tu es expert en veille IA & santé connectée. Génère 8 actualités récentes et pertinentes pour le ${today} sur ces thèmes : IA médicale, diagnostique IA, santé connectée, wearables, télémédecine, biohacking, longévité, robotique médicale.
+
+RÈGLE ABSOLUE : Réponds UNIQUEMENT avec du JSON brut. Commence par {.
+
+FORMAT JSON EXACT :
+{
+  "articles": [
+    {
+      "titre": "Titre accrocheur de l'actualité",
+      "resume": "Résumé factuel et précis en 2-3 phrases. Chiffres si pertinents.",
+      "source": "Nom de la source de référence (journal, institution, etc.)",
+      "categorie": "IA|sante|wearable|longevite",
+      "impact": "Impact stratégique pour MySentinelSolutions en 1 phrase.",
+      "date": "Date approximative (ex: Avril 2025)"
+    }
+  ]
+}`;
+    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(key)}`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:4096,temperature:0.4}})
+    });
+    const data=await res.json();
+    if(data.error) throw new Error(data.error.message);
+    const rawText=data.candidates[0].content.parts[0].text;
+    const parsed=safeParseJSON(rawText);
+    veilleData=parsed.articles||[];
+    saveVeilleCache(veilleData);
+    renderVeille();
+  }catch(e){
+    console.error('Veille error:',e);
+    document.getElementById('veilleLoader').textContent='⚠️ '+e.message.substring(0,100);
+    document.getElementById('veilleLoader').classList.add('on');
+  }
+}
+
+function filterVeille(cat){
+  veilleFilter=cat;
+  document.querySelectorAll('#veilleSourceRow .veille-source-tag').forEach(t=>{
+    t.classList.toggle('active', t.dataset.feed===cat);
+  });
+  if(veilleData.length) renderVeille();
+}
+
+function renderVeille(){
+  const loader=document.getElementById('veilleLoader');
+  const feed=document.getElementById('veilleFeed');
+  loader.classList.remove('on');
+  feed.style.display='flex';
+  const filtered=veilleFilter==='all' ? veilleData : veilleData.filter(a=>a.categorie===veilleFilter);
+  const catBg={IA:'#dbeafe',sante:'#dcfce7',wearable:'#f3e8ff',longevite:'#fef9c3'};
+  const catTxt={IA:'#1e40af',sante:'#166534',wearable:'#6b21a8',longevite:'#854d0e'};
+  const catLabel={IA:'🤖 IA',sante:'🏥 Santé',wearable:'⌚ Wearable',longevite:'🧬 Longévité'};
+  feed.innerHTML=filtered.map(a=>`
+    <div class="veille-item">
+      <div><span class="veille-item-cat" style="background:${catBg[a.categorie]||'#e2e8f0'};color:${catTxt[a.categorie]||'#475569'}">${catLabel[a.categorie]||a.categorie}</span></div>
+      <div style="flex:1">
+        <div class="veille-item-title">${escHtml(a.titre)}</div>
+        <div class="veille-item-summary">${escHtml(a.resume)}</div>
+        <div class="veille-item-meta">📰 ${escHtml(a.source)} · ${escHtml(a.date||'')} · <span style="color:var(--p)">💡 ${escHtml(a.impact||'')}</span></div>
+      </div>
+    </div>`).join('');
+  if(!filtered.length) feed.innerHTML='<div style="padding:14px;font-size:12px;color:var(--m);text-align:center">Aucun article pour ce filtre.</div>';
+  document.getElementById('veilleBadge').textContent=veilleData.length+' articles';
+}
+
+// ── Rapport Quotidien 21h ──────────────────────────────────────────
+function setupDailyReport(){
+  checkRapportBanner();
+  setInterval(checkRapportBanner, 60000);
+}
+
+function checkRapportBanner(){
+  const now=new Date();
+  const h=now.getHours();
+  const dateKey=now.toLocaleDateString('fr-FR');
+  const dismissed=localStorage.getItem('mss_rapport_dismissed_'+dateKey);
+  const generated=localStorage.getItem('mss_rapport_'+dateKey);
+  if(h>=21 && !dismissed && !generated){
+    document.getElementById('rapportBanner').classList.add('on');
+  } else {
+    document.getElementById('rapportBanner').classList.remove('on');
+  }
+}
+
+function dismissRapportBanner(){
+  const dateKey=new Date().toLocaleDateString('fr-FR');
+  localStorage.setItem('mss_rapport_dismissed_'+dateKey,'1');
+  document.getElementById('rapportBanner').classList.remove('on');
+}
+
+async function genRapportQuotidien(){
+  const key=getKey();
+  if(!key){ showToast('🔑 Clé API requise'); return; }
+  const today=new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('rapportDate').textContent=today;
+  document.getElementById('rapportContent').innerHTML=`<div style="text-align:center;padding:48px"><div class="ring" style="margin:0 auto 16px"></div><div style="font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;color:var(--pd)">Génération du rapport…</div><div style="font-size:11px;color:var(--m);margin-top:4px;font-family:'Manrope',sans-serif">Analyse des tendances IA &amp; Santé</div></div>`;
+  document.getElementById('rapportModal').classList.add('on');
+  document.body.style.overflow='hidden';
+  const veilleContext=veilleData.length>0
+    ? '\n\nACTUALITÉS DU JOUR ISSUES DE LA VEILLE :\n'+veilleData.slice(0,6).map(a=>`- [${a.categorie}] ${a.titre} : ${a.resume}`).join('\n')
+    : '';
+  try{
+    const prompt=`Tu es l'analyste senior de MySentinelSolutions. Génère un COMPTE RENDU QUOTIDIEN pour le ${today}. Destiné aux décideurs. Ton : sérieux, professionnel, factuel. 5 à 10 minutes de lecture.${veilleContext}
+
+RÈGLE ABSOLUE : Réponds UNIQUEMENT avec du JSON brut. Commence par {.
+
+FORMAT JSON EXACT :
+{
+  "resume_executif": "Synthèse des tendances du jour en 3-5 phrases. Ton directif et factuel.",
+  "chiffre_cle": "Un chiffre ou statistique marquant du secteur IA/Santé du moment.",
+  "tendances": [
+    {"titre": "Nom de la tendance", "analyse": "Analyse de 3-4 phrases. Chiffres, sources, implications marché.", "impact_mss": "Impact concret pour MySentinelSolutions en 1-2 phrases."},
+    {"titre": "...", "analyse": "...", "impact_mss": "..."},
+    {"titre": "...", "analyse": "...", "impact_mss": "..."}
+  ],
+  "opportunites_contenu": [
+    {"sujet": "Sujet d'article recommandé", "angle": "Angle éditorial suggéré", "urgence": "haute|moyenne|faible"},
+    {"sujet": "...", "angle": "...", "urgence": "..."},
+    {"sujet": "...", "angle": "...", "urgence": "..."}
+  ],
+  "citation_inspiration": "Citation d'un leader du secteur ou d'une étude récente pertinente."
+}`;
+    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(key)}`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:8192,temperature:0.45}})
+    });
+    const data=await res.json();
+    if(data.error) throw new Error(data.error.message);
+    const rawText=data.candidates[0].content.parts[0].text;
+    const parsed=safeParseJSON(rawText);
+    localStorage.setItem('mss_rapport_'+new Date().toLocaleDateString('fr-FR'),'1');
+    dismissRapportBanner();
+    store.rapport=formatRapportText(parsed, today);
+    renderRapport(parsed);
+  }catch(e){
+    document.getElementById('rapportContent').innerHTML=`<div style="padding:20px;background:#fef2f2;border-radius:12px;color:#991b1b;font-size:12px;font-family:'Manrope',sans-serif">⚠️ Erreur : ${escHtml(e.message)}</div>`;
+  }
+}
+
+function renderRapport(r){
+  const urgBg={haute:'#fee2e2',moyenne:'#fef9c3',faible:'#dcfce7'};
+  const urgTxt={haute:'#991b1b',moyenne:'#854d0e',faible:'#166534'};
+  document.getElementById('rapportContent').innerHTML=`
+    <div class="rapport-section">
+      <div class="rapport-section-title">📌 Résumé Exécutif</div>
+      <div class="rapport-item"><div class="rapport-item-body">${escHtml(r.resume_executif||'')}</div></div>
+      ${r.chiffre_cle?`<div style="background:linear-gradient(135deg,var(--p),var(--pd));color:#fff;border-radius:12px;padding:14px 16px;margin-top:8px"><div style="font-size:10px;font-weight:700;opacity:.65;text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px;font-family:'Outfit',sans-serif">Chiffre clé du jour</div><div style="font-size:14px;font-weight:700;line-height:1.4;font-family:'Manrope',sans-serif">${escHtml(r.chiffre_cle)}</div></div>`:''}
+    </div>
+    <div class="rapport-section">
+      <div class="rapport-section-title">📈 Tendances &amp; Analyses</div>
+      ${(r.tendances||[]).map(t=>`
+        <div class="rapport-item">
+          <div class="rapport-item-title">${escHtml(t.titre)}</div>
+          <div class="rapport-item-body">${escHtml(t.analyse)}</div>
+          ${t.impact_mss?`<div style="margin-top:6px;font-size:11px;font-weight:700;color:var(--p);font-family:'Outfit',sans-serif">💡 ${escHtml(t.impact_mss)}</div>`:''}
+        </div>`).join('')}
+    </div>
+    <div class="rapport-section">
+      <div class="rapport-section-title">✍️ Opportunités de Contenu</div>
+      ${(r.opportunites_contenu||[]).map(o=>`
+        <div class="rapport-item" style="border-left-color:${urgTxt[o.urgence]||'var(--p)'}">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+            <div class="rapport-item-title" style="margin:0">${escHtml(o.sujet)}</div>
+            <span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:4px;background:${urgBg[o.urgence]||'#e2e8f0'};color:${urgTxt[o.urgence]||'#475569'};font-family:'Outfit',sans-serif;flex-shrink:0;text-transform:uppercase;letter-spacing:.4px">${o.urgence||''}</span>
+          </div>
+          <div class="rapport-item-body">${escHtml(o.angle)}</div>
+        </div>`).join('')}
+    </div>
+    ${r.citation_inspiration?`
+    <div class="rapport-section">
+      <div class="rapport-section-title">💬 Citation Inspiration</div>
+      <div style="background:var(--bga);border:1px solid var(--b);border-radius:12px;padding:14px 16px;font-style:italic;font-size:13px;color:var(--m);font-family:'Manrope',sans-serif;border-left:4px solid var(--pm)">"${escHtml(r.citation_inspiration)}"</div>
+    </div>`:''}`;
+}
+
+function formatRapportText(r, today){
+  let t=`COMPTE RENDU QUOTIDIEN — MySentinelSolutions\n${today}\n${'─'.repeat(50)}\n\n`;
+  t+=`RÉSUMÉ EXÉCUTIF\n${r.resume_executif||''}\n\n`;
+  if(r.chiffre_cle) t+=`CHIFFRE CLÉ : ${r.chiffre_cle}\n\n`;
+  t+=`TENDANCES\n`;
+  (r.tendances||[]).forEach(x=>{ t+=`• ${x.titre}\n${x.analyse}\n${x.impact_mss?'→ Impact MSS : '+x.impact_mss:''}\n\n`; });
+  t+=`OPPORTUNITÉS DE CONTENU\n`;
+  (r.opportunites_contenu||[]).forEach(x=>{ t+=`[${x.urgence}] ${x.sujet} — ${x.angle}\n`; });
+  if(r.citation_inspiration) t+=`\nCITATION : "${r.citation_inspiration}"`;
+  return t;
+}
+
+function copyRapport(btn){
+  const origText=btn.textContent;
+  navigator.clipboard.writeText(store.rapport||'').then(()=>{
+    btn.textContent='✅ Copié!'; btn.classList.add('ok');
+    setTimeout(()=>{btn.textContent=origText;btn.classList.remove('ok');},2000);
+  });
+}
+
+function closeRapport(){
+  document.getElementById('rapportModal').classList.remove('on');
+  document.body.style.overflow='';
+}
+
+function closeRapportOnBg(e){
+  if(e.target===document.getElementById('rapportModal')) closeRapport();
+}
 
 // ── VEILLE RSS MODULE ─────────────────────────────────────────────
 const RSS_FEEDS = [
