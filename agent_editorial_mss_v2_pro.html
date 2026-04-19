@@ -316,6 +316,18 @@
   .rapport-art-src{font-size:10px;color:var(--p);font-weight:700;font-family:'Outfit',sans-serif;margin-top:5px}
   .rapport-social{background:var(--pl);border-radius:var(--r12);padding:14px 16px;margin-bottom:4px}
   .rapport-social-body{font-size:12.5px;color:var(--t);line-height:1.7;font-family:'Manrope',sans-serif;white-space:pre-wrap;word-break:break-word}
+  /* ── Recherche RSS ── */
+  .feed-search{width:100%;padding:9px 14px 9px 36px;border:1.5px solid var(--b);border-radius:var(--r12);font-family:'Manrope',sans-serif;font-size:14px;color:var(--t);background:var(--bga);outline:none;transition:border-color .2s,box-shadow .2s;margin-bottom:10px}
+  .feed-search:focus{border-color:var(--p);box-shadow:0 0 0 3px rgba(12,122,140,.1);background:#fff}
+  .feed-search-wrap{position:relative}
+  .feed-search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none;opacity:.5}
+  /* ── Countdown 21h ── */
+  .countdown-badge{display:inline-flex;align-items:center;gap:5px;background:var(--bga);border:1px solid var(--b);border-radius:8px;padding:3px 10px;font-size:11px;font-weight:700;color:var(--m);font-family:'Outfit',sans-serif;margin-top:5px;transition:all .3s}
+  .countdown-badge.ready{background:#fef9c3;border-color:#fde047;color:#854d0e}
+  .countdown-badge.imminent{background:var(--pl);border-color:var(--pm);color:var(--pd)}
+  /* ── Quick-select pertinence ── */
+  .btn-smart-sel{padding:7px 12px;border:none;border-radius:var(--r12);font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;cursor:pointer;transition:all .2s;min-height:36px;background:linear-gradient(135deg,#7c3aed,#5b21b6);color:#fff}
+  .btn-smart-sel:hover{opacity:.88;transform:translateY(-1px)}
 </style>
 </head>
 <body>
@@ -350,6 +362,7 @@
     <div>
       <div class="veille-title">📡 Veille IA &amp; Santé Connectée <span class="veille-live">Live</span></div>
       <div id="veilleTimestamp" style="font-size:10px;color:var(--m);font-family:'Manrope',sans-serif;margin-top:3px"></div>
+      <div id="countdown21h" class="countdown-badge" style="display:none"></div>
     </div>
     <div class="veille-controls">
       <button class="btn-veille sec" onclick="loadVeille(true)" id="btnRefresh">🔄 Actualiser</button>
@@ -362,11 +375,16 @@
     <button class="feed-fbtn" onclick="filterFeed('sante',this)">❤️ Santé</button>
     <button class="feed-fbtn" onclick="filterFeed('tech',this)">💡 Tech</button>
   </div>
+  <div class="feed-search-wrap">
+    <span class="feed-search-icon">🔍</span>
+    <input type="text" class="feed-search" id="feedSearch" placeholder="Filtrer par mot-clé (IA, diagnostic, wearable…)" oninput="searchFeed(this.value)">
+  </div>
   <div id="feedStatus" class="feed-status-txt">Cliquez sur "Actualiser" pour charger les dernières actualités IA &amp; Santé.</div>
   <div class="feed-items" id="feedItems" style="display:none"></div>
-  <div style="display:flex;gap:7px;margin-bottom:8px">
+  <div style="display:flex;gap:7px;margin-bottom:8px;flex-wrap:wrap">
     <button class="btn-veille sec" onclick="selectAllArticles()" style="flex:1;font-size:11px;padding:7px 10px">☑️ Tout sélectionner</button>
-    <button class="btn-veille sec" onclick="deselectAllArticles()" style="flex:1;font-size:11px;padding:7px 10px">☐ Tout déselectionner</button>
+    <button class="btn-veille sec" onclick="deselectAllArticles()" style="flex:1;font-size:11px;padding:7px 10px">☐ Tout désélectionner</button>
+    <button class="btn-smart-sel" onclick="smartSelectArticles()" title="Sélectionne les 8 articles les plus pertinents pour IA & Santé Connectée">✨ Top 8 pertinents</button>
   </div>
   <div class="feed-sel-bar" id="feedSelBar">
     <span class="feed-sel-txt" id="feedSelTxt">0 article sélectionné</span>
@@ -715,6 +733,7 @@ function init(){
   loadKey();
   updateHistBadge();
   checkDailyNotif();
+  startCountdown21h();
   updateFAB();
   window.addEventListener('resize', updateFAB);
   renderProds(); renderKW();
@@ -1532,15 +1551,11 @@ const VEILLE_CACHE_TTL = 3 * 60 * 60 * 1000; // 3 heures en ms
 let veilleArticles = [];
 let selectedArticles = new Set();
 let currentFeedFilter = 'all';
+let searchQuery = '';
 
-async function fetchFeedProxy(feedDef) {
-  const proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(feedDef.url);
-  const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(12000) });
-  if (!res.ok) throw new Error('HTTP ' + res.status);
-  const data = await res.json();
-  if (!data.contents) throw new Error('Empty response');
+function parseRssXml(contents, feedDef) {
   const parser = new DOMParser();
-  const xml = parser.parseFromString(data.contents, 'text/xml');
+  const xml = parser.parseFromString(contents, 'text/xml');
   const items = xml.querySelectorAll('item, entry');
   return Array.from(items).slice(0, 8).map(item => {
     const title = item.querySelector('title')?.textContent?.trim() || '';
@@ -1554,6 +1569,29 @@ async function fetchFeedProxy(feedDef) {
     const dateStr = ts ? new Date(ts).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
     return { title, desc, link, dateStr, ts, tag: feedDef.tag, source: feedDef.label, icon: feedDef.icon, id: Math.random().toString(36).slice(2) };
   }).filter(a => a.title);
+}
+
+async function fetchFeedProxy(feedDef) {
+  const encodedUrl = encodeURIComponent(feedDef.url);
+  const proxies = [
+    { url: 'https://api.allorigins.win/get?url=' + encodedUrl, json: true },
+    { url: 'https://corsproxy.io/?' + encodedUrl, json: false },
+    { url: 'https://api.codetabs.com/v1/proxy?quest=' + encodedUrl, json: false }
+  ];
+  let lastErr;
+  for (const proxy of proxies) {
+    try {
+      const res = await fetch(proxy.url, { signal: AbortSignal.timeout(12000) });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const contents = proxy.json ? (await res.json()).contents : await res.text();
+      if (!contents) throw new Error('Empty response');
+      return parseRssXml(contents, feedDef);
+    } catch(e) {
+      lastErr = e;
+      console.warn(`Proxy ${proxy.url.substring(0,40)} failed for ${feedDef.label}:`, e.message);
+    }
+  }
+  throw lastErr;
 }
 
 // ── Cache veille ──────────────────────────────────────────────────
@@ -1641,9 +1679,19 @@ async function loadVeille(forceRefresh = true) {
 
 function renderFeedItems() {
   const itemsEl = document.getElementById('feedItems');
-  const filtered = currentFeedFilter === 'all' ? veilleArticles : veilleArticles.filter(a => a.tag === currentFeedFilter);
+  let filtered = currentFeedFilter === 'all' ? veilleArticles : veilleArticles.filter(a => a.tag === currentFeedFilter);
+  if (searchQuery.trim()) {
+    const q = searchQuery.toLowerCase().trim();
+    filtered = filtered.filter(a =>
+      a.title.toLowerCase().includes(q) ||
+      (a.desc||'').toLowerCase().includes(q) ||
+      a.source.toLowerCase().includes(q)
+    );
+  }
   if (!filtered.length) {
-    itemsEl.innerHTML = '<div class="feed-status-txt">Aucun article dans cette catégorie.</div>';
+    itemsEl.innerHTML = searchQuery.trim()
+      ? `<div class="feed-status-txt">Aucun résultat pour "<strong>${escHtml(searchQuery)}</strong>".</div>`
+      : '<div class="feed-status-txt">Aucun article dans cette catégorie.</div>';
     return;
   }
   itemsEl.innerHTML = filtered.map(a => `
@@ -1695,6 +1743,26 @@ function deselectAllArticles() {
   renderFeedItems();
   updateSelBar();
   showToast('☐ Sélection effacée');
+}
+
+function searchFeed(query) {
+  searchQuery = query;
+  renderFeedItems();
+}
+
+const SMART_KEYWORDS = ['ia','intelligence artificielle','ai','machine learning','deep learning','diagnostic','wearable','capteur','santé connectée','health','medtech','algorithme','ehr','fda','ce mark','medecine','médecine','mhealth','biomarqueur','essai clinique','annotation','détection','prédiction','modèle','données de santé'];
+
+function smartSelectArticles() {
+  selectedArticles.clear();
+  const scored = veilleArticles.map(a => {
+    const text = (a.title + ' ' + (a.desc||'')).toLowerCase();
+    const score = SMART_KEYWORDS.reduce((s, kw) => s + (text.includes(kw) ? 1 : 0), 0);
+    return { ...a, score };
+  }).sort((a, b) => b.score - a.score || (b.ts||0) - (a.ts||0));
+  scored.slice(0, 8).forEach(a => selectedArticles.add(a.id));
+  renderFeedItems();
+  updateSelBar();
+  showToast(`✨ ${selectedArticles.size} articles pertinents sélectionnés`, 3000);
 }
 
 async function generateRapportFromSelection() {
@@ -1937,6 +2005,34 @@ function showNotifBar() {
 
 function closeNotif() {
   document.getElementById('notifBar').classList.remove('on');
+}
+
+function startCountdown21h() {
+  const el = document.getElementById('countdown21h');
+  if (!el) return;
+  function update() {
+    const now = new Date();
+    const lastDate = localStorage.getItem('mss_rapport_date');
+    if (lastDate === now.toDateString()) {
+      el.style.display = 'none';
+      return;
+    }
+    el.style.display = 'inline-flex';
+    const target = new Date();
+    target.setHours(21, 0, 0, 0);
+    if (now >= target) {
+      el.textContent = '📰 Rapport 21h disponible';
+      el.className = 'countdown-badge ready';
+    } else {
+      const diff = target - now;
+      const h = Math.floor(diff / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      el.textContent = `⏱ Rapport dans ${h}h${String(m).padStart(2,'0')}`;
+      el.className = diff < 3600000 ? 'countdown-badge imminent' : 'countdown-badge';
+    }
+  }
+  update();
+  setInterval(update, 60000);
 }
 
 // ── Export PDF / Impression du rapport ────────────────────────────
