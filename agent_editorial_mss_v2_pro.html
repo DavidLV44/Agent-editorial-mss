@@ -754,6 +754,14 @@ function init(){
 
   // Auto-refresh veille toutes les 3 heures
   setInterval(() => loadVeille(true), VEILLE_CACHE_TTL);
+
+  // Mise à jour du compteur de prochain refresh toutes les minutes
+  setInterval(() => {
+    try {
+      const raw = localStorage.getItem('mss_veille_cache');
+      if (raw) { const { ts } = JSON.parse(raw); if (ts) updateVeilleTimestamp(ts); }
+    } catch(e) {}
+  }, 60000);
 }
 
 function renderProds(){
@@ -1304,9 +1312,19 @@ function histRestore(id){
   const entry = histLoad().find(h=>h.id===id);
   if(!entry) return;
   store = {...entry.store};
-  // Restaurer l'interface résultats
   document.getElementById('formCard').style.display='none';
+  document.getElementById('veilleCard').style.display='block';
   document.getElementById('loader').classList.remove('on');
+
+  if(entry.isRapport && entry.rapportHtml){
+    document.getElementById('c-rapport').innerHTML = entry.rapportHtml;
+    document.getElementById('results').classList.add('on');
+    closeHist();
+    tab('rapport');
+    showToast('✅ Rapport restauré');
+    return;
+  }
+
   document.getElementById('c-html').textContent = store.html||'';
   document.getElementById('c-seo').textContent = store.seo||'';
   document.getElementById('c-facebook').innerHTML = store.fbHtml||'';
@@ -1535,7 +1553,6 @@ const RSS_FEEDS = [
   // HealthTech international spécialisé
   { label:'Healthcare IT News',   url:'https://www.healthcareitnews.com/rss.xml',                                        tag:'tech',  icon:'💻' },
   { label:'HIT Consulting',       url:'https://hitconsultant.net/feed/',                                                 tag:'tech',  icon:'📊' },
-  { label:'Fierce HealthIT',      url:'https://www.fiercehealthcare.com/rss/xml',                                        tag:'tech',  icon:'⚡' },
   { label:'MedTech Dive',         url:'https://www.medtechdive.com/feeds/news/',                                         tag:'tech',  icon:'🔬' },
   { label:'Digital Health Today', url:'https://digitalhealthtoday.com/feed/',                                            tag:'tech',  icon:'📲' },
   // IA médicale & recherche
@@ -1619,7 +1636,9 @@ function updateVeilleTimestamp(ts) {
   const d = new Date(ts);
   const diffMin = Math.round((Date.now() - ts) / 60000);
   const ago = diffMin < 1 ? 'à l\'instant' : diffMin < 60 ? `il y a ${diffMin} min` : `il y a ${Math.round(diffMin/60)}h`;
-  el.textContent = `Mis à jour ${ago} · ${d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}`;
+  const nextMin = Math.max(0, Math.round((VEILLE_CACHE_TTL - (Date.now() - ts)) / 60000));
+  const nextTxt = nextMin <= 0 ? 'mise à jour disponible' : nextMin < 60 ? `prochain refresh dans ${nextMin} min` : `prochain refresh dans ${Math.round(nextMin/60)}h`;
+  el.textContent = `Mis à jour ${ago} · ${d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})} · ${nextTxt}`;
 }
 
 async function loadVeille(forceRefresh = true) {
@@ -1779,10 +1798,19 @@ async function startRapportAuto() {
     if (!veilleArticles.length) return;
   }
   selectedArticles.clear();
-  veilleArticles.slice(0, 8).forEach(a => selectedArticles.add(a.id));
+  // Sélection équilibrée : top 4 par catégorie (ia, sante, tech), max 12 articles
+  const byTag = {ia:[], sante:[], tech:[]};
+  veilleArticles.forEach(a => { if (byTag[a.tag]) byTag[a.tag].push(a); });
+  const balanced = [
+    ...byTag.ia.slice(0,4),
+    ...byTag.sante.slice(0,4),
+    ...byTag.tech.slice(0,4)
+  ].slice(0, 12);
+  const autoSel = balanced.length >= 4 ? balanced : veilleArticles.slice(0, 10);
+  autoSel.forEach(a => selectedArticles.add(a.id));
   renderFeedItems();
   updateSelBar();
-  await generateRapport(veilleArticles.slice(0, 8));
+  await generateRapport(autoSel);
 }
 
 async function generateRapport(articles) {
@@ -1814,18 +1842,18 @@ Sources analysées : ${articles.length} article${articles.length > 1 ? 's' : ''}
 ARTICLES EN VEILLE :
 ${articlesText}
 
-Génère un rapport de veille quotidien professionnel — cible : 5 à 10 min de lecture (synthèse 800-1200 mots). FORMAT JSON EXACT :
+Génère un rapport de veille quotidien professionnel — cible : 5 à 10 min de lecture (synthèse 1200-2000 mots). FORMAT JSON EXACT :
 {
   "titre_rapport": "Veille IA & Santé Connectée — [2-4 mots résumant la tendance dominante] · ${today}",
-  "executive_summary": "Résumé exécutif en 3-4 phrases. Les faits les plus saillants du jour, sans jargon marketing. Adapté aux décideurs disposant de 30 secondes. Ton neutre, analytique, précis.",
-  "highlights": ["🔬 Signal fort : [fait précis en 12 mots max]", "⚡ À surveiller : [fait précis en 12 mots]", "💡 Implication clé : [fait précis en 12 mots]"],
-  "synthese": "Analyse approfondie 800-1200 mots, structurée en 7 paragraphes. Chaque paragraphe commence par un titre court en MAJUSCULES. § CONTEXTE & TENDANCE DOMINANTE (150 mots) : vue d'ensemble du jour, signal principal. § IA DIAGNOSTIQUE & CLINIQUE (150 mots) : avancées algorithmes, essais cliniques, validations FDA/CE. § WEARABLES & MONITORING CONTINU (130 mots) : capteurs, dispositifs portables, données patients. § RÉGLEMENTATION & ÉTHIQUE (110 mots) : cadres légaux, enjeux vie privée, biais algorithmiques. § MARCHÉS & INVESTISSEMENTS (100 mots) : levées de fonds, acquisitions, parts de marché. § SIGNAUX FAIBLES & PERSPECTIVES 6-12 MOIS (130 mots) : tendances émergentes, ruptures potentielles, à surveiller. § IMPLICATIONS OPÉRATIONNELLES (130 mots) : recommandations concrètes pour DSI, directeurs innovation, investisseurs MedTech. Ton analytique, factuel, citations précises des sources. Zéro jargon marketing.",
-  "tendances": ["Tendance 1 avec momentum (ex: +fort / stable / émergent) — secteur IA médicale", "Tendance 2 — wearables & monitoring continu", "Tendance 3 — réglementation ou marchés"],
-  "points_cles": ["Fait marquant 1 avec chiffre ou référence source précise", "Fait marquant 2 — implication sectorielle mesurable", "Fait marquant 3 — signal de rupture ou innovation identifiée"],
-  "linkedin": "Post LinkedIn expert (250-320 mots). Accroche : chiffre ou constat contre-intuitif sur une seule ligne, puis saut de ligne. Corps : 3-4 blocs de 2-3 lignes max, données chiffrées obligatoires, aucune formule creuse. Conclusion : perspective stratégique ou question de fond ouverte. 3-4 hashtags : #SantéNumérique #HealthTech #IA #MedTech. Zéro emoji. Ton directeur médical ou analyste senior.",
-  "facebook": "Post Facebook expert-vulgarisé (180-240 mots). Accroche : 1 chiffre précis + contexte factuel (zéro clickbait). Corps : explication pour audience cultivée non-spécialiste. Chiffre clé mis en évidence. Question de fond ouvrant le débat. 2-3 hashtags grand public. 1-2 emojis max si pertinents.",
-  "twitter": "Thread X/Twitter (4 tweets). Tweet 1 (accroche + chiffre clé, 240 car max). Tweet 2 (fait sectoriel 1, 240 car). Tweet 3 (fait sectoriel 2 + preuve, 240 car). Tweet 4 (implication + CTA sobre, 240 car). Séparateur entre chaque tweet : \\n---\\n. Ton expert, zéro sensationnalisme, 1-2 hashtags max.",
-  "newsletter": "Extrait newsletter B2B (110-150 mots). Titre court factuel. Corps : 3 points en gras + 1 ligne d'explication chacun. Signature 'L'équipe MySentinelSolutions'. Audience : DSI santé, directeurs innovation, investisseurs MedTech. Ton rigoureux, aucun jargon commercial."
+  "executive_summary": "Résumé exécutif en 4-5 phrases. Les faits les plus saillants du jour, sans jargon marketing. Adapté aux décideurs disposant de 45 secondes. Ton neutre, analytique, précis. Mentionne au moins un chiffre concret.",
+  "highlights": ["🔬 Signal fort : [fait précis en 15 mots max avec chiffre]", "⚡ À surveiller : [fait précis en 15 mots avec source]", "💡 Implication clé : [recommandation opérationnelle en 15 mots]", "📊 Marché : [donnée chiffrée ou tendance en 15 mots]"],
+  "synthese": "Analyse approfondie 1200-2000 mots, structurée en 8 paragraphes denses. Chaque paragraphe commence par un titre court en MAJUSCULES suivi de deux-points. § CONTEXTE & TENDANCE DOMINANTE (200 mots) : vue d'ensemble du jour, signal principal, mise en perspective avec la semaine précédente. § IA DIAGNOSTIQUE & CLINIQUE (200 mots) : avancées algorithmes, essais cliniques, validations FDA/CE, performance comparée aux experts humains. § WEARABLES & MONITORING CONTINU (180 mots) : capteurs, dispositifs portables, données patients en vie réelle, précision clinique. § RÉGLEMENTATION & ÉTHIQUE (160 mots) : cadres légaux EU AI Act, enjeux vie privée, biais algorithmiques, responsabilité médicale. § MARCHÉS & INVESTISSEMENTS (150 mots) : levées de fonds, acquisitions, valorisations, parts de marché, acteurs dominants. § RECHERCHE & PUBLICATIONS (140 mots) : études cliniques récentes, méta-analyses, niveaux de preuve, controverses scientifiques. § SIGNAUX FAIBLES & PERSPECTIVES 6-12 MOIS (170 mots) : tendances émergentes, ruptures potentielles, technologies en phase de validation, à surveiller impérativement. § IMPLICATIONS OPÉRATIONNELLES (200 mots) : recommandations concrètes et actionnables pour DSI de santé, directeurs innovation, investisseurs MedTech, praticiens connectés. Ton analytique, factuel, citations précises des sources entre parenthèses. Zéro jargon marketing. Zéro formule vague.",
+  "tendances": ["Tendance 1 avec momentum précis (ex: +fort / stable / émergent) — secteur IA médicale avec chiffre", "Tendance 2 — wearables & monitoring continu, fait mesurable", "Tendance 3 — réglementation ou marchés, donnée quantifiée", "Tendance 4 — signal faible à surveiller avec horizon temporel"],
+  "points_cles": ["Fait marquant 1 avec chiffre et référence source précise entre parenthèses", "Fait marquant 2 — implication sectorielle mesurable et quantifiée", "Fait marquant 3 — signal de rupture ou innovation identifiée avec source", "Fait marquant 4 — enjeu réglementaire ou éthique concret"],
+  "linkedin": "Post LinkedIn expert (280-340 mots). TON ABSOLU : analyste senior institutionnel ou directeur médical — zéro emoji dans le corps, zéro superlatif non étayé, zéro formule marketing. Accroche : 1 fait contre-intuitif ou chiffre précis sur une seule ligne courte, puis double saut de ligne. Corps : 4 blocs de 2-3 lignes max chacun, séparés par des sauts de ligne — données chiffrées obligatoires à chaque bloc, source entre parenthèses si possible. Conclusion : question de fond ouverte ou perspective stratégique sobre (1 ligne). 3-4 hashtags professionnels uniquement : #SantéNumérique #HealthTech #IA #MedTech.",
+  "facebook": "Post Facebook expert-vulgarisé (200-260 mots). TON : Sciences & Avenir ou Le Monde Sciences — rigoureux, accessible, jamais racoleur. Accroche : 1 chiffre précis + contexte factuel immédiat (zéro clickbait, zéro question rhétorique). Corps : 3 paragraphes clairs pour audience cultivée non-spécialiste — 1 chiffre clé mis en évidence par des astérisques si pertinent. Question de fond ouvrant un débat sérieux en conclusion. 2-3 hashtags sectoriels. 1 emoji max si vraiment pertinent pour la compréhension.",
+  "twitter": "Thread X/Twitter (5 tweets). Tweet 1 (accroche : chiffre précis + contexte, 240 car max). Tweet 2 (fait sectoriel 1 avec preuve, 240 car). Tweet 3 (fait sectoriel 2 + nuance critique, 240 car). Tweet 4 (implication ou signal faible, 240 car). Tweet 5 (perspective 6-12 mois sobre + CTA expert, 240 car). Séparateur : \\n---\\n. Ton expert, zéro sensationnalisme, 1-2 hashtags max. Zéro emoji dans les tweets sauf le premier si pertinent.",
+  "newsletter": "Extrait newsletter B2B (130-180 mots). Titre factuel court. Corps : 4 points en gras + 1-2 lignes d'explication chacun, données chiffrées. Signature 'L'équipe MySentinelSolutions'. Audience : DSI santé, directeurs innovation, investisseurs MedTech, praticiens numériques. Ton rigoureux, aucun jargon commercial, aucun superlatif."
 }`;
 
   let rawResponse = '';
@@ -1836,7 +1864,7 @@ Génère un rapport de veille quotidien professionnel — cible : 5 à 10 min de
       body: JSON.stringify({
         system_instruction: { parts: [{ text: systemPrompt }] },
         contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
-        generationConfig: { maxOutputTokens: 24576, temperature: 0.45 }
+        generationConfig: { maxOutputTokens: 32768, temperature: 0.45 }
       })
     });
     const data = await res.json();
@@ -1944,7 +1972,14 @@ ${(parsed.points_cles||[]).length ? `<div style="margin-bottom:18px">
       format: 'Rapport quotidien',
       seoPreview: (parsed.points_cles||[]).slice(0,2).join(' · '),
       conseils: {},
-      store: { html:'', seo:'', fb_text: store.rapport_facebook||'', fb_link:'', fbHtml:'', insta_caption:'' }
+      isRapport: true,
+      rapportHtml: document.getElementById('c-rapport').innerHTML,
+      store: {
+        html:'', seo:'', fb_text: store.rapport_facebook||'', fb_link:'', fbHtml:'', insta_caption:'',
+        rapport: store.rapport||'', rapport_linkedin: store.rapport_linkedin||'',
+        rapport_facebook: store.rapport_facebook||'', rapport_twitter: store.rapport_twitter||'',
+        rapport_newsletter: store.rapport_newsletter||''
+      }
     });
     updateHistBadge();
     showToast('✅ Rapport de veille généré !', 3000);
