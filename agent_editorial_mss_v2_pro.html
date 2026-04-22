@@ -321,6 +321,9 @@
   .feed-search:focus{border-color:var(--p);box-shadow:0 0 0 3px rgba(12,122,140,.1);background:#fff}
   .feed-search-wrap{position:relative}
   .feed-search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none;opacity:.5}
+  /* ── Sélecteur modèle rapport ── */
+  .model-select{padding:6px 10px;border:1.5px solid var(--pm);border-radius:var(--r12);font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;color:var(--pd);background:var(--bg);cursor:pointer;min-height:36px;outline:none;transition:border-color .2s}
+  .model-select:focus{border-color:var(--p)}
   /* ── Countdown 21h ── */
   .countdown-badge{display:inline-flex;align-items:center;gap:5px;background:var(--bga);border:1px solid var(--b);border-radius:8px;padding:3px 10px;font-size:11px;font-weight:700;color:var(--m);font-family:'Outfit',sans-serif;margin-top:5px;transition:all .3s}
   .countdown-badge.ready{background:#fef9c3;border-color:#fde047;color:#854d0e}
@@ -366,6 +369,10 @@
     </div>
     <div class="veille-controls">
       <button class="btn-veille sec" onclick="loadVeille(true)" id="btnRefresh">🔄 Actualiser</button>
+      <select id="rapportModelSel" class="model-select" title="Modèle IA : Flash = rapide & économique · Pro = analyse plus approfondie">
+        <option value="gemini-2.5-flash">⚡ Flash</option>
+        <option value="gemini-2.5-pro">🎯 Pro</option>
+      </select>
       <button class="btn-veille pri" onclick="startRapportAuto()" id="btnRapport21">📰 Rapport 21h</button>
     </div>
   </div>
@@ -895,7 +902,7 @@ FORMAT JSON EXACT :
 {
   "html": "<section class=\\"hero\\">...</section><section class=\\"section\\">...</section>",
   "facebook": {
-    "texte": "Post Facebook expert-vulgarisé (200-320 mots). Accroche : chiffre ou constat factuel (pas de question rhétorique). Corps : 3 paragraphes clairs, ton sérieux et accessible. Chiffre clé en évidence. Conclusion : question de fond ou invitation à lire (sobre). Aucun emoji excessif — 1-2 max si pertinents.",
+    "texte": "Post Facebook expert-vulgarisé (200-280 mots). Style Sciences & Avenir / Le Monde Sciences — rigoureux, accessible, jamais racoleur. Accroche : 1 chiffre précis + contexte factuel immédiat — zéro clickbait, zéro question rhétorique creuse. Corps : 3 paragraphes clairs pour audience cultivée non-spécialiste, 1 chiffre clé mis en évidence. Question de fond sérieuse ouvrant un débat en conclusion (jamais de promesse ou d'urgence artificielle). 1 emoji max si vraiment utile. 2-3 hashtags sectoriels. Zéro sensationnalisme, zéro superlatif non étayé.",
     "lien": "https://mysentinelsolutions.com/slug-de-larticle",
     "titre_lien": "Titre factuel et professionnel de l'article (pas de clickbait)",
     "cta": "CTA sobre (ex: Lire l'analyse complète → / Accéder au guide expert →)"
@@ -911,8 +918,8 @@ FORMAT JSON EXACT :
     "legende": "Légende Instagram sérieuse (3-4 phrases factuelles, 8-12 hashtags sectoriels pertinents)"
   },
   "linkedin": {
-    "texte": "Post LinkedIn professionnel (200-320 mots). Accroche : fait sectoriel précis ou chiffre concret — une seule ligne, puis saut de ligne. Corps : blocs courts (2-3 lignes max), données chiffrées obligatoires, 3-4 points clés numérotés. Conclusion sobre + CTA expert. Adapte l'intensité au ton éditorial sélectionné.",
-    "hashtags": "#SantéNumérique #HealthTech #IA #MedTech #Longévité"
+    "texte": "Post LinkedIn expert (280-340 mots). TON ABSOLU quand tone='pro' : analyste senior institutionnel ou directeur médical — zéro emoji dans le corps, zéro superlatif non étayé, zéro formule marketing ('révolutionnaire', 'game-changer', 'incroyable'). Accroche : 1 fait contre-intuitif ou chiffre précis sur une seule ligne courte (jamais de question rhétorique), puis double saut de ligne. Corps : 4 blocs de 2-3 lignes max chacun, séparés par sauts de ligne, données chiffrées obligatoires à chaque bloc, source entre parenthèses si possible. Conclusion : perspective stratégique sobre ou question de fond ouverte — 1 ligne. 3-4 hashtags sectoriels uniquement : #SantéNumérique #HealthTech #IA #MedTech.",
+    "hashtags": "#SantéNumérique #HealthTech #IA #MedTech"
   },
   "seo": "Titre SEO (60 car max) | meta description (155 car max) | mot-clé principal",
   "twitter": "Thread X/Twitter (4 tweets). Tweet 1 (accroche + chiffre, 240 car max). Tweet 2 (fait clé 1, 240 car). Tweet 3 (fait clé 2 + preuve, 240 car). Tweet 4 (conclusion sobre + CTA, 240 car). Chaque tweet séparé par \\n---\\n. Ton expert, zéro clickbait, 1-2 hashtags max.",
@@ -1593,7 +1600,8 @@ async function fetchFeedProxy(feedDef) {
   const proxies = [
     { url: 'https://api.allorigins.win/get?url=' + encodedUrl, json: true },
     { url: 'https://corsproxy.io/?' + encodedUrl, json: false },
-    { url: 'https://api.codetabs.com/v1/proxy?quest=' + encodedUrl, json: false }
+    { url: 'https://api.codetabs.com/v1/proxy?quest=' + encodedUrl, json: false },
+    { url: 'https://thingproxy.freeboard.io/fetch/' + encodedUrl, json: false }
   ];
   let lastErr;
   for (const proxy of proxies) {
@@ -1769,7 +1777,29 @@ function searchFeed(query) {
   renderFeedItems();
 }
 
-const SMART_KEYWORDS = ['ia','intelligence artificielle','ai','machine learning','deep learning','diagnostic','wearable','capteur','santé connectée','health','medtech','algorithme','ehr','fda','ce mark','medecine','médecine','mhealth','biomarqueur','essai clinique','annotation','détection','prédiction','modèle','données de santé'];
+const SMART_KEYWORDS = [
+  // IA & Algorithmes médicaux
+  'ia','intelligence artificielle','ai','machine learning','deep learning','llm','gpt','algorithme',
+  'modèle','prédiction','détection','annotation','inférence','réseau de neurones','computer vision',
+  // Diagnostic & Clinique
+  'diagnostic','imagerie médicale','radiologie','pathologie','scanner','irm','echographie','endoscopie',
+  'biomarqueur','essai clinique','ehr','dmp','fda','ce mark','approbation','validation clinique',
+  // Santé connectée & Wearables
+  'wearable','capteur','health','medtech','santé connectée','mhealth','iot médical','dispositif connecté',
+  'monitoring','télémédecine','téléconsultation','e-santé','numérique en santé','objets connectés',
+  // Données & Réglementation
+  'données de santé','hdh','snds','rgpd santé','interopérabilité','hl7','fhir','cybersécurité santé',
+  'eu ai act','règlement','réglementation','éthique','vie privée','biais algorithmique',
+  // Marchés & Investissements
+  'startup','levée de fonds','financement','acquisition','valorisation','marché','investissement',
+  'ipo','partenariat','contrat','déploiement','adoption','scalabilité',
+  // Spécialités médicales
+  'oncologie','cardiologie','neurologie','dermatologie','ophtalmologie','psychiatrie',
+  'diabète','cancer','alzheimer','insuffisance cardiaque','sepsis','avc',
+  // Institutions françaises
+  'has','haute autorité de santé','ans','assurance maladie','hôpital','chu','aphp',
+  'inserm','inria','cnrs','ministère de la santé','cnam','drees'
+];
 
 function smartSelectArticles() {
   selectedArticles.clear();
@@ -1856,9 +1886,10 @@ Génère un rapport de veille quotidien professionnel — cible : 5 à 10 min de
   "newsletter": "Extrait newsletter B2B (130-180 mots). Titre factuel court. Corps : 4 points en gras + 1-2 lignes d'explication chacun, données chiffrées. Signature 'L'équipe MySentinelSolutions'. Audience : DSI santé, directeurs innovation, investisseurs MedTech, praticiens numériques. Ton rigoureux, aucun jargon commercial, aucun superlatif."
 }`;
 
+  const rapportModel = document.getElementById('rapportModelSel')?.value || 'gemini-2.5-flash';
   let rawResponse = '';
   try {
-    const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + encodeURIComponent(apiKey), {
+    const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + rapportModel + ':generateContent?key=' + encodeURIComponent(apiKey), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -2003,9 +2034,26 @@ function checkDailyNotif() {
   const now = new Date();
   const target = new Date();
   target.setHours(21, 0, 0, 0);
+  const preTarget = new Date();
+  preTarget.setHours(20, 45, 0, 0);
+
   if (now >= target) {
     showNotifBar();
   } else {
+    // Pré-rappel 20h45 : actualise les flux RSS pour des données fraîches au moment du rapport
+    if (now < preTarget) {
+      const preDelay = preTarget.getTime() - now.getTime();
+      setTimeout(() => {
+        loadVeille(true).catch(() => {});
+        showToast('📡 Veille actualisée — Rapport dans 15 min', 5000);
+        if ('Notification' in window && Notification.permission === 'granted') {
+          new Notification('MySentinelSolutions — Rapport dans 15 min', {
+            body: 'Flux RSS actualisés. Votre rapport 21h sera disponible dans 15 minutes.',
+          });
+        }
+      }, preDelay);
+    }
+
     const delay = target.getTime() - now.getTime();
     setTimeout(() => {
       showNotifBar();
