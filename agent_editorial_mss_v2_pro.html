@@ -363,7 +363,7 @@
 <div class="veille-card" id="veilleCard">
   <div class="veille-hdr">
     <div>
-      <div class="veille-title">📡 Veille IA &amp; Santé Connectée <span class="veille-live">Live</span></div>
+      <div class="veille-title">📡 Veille IA &amp; Santé Connectée <span class="veille-live">Live</span> <span id="veilleCount" style="font-size:10px;font-weight:700;color:var(--p);font-family:'Outfit',sans-serif;display:none"></span></div>
       <div id="veilleTimestamp" style="font-size:10px;color:var(--m);font-family:'Manrope',sans-serif;margin-top:3px"></div>
       <div id="countdown21h" class="countdown-badge" style="display:none"></div>
     </div>
@@ -542,7 +542,7 @@
   </div>
 
   <div class="panel ocard" id="panel-rapport">
-    <div class="ohead"><span class="otitle">📰 Rapport de Veille</span><div style="display:flex;gap:7px;flex-wrap:wrap"><button class="btn-preview" onclick="printRapport()">🖨️ PDF</button><button class="btn-preview" onclick="exportRapportEmail()">✉️ Email</button><button class="bcopy" onclick="copy('rapport',this)">📋 Copier tout</button></div></div>
+    <div class="ohead"><span class="otitle">📰 Rapport de Veille</span><div style="display:flex;gap:7px;flex-wrap:wrap"><button class="btn-preview" onclick="printRapport()">🖨️ PDF</button><button class="btn-preview" onclick="exportRapportEmail()">✉️ Email</button><button class="bcopy" onclick="copyPackReseaux(this)" style="background:#7c3aed">📦 Pack réseaux</button><button class="bcopy" onclick="copy('rapport',this)">📋 Tout</button></div></div>
     <div class="obody" id="c-rapport" style="max-height:none;padding:18px">
       <div style="text-align:center;color:var(--m);font-size:12px;font-family:'Manrope',sans-serif;padding:20px 0">Sélectionnez des articles dans le module Veille ci-dessus et cliquez sur "Générer le rapport".</div>
     </div>
@@ -1568,6 +1568,14 @@ const RSS_FEEDS = [
   // Santé numérique française supplémentaire
   { label:'Agence du Num. Santé', url:'https://esante.gouv.fr/rss.xml',                                                  tag:'sante', icon:'🇫🇷' },
   { label:'Impact Santé Société', url:'https://impactsantesociete.fr/feed/',                                             tag:'sante', icon:'💊' },
+  // Nouvelles sources institutionnelles & spécialisées
+  { label:'HAS – Actualités',       url:'https://www.has-sante.fr/upload/docs/application/rss/rss_actualites.xml',          tag:'sante', icon:'🏛️' },
+  { label:'Kaiser Health News',     url:'https://khn.org/feed/',                                                             tag:'sante', icon:'📰' },
+  { label:'Becker\'s Hospital Rev.',url:'https://www.beckershospitalreview.com/rss/',                                        tag:'tech',  icon:'🏥' },
+  { label:'BioSpace',               url:'https://www.biospace.com/feed/',                                                    tag:'tech',  icon:'🔬' },
+  { label:'Frontiers – AI',         url:'https://www.frontiersin.org/journals/artificial-intelligence/rss',                  tag:'ia',    icon:'🧬' },
+  { label:'Le Quotidien du Médecin',url:'https://www.lequotidiendumedecin.fr/rss.xml',                                      tag:'sante', icon:'🩺' },
+  { label:'MIT CSAIL News',         url:'https://www.csail.mit.edu/news/rss.xml',                                            tag:'ia',    icon:'🎓' },
 ];
 
 const VEILLE_CACHE_TTL = 3 * 60 * 60 * 1000; // 3 heures en ms
@@ -1649,6 +1657,19 @@ function updateVeilleTimestamp(ts) {
   el.textContent = `Mis à jour ${ago} · ${d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})} · ${nextTxt}`;
 }
 
+function updateVeilleCount() {
+  const el = document.getElementById('veilleCount');
+  if (!el) return;
+  if (veilleArticles.length) {
+    const byTag = {ia:0, sante:0, tech:0};
+    veilleArticles.forEach(a => { if (byTag[a.tag] !== undefined) byTag[a.tag]++; });
+    el.textContent = `· ${veilleArticles.length} articles (IA:${byTag.ia} · Santé:${byTag.sante} · Tech:${byTag.tech})`;
+    el.style.display = 'inline';
+  } else {
+    el.style.display = 'none';
+  }
+}
+
 async function loadVeille(forceRefresh = true) {
   const btnR = document.getElementById('btnRefresh');
   const status = document.getElementById('feedStatus');
@@ -1665,6 +1686,7 @@ async function loadVeille(forceRefresh = true) {
       itemsEl.style.display = 'flex';
       renderFeedItems();
       updateVeilleTimestamp(cached.ts);
+      updateVeilleCount();
       showToast('📦 ' + veilleArticles.length + ' articles restaurés (cache)');
       return;
     }
@@ -1701,6 +1723,7 @@ async function loadVeille(forceRefresh = true) {
   renderFeedItems();
   saveVeilleCache(veilleArticles);
   updateVeilleTimestamp(Date.now());
+  updateVeilleCount();
   showToast(`✅ ${veilleArticles.length} articles chargés (${loaded}/${RSS_FEEDS.length} sources)`);
 }
 
@@ -1803,15 +1826,38 @@ const SMART_KEYWORDS = [
 
 function smartSelectArticles() {
   selectedArticles.clear();
+  const now = Date.now();
   const scored = veilleArticles.map(a => {
     const text = (a.title + ' ' + (a.desc||'')).toLowerCase();
-    const score = SMART_KEYWORDS.reduce((s, kw) => s + (text.includes(kw) ? 1 : 0), 0);
-    return { ...a, score };
+    // Fréquence des mots-clés (occurrences, pas seulement présence)
+    const kwScore = SMART_KEYWORDS.reduce((s, kw) => {
+      let count = 0, pos = 0;
+      while ((pos = text.indexOf(kw, pos)) !== -1) { count++; pos += kw.length; }
+      return s + count;
+    }, 0);
+    // Bonus de récence : articles récents prioritaires
+    const ageH = a.ts ? (now - a.ts) / 3600000 : 999;
+    const recencyBonus = ageH < 6 ? 10 : ageH < 24 ? 5 : ageH < 48 ? 2 : 0;
+    return { ...a, score: kwScore + recencyBonus };
   }).sort((a, b) => b.score - a.score || (b.ts||0) - (a.ts||0));
-  scored.slice(0, 8).forEach(a => selectedArticles.add(a.id));
+
+  // Diversité des sources : max 2 articles par source
+  const sourceCounts = {};
+  const diverse = [];
+  for (const a of scored) {
+    const cnt = sourceCounts[a.source] || 0;
+    if (cnt < 2) { diverse.push(a); sourceCounts[a.source] = cnt + 1; }
+    if (diverse.length >= 8) break;
+  }
+  // Équilibre par tag si possible
+  const byTag = {ia:[], sante:[], tech:[]};
+  diverse.forEach(a => { if (byTag[a.tag]) byTag[a.tag].push(a); });
+  const balanced = [...byTag.ia.slice(0,3), ...byTag.sante.slice(0,3), ...byTag.tech.slice(0,2)];
+  const finalSel = balanced.length >= 4 ? balanced : diverse;
+  finalSel.forEach(a => selectedArticles.add(a.id));
   renderFeedItems();
   updateSelBar();
-  showToast(`✨ ${selectedArticles.size} articles pertinents sélectionnés`, 3000);
+  showToast(`✨ ${selectedArticles.size} articles sélectionnés (récence + pertinence)`, 3000);
 }
 
 async function generateRapportFromSelection() {
@@ -1880,7 +1926,7 @@ Génère un rapport de veille quotidien professionnel — cible : 5 à 10 min de
   "synthese": "Analyse approfondie 1200-2000 mots, structurée en 8 paragraphes denses. Chaque paragraphe commence par un titre court en MAJUSCULES suivi de deux-points. § CONTEXTE & TENDANCE DOMINANTE (200 mots) : vue d'ensemble du jour, signal principal, mise en perspective avec la semaine précédente. § IA DIAGNOSTIQUE & CLINIQUE (200 mots) : avancées algorithmes, essais cliniques, validations FDA/CE, performance comparée aux experts humains. § WEARABLES & MONITORING CONTINU (180 mots) : capteurs, dispositifs portables, données patients en vie réelle, précision clinique. § RÉGLEMENTATION & ÉTHIQUE (160 mots) : cadres légaux EU AI Act, enjeux vie privée, biais algorithmiques, responsabilité médicale. § MARCHÉS & INVESTISSEMENTS (150 mots) : levées de fonds, acquisitions, valorisations, parts de marché, acteurs dominants. § RECHERCHE & PUBLICATIONS (140 mots) : études cliniques récentes, méta-analyses, niveaux de preuve, controverses scientifiques. § SIGNAUX FAIBLES & PERSPECTIVES 6-12 MOIS (170 mots) : tendances émergentes, ruptures potentielles, technologies en phase de validation, à surveiller impérativement. § IMPLICATIONS OPÉRATIONNELLES (200 mots) : recommandations concrètes et actionnables pour DSI de santé, directeurs innovation, investisseurs MedTech, praticiens connectés. Ton analytique, factuel, citations précises des sources entre parenthèses. Zéro jargon marketing. Zéro formule vague.",
   "tendances": ["Tendance 1 avec momentum précis (ex: +fort / stable / émergent) — secteur IA médicale avec chiffre", "Tendance 2 — wearables & monitoring continu, fait mesurable", "Tendance 3 — réglementation ou marchés, donnée quantifiée", "Tendance 4 — signal faible à surveiller avec horizon temporel"],
   "points_cles": ["Fait marquant 1 avec chiffre et référence source précise entre parenthèses", "Fait marquant 2 — implication sectorielle mesurable et quantifiée", "Fait marquant 3 — signal de rupture ou innovation identifiée avec source", "Fait marquant 4 — enjeu réglementaire ou éthique concret"],
-  "linkedin": "Post LinkedIn expert (280-340 mots). TON ABSOLU : analyste senior institutionnel ou directeur médical — zéro emoji dans le corps, zéro superlatif non étayé, zéro formule marketing. Accroche : 1 fait contre-intuitif ou chiffre précis sur une seule ligne courte, puis double saut de ligne. Corps : 4 blocs de 2-3 lignes max chacun, séparés par des sauts de ligne — données chiffrées obligatoires à chaque bloc, source entre parenthèses si possible. Conclusion : question de fond ouverte ou perspective stratégique sobre (1 ligne). 3-4 hashtags professionnels uniquement : #SantéNumérique #HealthTech #IA #MedTech.",
+  "linkedin": "Post LinkedIn expert (280-340 mots). STYLE GUIDE SENTINEL — TON ABSOLU : analyste sectoriel senior, style rapport McKinsey ou Berger & Montague appliqué à la santé numérique. RÈGLES STRICTES : zéro emoji dans le corps du texte (toléré uniquement en hashtag), zéro superlatif non étayé ('révolutionnaire', 'incroyable', 'historique', 'game-changer'), zéro formule marketing, zéro CTA commercial. STRUCTURE IMPOSÉE : Ligne 1 seule : 1 chiffre précis + fait factuel immédiat (max 15 mots, pas de ponctuation finale). Ligne 2 vide obligatoire. Paragraphe 1 (3 lignes max) : contexte sectoriel + donnée chiffrée, source entre parenthèses. Ligne vide. Paragraphe 2 (3 lignes max) : implication opérationnelle ou signal faible, chiffre obligatoire. Ligne vide. Paragraphe 3 (2 lignes max) : nuance critique ou limite identifiée — ton analytique, pas alarmiste. Ligne vide. Paragraphe 4 (2 lignes max) : perspective stratégique 6-12 mois, ton sobre. Ligne vide. Ligne finale : question de fond ouverte pour l'audience DSI/directeurs innovation (pas de réponse dans le texte). Ligne vide. 3-4 hashtags uniquement : #SantéNumérique #HealthTech #IA #MedTech.",
   "facebook": "Post Facebook expert-vulgarisé (200-260 mots). TON : Sciences & Avenir ou Le Monde Sciences — rigoureux, accessible, jamais racoleur. Accroche : 1 chiffre précis + contexte factuel immédiat (zéro clickbait, zéro question rhétorique). Corps : 3 paragraphes clairs pour audience cultivée non-spécialiste — 1 chiffre clé mis en évidence par des astérisques si pertinent. Question de fond ouvrant un débat sérieux en conclusion. 2-3 hashtags sectoriels. 1 emoji max si vraiment pertinent pour la compréhension.",
   "twitter": "Thread X/Twitter (5 tweets). Tweet 1 (accroche : chiffre précis + contexte, 240 car max). Tweet 2 (fait sectoriel 1 avec preuve, 240 car). Tweet 3 (fait sectoriel 2 + nuance critique, 240 car). Tweet 4 (implication ou signal faible, 240 car). Tweet 5 (perspective 6-12 mois sobre + CTA expert, 240 car). Séparateur : \\n---\\n. Ton expert, zéro sensationnalisme, 1-2 hashtags max. Zéro emoji dans les tweets sauf le premier si pertinent.",
   "newsletter": "Extrait newsletter B2B (130-180 mots). Titre factuel court. Corps : 4 points en gras + 1-2 lignes d'explication chacun, données chiffrées. Signature 'L'équipe MySentinelSolutions'. Audience : DSI santé, directeurs innovation, investisseurs MedTech, praticiens numériques. Ton rigoureux, aucun jargon commercial, aucun superlatif."
@@ -2068,6 +2114,32 @@ function checkDailyNotif() {
   if ('Notification' in window && Notification.permission === 'default') {
     Notification.requestPermission();
   }
+}
+
+function copyPackReseaux(btn) {
+  const li = store.rapport_linkedin || '';
+  const fb = store.rapport_facebook || '';
+  const tw = store.rapport_twitter || '';
+  const nl = store.rapport_newsletter || '';
+  if (!li && !fb && !tw && !nl) { showToast('Générez d\'abord un rapport'); return; }
+  const sep = '\n\n' + '─'.repeat(40) + '\n\n';
+  const pack = [
+    '💼 LINKEDIN\n\n' + li,
+    '📘 FACEBOOK\n\n' + fb,
+    '𝕏 TWITTER / X\n\n' + tw,
+    '✉️ NEWSLETTER\n\n' + nl
+  ].filter(Boolean).join(sep);
+  navigator.clipboard.writeText(pack).then(() => {
+    btn.textContent = '✅ Copié !';
+    btn.style.background = '#16a34a';
+    setTimeout(() => { btn.textContent = '📦 Pack réseaux'; btn.style.background = '#7c3aed'; }, 2500);
+    showToast('📦 Pack réseaux (4 formats) copié !', 3000);
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = pack; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    showToast('📦 Pack réseaux copié !', 3000);
+  });
 }
 
 function exportRapportEmail() {
