@@ -331,6 +331,11 @@
   /* ── Quick-select pertinence ── */
   .btn-smart-sel{padding:7px 12px;border:none;border-radius:var(--r12);font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;cursor:pointer;transition:all .2s;min-height:36px;background:linear-gradient(135deg,#7c3aed,#5b21b6);color:#fff}
   .btn-smart-sel:hover{opacity:.88;transform:translateY(-1px)}
+  /* ── Lien source article ── */
+  .feed-item-link{font-size:13px;color:var(--p);text-decoration:none;padding:3px 6px;border-radius:4px;flex-shrink:0;opacity:.55;transition:all .2s;line-height:1;margin-top:1px}
+  .feed-item-link:hover{opacity:1;background:var(--pl)}
+  /* ── Countdown rapport déjà généré ── */
+  .countdown-badge.done{background:#dcfce7;border-color:#86efac;color:#166534}
 </style>
 </head>
 <body>
@@ -548,6 +553,7 @@
     </div>
   </div>
 
+  <button class="btn-reset" id="btnPackArticle" onclick="copyArticlePackReseaux(this)" style="margin-top:8px;border-color:#7c3aed;color:#7c3aed">📦 Copier pack réseaux (FB · LinkedIn · X · Newsletter)</button>
   <button class="btn-reset" onclick="reset()">+ Nouveau contenu</button>
 </div>
 
@@ -848,6 +854,7 @@ function reset(){
   document.getElementById('c-twitter').textContent='';
   document.getElementById('c-newsletter').textContent='';
   document.getElementById('img-grid').innerHTML='';
+  document.getElementById('c-rapport').innerHTML='<div style="text-align:center;color:var(--m);font-size:12px;font-family:\'Manrope\',sans-serif;padding:20px 0">Sélectionnez des articles dans le module Veille ci-dessus et cliquez sur "Générer le rapport".</div>';
   store={};
   hideErr();
   document.getElementById('topicInput').focus();
@@ -1701,30 +1708,46 @@ async function loadVeille(forceRefresh = true) {
   selectedArticles.clear();
   updateSelBar();
 
-  let loaded = 0;
-  const results = await Promise.allSettled(RSS_FEEDS.map(f => fetchFeedProxy(f)));
-  results.forEach((r, i) => {
-    if (r.status === 'fulfilled') { veilleArticles.push(...r.value); loaded++; }
-    else console.warn('Feed', RSS_FEEDS[i].label, 'failed:', r.reason?.message);
-  });
+  let loaded = 0, failed = 0, totalResolved = 0;
+  const total = RSS_FEEDS.length;
+  status.style.display = 'block';
+  status.textContent = `⏳ Connexion aux sources RSS… (0/${total})`;
 
-  // Tri par date décroissante (articles les plus récents en premier)
-  veilleArticles.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+  const updateProgress = () => {
+    if (veilleArticles.length > 0 && itemsEl.style.display === 'none') itemsEl.style.display = 'flex';
+    status.textContent = veilleArticles.length > 0
+      ? `⏳ ${totalResolved}/${total} sources — ${veilleArticles.length} articles trouvés`
+      : `⏳ Connexion aux sources… (${totalResolved}/${total})`;
+    veilleArticles.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+    renderFeedItems();
+    updateVeilleCount();
+  };
+
+  await Promise.allSettled(RSS_FEEDS.map(async f => {
+    try {
+      const articles = await fetchFeedProxy(f);
+      veilleArticles.push(...articles);
+      loaded++;
+    } catch(e) {
+      failed++;
+      console.warn('Feed', f.label, 'failed:', e.message);
+    }
+    totalResolved++;
+    if (totalResolved % 4 === 0 || totalResolved === total) updateProgress();
+  }));
 
   btnR.disabled = false;
   btnR.textContent = '🔄 Actualiser';
 
   if (!veilleArticles.length) {
+    itemsEl.style.display = 'none';
     status.textContent = 'Aucun article chargé. Vérifiez votre connexion et réessayez.';
     return;
   }
   status.style.display = 'none';
-  itemsEl.style.display = 'flex';
-  renderFeedItems();
   saveVeilleCache(veilleArticles);
   updateVeilleTimestamp(Date.now());
-  updateVeilleCount();
-  showToast(`✅ ${veilleArticles.length} articles chargés (${loaded}/${RSS_FEEDS.length} sources)`);
+  showToast(`✅ ${veilleArticles.length} articles chargés (${loaded}/${total} sources${failed > 0 ? ' · ' + failed + ' échec' + (failed > 1 ? 's' : '') : ''})`);
 }
 
 function renderFeedItems() {
@@ -1749,6 +1772,7 @@ function renderFeedItems() {
       <div class="feed-item-hdr">
         <div class="feed-item-chk">${selectedArticles.has(a.id) ? '✓' : ''}</div>
         <div class="feed-item-title">${escHtml(a.title)}</div>
+        ${a.link ? `<a href="${escHtml(a.link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="feed-item-link" title="Ouvrir la source">↗</a>` : ''}
       </div>
       <div class="feed-item-meta">
         <span class="feed-item-src">${a.icon} ${escHtml(a.source)}</span>
@@ -1965,9 +1989,16 @@ Génère un rapport de veille quotidien professionnel — cible : 5 à 10 min de
       '\n\nX / TWITTER\n' + store.rapport_twitter +
       '\n\nNEWSLETTER\n' + store.rapport_newsletter;
 
-    // Estimation du temps de lecture
-    const wordCount = (parsed.synthese||'').split(/\s+/).length;
-    const readMin = Math.max(5, Math.round(wordCount / 200));
+    // Estimation du temps de lecture (toutes sections, cible 5-10 min)
+    const allText = [
+      parsed.executive_summary||'',
+      (parsed.highlights||[]).join(' '),
+      parsed.synthese||'',
+      (parsed.tendances||[]).join(' '),
+      (parsed.points_cles||[]).join(' ')
+    ].join(' ');
+    const wordCount = allText.split(/\s+/).filter(Boolean).length;
+    const readMin = Math.min(10, Math.max(5, Math.round(wordCount / 200)));
 
     const rapportHtml = `
 <div class="rapport-meta">📅 ${escHtml(today)} &nbsp;·&nbsp; ${articles.length} source${articles.length>1?'s':''} analysée${articles.length>1?'s':''} &nbsp;·&nbsp; ⏱ ~${readMin} min de lecture</div>
@@ -2142,6 +2173,33 @@ function copyPackReseaux(btn) {
   });
 }
 
+function copyArticlePackReseaux(btn) {
+  const li = store.li_text || '';
+  const fb = store.fb_text || '';
+  const tw = store.twitter || '';
+  const nl = store.newsletter || '';
+  if (!li && !fb && !tw && !nl) { showToast('Générez d\'abord du contenu'); return; }
+  const sep = '\n\n' + '─'.repeat(40) + '\n\n';
+  const pack = [
+    li && ('💼 LINKEDIN\n\n' + li),
+    fb && ('📘 FACEBOOK\n\n' + fb),
+    tw && ('𝕏 TWITTER / X\n\n' + tw),
+    nl && ('✉️ NEWSLETTER\n\n' + nl)
+  ].filter(Boolean).join(sep);
+  navigator.clipboard.writeText(pack).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✅ Pack copié !';
+    btn.style.color = '#16a34a'; btn.style.borderColor = '#16a34a';
+    setTimeout(() => { btn.textContent = orig; btn.style.color = '#7c3aed'; btn.style.borderColor = '#7c3aed'; }, 2500);
+    showToast('📦 Pack réseaux (4 formats) copié !', 3000);
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = pack; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    showToast('📦 Pack réseaux copié !', 3000);
+  });
+}
+
 function exportRapportEmail() {
   const rapport = store.rapport || '';
   if (!rapport) { showToast('Aucun rapport à exporter'); return; }
@@ -2169,7 +2227,9 @@ function startCountdown21h() {
     const now = new Date();
     const lastDate = localStorage.getItem('mss_rapport_date');
     if (lastDate === now.toDateString()) {
-      el.style.display = 'none';
+      el.style.display = 'inline-flex';
+      el.textContent = '✅ Rapport généré aujourd\'hui';
+      el.className = 'countdown-badge done';
       return;
     }
     el.style.display = 'inline-flex';
