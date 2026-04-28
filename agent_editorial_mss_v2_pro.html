@@ -376,7 +376,7 @@
       <button class="btn-veille sec" onclick="loadVeille(true)" id="btnRefresh">🔄 Actualiser</button>
       <select id="rapportModelSel" class="model-select" title="Modèle IA : Flash = rapide & économique · Pro = analyse plus approfondie">
         <option value="gemini-2.5-flash">⚡ Flash</option>
-        <option value="gemini-2.5-pro">🎯 Pro</option>
+        <option value="gemini-2.5-pro" selected>🎯 Pro</option>
       </select>
       <button class="btn-veille pri" onclick="startRapportAuto()" id="btnRapport21">📰 Rapport 21h</button>
     </div>
@@ -775,6 +775,16 @@ function init(){
       if (raw) { const { ts } = JSON.parse(raw); if (ts) updateVeilleTimestamp(ts); }
     } catch(e) {}
   }, 60000);
+
+  // Auto-refresh si cache périmé quand l'utilisateur revient sur l'onglet
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && veilleArticles.length) {
+      try {
+        const raw = localStorage.getItem('mss_veille_cache');
+        if (raw) { const { ts } = JSON.parse(raw); if (Date.now() - ts > VEILLE_CACHE_TTL) loadVeille(true); }
+      } catch(e) {}
+    }
+  });
 }
 
 function renderProds(){
@@ -1585,7 +1595,7 @@ const RSS_FEEDS = [
   { label:'MIT CSAIL News',         url:'https://www.csail.mit.edu/news/rss.xml',                                            tag:'ia',    icon:'🎓' },
 ];
 
-const VEILLE_CACHE_TTL = 3 * 60 * 60 * 1000; // 3 heures en ms
+const VEILLE_CACHE_TTL = 2 * 60 * 60 * 1000; // 2 heures en ms
 
 let veilleArticles = [];
 let selectedArticles = new Set();
@@ -1694,7 +1704,8 @@ async function loadVeille(forceRefresh = true) {
       renderFeedItems();
       updateVeilleTimestamp(cached.ts);
       updateVeilleCount();
-      showToast('📦 ' + veilleArticles.length + ' articles restaurés (cache)');
+      smartSelectArticles(true);
+      showToast('📦 ' + veilleArticles.length + ' articles restaurés · ' + selectedArticles.size + ' pré-sélectionnés — Rapport prêt');
       return;
     }
   }
@@ -1848,7 +1859,7 @@ const SMART_KEYWORDS = [
   'inserm','inria','cnrs','ministère de la santé','cnam','drees'
 ];
 
-function smartSelectArticles() {
+function smartSelectArticles(silent = false) {
   selectedArticles.clear();
   const now = Date.now();
   const scored = veilleArticles.map(a => {
@@ -1881,7 +1892,7 @@ function smartSelectArticles() {
   finalSel.forEach(a => selectedArticles.add(a.id));
   renderFeedItems();
   updateSelBar();
-  showToast(`✨ ${selectedArticles.size} articles sélectionnés (récence + pertinence)`, 3000);
+  if (!silent) showToast(`✨ ${selectedArticles.size} articles sélectionnés (récence + pertinence)`, 3000);
 }
 
 async function generateRapportFromSelection() {
@@ -2001,6 +2012,16 @@ Génère un rapport de veille quotidien professionnel — cible : 5 à 10 min de
     const readMin = Math.min(10, Math.max(5, Math.round(wordCount / 200)));
 
     const rapportHtml = `
+<div style="background:linear-gradient(135deg,#064e5a 0%,#0c7a8c 100%);border-radius:var(--r16);padding:16px 18px;margin-bottom:14px">
+  <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:rgba(255,255,255,.72);font-family:'Outfit',sans-serif;margin-bottom:10px">📣 Pack réseaux — copie directe</div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+    <button onclick="copy('rapport_linkedin',this)" style="flex:1;min-width:90px;padding:9px 7px;background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3);border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif">💼 LinkedIn</button>
+    <button onclick="copy('rapport_facebook',this)" style="flex:1;min-width:90px;padding:9px 7px;background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3);border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif">📘 Facebook</button>
+    <button onclick="copy('rapport_twitter',this)" style="flex:1;min-width:70px;padding:9px 7px;background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3);border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif">𝕏 Twitter</button>
+    <button onclick="copy('rapport_newsletter',this)" style="flex:1;min-width:90px;padding:9px 7px;background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3);border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif">✉️ Newsletter</button>
+  </div>
+  <button onclick="copyPackReseaux(this)" style="width:100%;padding:11px;background:rgba(255,255,255,.22);color:#fff;border:1.5px solid rgba(255,255,255,.45);border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Outfit',sans-serif">📦 Tout copier — LinkedIn + Facebook + Twitter + Newsletter</button>
+</div>
 <div class="rapport-meta">📅 ${escHtml(today)} &nbsp;·&nbsp; ${articles.length} source${articles.length>1?'s':''} analysée${articles.length>1?'s':''} &nbsp;·&nbsp; ⏱ ~${readMin} min de lecture</div>
 
 ${parsed.executive_summary ? `<div style="background:#f0fdf4;border:1px solid #86efac;border-left:4px solid #16a34a;border-radius:0 12px 12px 0;padding:14px 18px;margin-bottom:16px">
@@ -2204,12 +2225,17 @@ function exportRapportEmail() {
   const rapport = store.rapport || '';
   if (!rapport) { showToast('Aucun rapport à exporter'); return; }
   const today = new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-  const subject = encodeURIComponent('Rapport Veille IA & Santé Connectée — ' + today);
-  const body = encodeURIComponent(rapport.substring(0, 1800)); // mailto limit
+  // Copier le rapport complet dans le presse-papier (mailto ne supporte pas >2000 chars)
+  navigator.clipboard.writeText(rapport).then(() => {
+    showToast('📋 Rapport complet copié · Collez dans votre email', 4000);
+  }).catch(() => {});
+  // Ouvrir le client email avec sujet et amorce
+  const subject = encodeURIComponent('Veille IA & Santé Connectée — ' + today);
+  const preview = rapport.replace(/\n{3,}/g, '\n\n').substring(0, 600);
+  const body = encodeURIComponent('[Rapport complet copié dans le presse-papier — coller ici]\n\n' + preview + '\n\n[…]');
   const link = document.createElement('a');
   link.href = 'mailto:?subject=' + subject + '&body=' + body;
   link.click();
-  showToast('✉️ Client email ouvert');
 }
 
 function showNotifBar() {
