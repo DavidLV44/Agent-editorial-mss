@@ -336,6 +336,10 @@
   .feed-item-link:hover{opacity:1;background:var(--pl)}
   /* ── Countdown rapport déjà généré ── */
   .countdown-badge.done{background:#dcfce7;border-color:#86efac;color:#166534}
+  /* ── Skip images label ── */
+  .skip-img-lbl{display:flex;align-items:center;gap:7px;cursor:pointer;font-size:12px;font-weight:600;color:var(--m);font-family:'Manrope',sans-serif;user-select:none;padding:8px 14px;border:1.5px solid var(--b);border-radius:50px;background:var(--bga);min-height:40px;transition:border-color .2s,background .2s}
+  .skip-img-lbl input[type=checkbox]{width:14px;height:14px;cursor:pointer;accent-color:var(--p);flex-shrink:0}
+  .skip-img-lbl:hover{border-color:var(--pm);background:var(--pl)}
 </style>
 </head>
 <body>
@@ -452,6 +456,16 @@
   <label class="flabel">💬 Sujet / produit précis</label>
   <input type="text" id="topicInput" placeholder="Ex : Bon Charge red light panel, Normatec 3…" />
   <p class="hint">Laisse vide pour laisser l'agent choisir le meilleur sujet</p>
+  <div style="display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:14px">
+    <select id="articleModelSel" class="model-select" title="Flash = rapide & économique · Pro = qualité maximale, analyse approfondie">
+      <option value="gemini-2.5-flash">⚡ Flash — rapide</option>
+      <option value="gemini-2.5-pro" selected>🎯 Pro — qualité max</option>
+    </select>
+    <label class="skip-img-lbl">
+      <input type="checkbox" id="skipImages">
+      <span>⚡ Mode rapide (sans images)</span>
+    </label>
+  </div>
 
   <button class="btn-gen" id="btnGen" onclick="generate()">✨ Générer le contenu high-ticket</button>
 </div>
@@ -873,6 +887,8 @@ function reset(){
 async function generate(){
   hideErr();
   const apiKey=getKey();
+  const articleModel=document.getElementById('articleModelSel')?.value||'gemini-2.5-pro';
+  const skipImages=document.getElementById('skipImages')?.checked||false;
   if(!apiKey){
     showErr('Clé API manquante. Saisissez votre clé Google AI Studio en haut de la page.','');
     return;
@@ -953,7 +969,7 @@ Génère maintenant. Commence par { directement.`;
   let rawResponse = '';
 
   try{
-    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`,{
+    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${articleModel}:generateContent?key=${encodeURIComponent(apiKey)}`,{
       method:"POST",
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({
@@ -998,7 +1014,7 @@ Génère maintenant. Commence par { directement.`;
     // ── LinkedIn ──
     const li = typeof parsed.linkedin === 'object' ? parsed.linkedin : {texte: parsed.linkedin||'', hashtags:''};
     buildLinkedIn(li);
-    buildLinkedInImage();
+    if(!skipImages) buildLinkedInImage();
 
     // ── Twitter / X ──
     store.twitter = parsed.twitter || '';
@@ -1029,37 +1045,47 @@ Génère maintenant. Commence par { directement.`;
     const imageData=parsed.images||[];
     const imageMap={};
     store.webp = store.webp||{};
-    lstep(5);
     const grid=document.getElementById('img-grid');
     grid.innerHTML='';
     const slugBase = sanitizeFilename(sujet||selProd);
 
-    const articleImgPromises=imageData.map(async imgDef=>{
-      const wrapper=document.createElement('div');
-      wrapper.className='iitem';
-      wrapper.innerHTML=`<div class="iloader" style="aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;font-size:11px;color:#64748b">⏳ Génération Imagen…</div><div class="ilabel"><span>${imgDef.id}</span></div>`;
-      grid.appendChild(wrapper);
-      try{
-        const promptFull = imgDef.prompt+', photorealistic, premium quality, professional photography, no text overlay, no watermark, no logo, sharp focus, beautiful lighting';
-        const webpUrl = await generateImageGemini(promptFull, '16:9');
-        store.webp['article-'+imgDef.id] = webpUrl;
-        imageMap[imgDef.id] = webpUrl;
-        const dlKey = 'article-'+imgDef.id;
-        const dlName = slugBase+'-'+imgDef.id;
-        wrapper.innerHTML=`<img src="${webpUrl}" alt="${imgDef.id}" style="width:100%;display:block;aspect-ratio:16/9;object-fit:cover"><div class="ilabel"><span>${imgDef.id}<span class="img-webp-badge">WebP</span></span><button class="btn-dl" onclick="downloadWebP('${dlKey}','${dlName}')">⬇️ Télécharger</button></div>`;
-      }catch(e){
-        console.warn('Image article échouée:',imgDef.id, e.message);
-        wrapper.querySelector('.iloader').textContent='⚠️ '+e.message.substring(0,50);
-        imageMap[imgDef.id]='';
-      }
-    });
+    let articleImgPromises=[];
+    if(!skipImages){
+      lstep(5);
+      articleImgPromises=imageData.map(async imgDef=>{
+        const wrapper=document.createElement('div');
+        wrapper.className='iitem';
+        wrapper.innerHTML=`<div class="iloader" style="aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;font-size:11px;color:#64748b">⏳ Génération Imagen…</div><div class="ilabel"><span>${imgDef.id}</span></div>`;
+        grid.appendChild(wrapper);
+        try{
+          const promptFull = imgDef.prompt+', photorealistic, premium quality, professional photography, no text overlay, no watermark, no logo, sharp focus, beautiful lighting';
+          const webpUrl = await generateImageGemini(promptFull, '16:9');
+          store.webp['article-'+imgDef.id] = webpUrl;
+          imageMap[imgDef.id] = webpUrl;
+          const dlKey = 'article-'+imgDef.id;
+          const dlName = slugBase+'-'+imgDef.id;
+          wrapper.innerHTML=`<img src="${webpUrl}" alt="${imgDef.id}" style="width:100%;display:block;aspect-ratio:16/9;object-fit:cover"><div class="ilabel"><span>${imgDef.id}<span class="img-webp-badge">WebP</span></span><button class="btn-dl" onclick="downloadWebP('${dlKey}','${dlName}')">⬇️ Télécharger</button></div>`;
+        }catch(e){
+          console.warn('Image article échouée:',imgDef.id, e.message);
+          wrapper.querySelector('.iloader').textContent='⚠️ '+e.message.substring(0,50);
+          imageMap[imgDef.id]='';
+        }
+      });
+    }else{
+      imageData.forEach(imgDef=>{
+        const wrapper=document.createElement('div');
+        wrapper.className='iitem';
+        wrapper.innerHTML=`<div class="iloader" style="aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;font-size:11px;color:#64748b">⚡ Mode rapide — images ignorées</div><div class="ilabel"><span>${imgDef.id}</span></div>`;
+        grid.appendChild(wrapper);
+      });
+    }
 
     // ── Images Instagram slides ──
     const igSlides = (parsed.instagram?.slides)||[];
-    buildInstaSlides(igSlides, slugBase);
+    buildInstaSlides(igSlides, slugBase, skipImages);
 
     // ── Facebook image ──
-    buildFacebookImage(slugBase);
+    if(!skipImages) buildFacebookImage(slugBase);
 
     await Promise.allSettled(articleImgPromises);
 
@@ -1168,7 +1194,7 @@ async function buildFacebookImage(slugBase){
   }
 }
 
-async function buildInstaSlides(slides, slugBase){
+async function buildInstaSlides(slides, slugBase, skipImg=false){
   const carousel = document.getElementById('insta-carousel');
   carousel.innerHTML = '';
   store.webp = store.webp||{};
@@ -1179,8 +1205,9 @@ async function buildInstaSlides(slides, slugBase){
     const slide = document.createElement('div');
     slide.className = 'insta-slide';
     const dotsHtml = Array.from({length:total},(_,di)=>`<div class="insta-slide-dot${di===i?' active':''}"></div>`).join('');
+    const bgLabel = skipImg ? '⚡' : '⏳ Imagen…';
     slide.innerHTML=`
-      <div class="insta-slide-bg-loading" id="insta-bg-${i}" style="display:flex;align-items:center;justify-content:center;font-size:10px;color:rgba(255,255,255,.7)">⏳ Imagen…</div>
+      <div class="insta-slide-bg-loading" id="insta-bg-${i}" style="display:flex;align-items:center;justify-content:center;font-size:10px;color:rgba(255,255,255,.7)">${bgLabel}</div>
       <div class="insta-slide-overlay"></div>
       <div class="insta-slide-num">${i+1} / ${total}</div>
       <div class="insta-slide-dots">${dotsHtml}</div>
@@ -1192,7 +1219,7 @@ async function buildInstaSlides(slides, slugBase){
     carousel.appendChild(slide);
 
     // Génération async sans bloquer l'affichage des slides
-    (async(idx, prompt)=>{
+    if(!skipImg)(async(idx, prompt)=>{
       try{
         const fullPrompt = (prompt||'premium wellness technology')+', square format, vibrant colors, professional photography, no text overlay, no watermark, cinematic lighting';
         const webpUrl = await generateImageGemini(fullPrompt, '1:1');
@@ -1644,6 +1671,21 @@ async function fetchFeedProxy(feedDef) {
   throw lastErr;
 }
 
+// ── Déduplication articles RSS ────────────────────────────────────
+function deduplicateArticles(articles){
+  const seen = new Map();
+  return articles.filter(a => {
+    const key = a.title.toLowerCase()
+      .normalize('NFD').replace(/[̀-ͯ]/g,'')
+      .replace(/[^a-z0-9 ]/g,'')
+      .trim()
+      .split(/\s+/).slice(0,7).join(' ');
+    if(seen.has(key)) return false;
+    seen.set(key, true);
+    return true;
+  });
+}
+
 // ── Cache veille ──────────────────────────────────────────────────
 function saveVeilleCache(articles) {
   try {
@@ -1755,10 +1797,15 @@ async function loadVeille(forceRefresh = true) {
     status.textContent = 'Aucun article chargé. Vérifiez votre connexion et réessayez.';
     return;
   }
+  const beforeDedup = veilleArticles.length;
+  veilleArticles = deduplicateArticles(veilleArticles);
+  const dedupRemoved = beforeDedup - veilleArticles.length;
+  renderFeedItems();
+  updateVeilleCount();
   status.style.display = 'none';
   saveVeilleCache(veilleArticles);
   updateVeilleTimestamp(Date.now());
-  showToast(`✅ ${veilleArticles.length} articles chargés (${loaded}/${total} sources${failed > 0 ? ' · ' + failed + ' échec' + (failed > 1 ? 's' : '') : ''})`);
+  showToast(`✅ ${veilleArticles.length} articles chargés (${loaded}/${total} sources${dedupRemoved > 0 ? ' · ' + dedupRemoved + ' doublons retirés' : ''}${failed > 0 ? ' · ' + failed + ' échec' + (failed > 1 ? 's' : '') : ''})`);
 }
 
 function renderFeedItems() {
