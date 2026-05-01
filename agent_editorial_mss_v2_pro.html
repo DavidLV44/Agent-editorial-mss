@@ -340,6 +340,16 @@
   .skip-img-lbl{display:flex;align-items:center;gap:7px;cursor:pointer;font-size:12px;font-weight:600;color:var(--m);font-family:'Manrope',sans-serif;user-select:none;padding:8px 14px;border:1.5px solid var(--b);border-radius:50px;background:var(--bga);min-height:40px;transition:border-color .2s,background .2s}
   .skip-img-lbl input[type=checkbox]{width:14px;height:14px;cursor:pointer;accent-color:var(--p);flex-shrink:0}
   .skip-img-lbl:hover{border-color:var(--pm);background:var(--pl)}
+  /* ── Workflow Express ── */
+  .workflow-card{background:linear-gradient(135deg,#064e5a 0%,#0c7a8c 100%);border-radius:var(--r16);box-shadow:var(--s2);padding:16px 20px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .wf-left{flex:1;min-width:0}
+  .wf-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:rgba(255,255,255,.65);font-family:'Outfit',sans-serif;margin-bottom:6px}
+  .wf-status-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .wf-status{font-size:13px;font-weight:700;color:#fff;font-family:'Outfit',sans-serif}
+  .wf-countdown{font-size:11px;font-weight:700;color:rgba(255,255,255,.85);font-family:'Outfit',sans-serif;background:rgba(255,255,255,.15);border-radius:50px;padding:3px 11px}
+  .btn-routine{padding:12px 22px;background:rgba(255,255,255,.18);color:#fff;border:2px solid rgba(255,255,255,.45);border-radius:var(--r12);font-family:'Outfit',sans-serif;font-size:13px;font-weight:800;cursor:pointer;transition:all .2s;white-space:nowrap;min-height:44px}
+  .btn-routine:hover{background:rgba(255,255,255,.3);transform:translateY(-1px)}
+  .btn-routine:disabled{opacity:.5;cursor:not-allowed;transform:none}
 </style>
 </head>
 <body>
@@ -359,6 +369,18 @@
   <span class="apikey-hint">Gratuit sur aistudio.google.com · stockée localement · jamais envoyée ailleurs qu'à generativelanguage.googleapis.com</span>
   <input type="password" id="apiKeyInput" placeholder="AIza…" autocomplete="off" />
   <button class="btn-save" id="btnSaveKey" onclick="saveKey()">Enregistrer</button>
+</div>
+
+<!-- WORKFLOW EXPRESS -->
+<div class="workflow-card" id="workflowCard">
+  <div class="wf-left">
+    <div class="wf-label">Routine quotidienne — Veille IA &amp; Santé</div>
+    <div class="wf-status-row">
+      <span class="wf-status" id="wfStatus">📊 Aucun rapport aujourd'hui</span>
+      <span class="wf-countdown" id="wfCountdown" style="display:none"></span>
+    </div>
+  </div>
+  <button class="btn-routine" id="btnRoutine" onclick="lancerRoutine()" title="Actualise les flux RSS · sélectionne les meilleurs articles · génère le rapport complet">🚀 Rapport du jour</button>
 </div>
 
 <!-- NOTIFICATION 21H -->
@@ -761,6 +783,8 @@ function init(){
   updateHistBadge();
   checkDailyNotif();
   startCountdown21h();
+  updateWorkflowCard();
+  setInterval(updateWorkflowCard, 60000);
   updateFAB();
   window.addEventListener('resize', updateFAB);
   renderProds(); renderKW();
@@ -1620,6 +1644,15 @@ const RSS_FEEDS = [
   { label:'Frontiers – AI',         url:'https://www.frontiersin.org/journals/artificial-intelligence/rss',                  tag:'ia',    icon:'🧬' },
   { label:'Le Quotidien du Médecin',url:'https://www.lequotidiendumedecin.fr/rss.xml',                                      tag:'sante', icon:'🩺' },
   { label:'MIT CSAIL News',         url:'https://www.csail.mit.edu/news/rss.xml',                                            tag:'ia',    icon:'🎓' },
+  // Recherche médicale internationale premium
+  { label:'npj Digital Medicine',   url:'https://www.nature.com/npjdigitalmed.rss',                                            tag:'ia',    icon:'🧬' },
+  { label:'Lancet Digit. Health',   url:'https://www.thelancet.com/rssfeed/landig_current.xml',                                tag:'sante', icon:'🔬' },
+  { label:'Nature Medicine',        url:'https://www.nature.com/nm.rss',                                                        tag:'sante', icon:'🧪' },
+  { label:'WHO – Digital Health',   url:'https://www.who.int/rss-feeds/news-english.xml',                                      tag:'sante', icon:'🌍' },
+  { label:'ArXiv – cs.AI',          url:'https://export.arxiv.org/rss/cs.AI',                                                  tag:'ia',    icon:'📜' },
+  { label:'Health Data Hub',        url:'https://www.health-data-hub.fr/rss.xml',                                              tag:'sante', icon:'🇫🇷' },
+  { label:'Santé Publique France',  url:'https://www.santepubliquefrance.fr/rss.xml',                                          tag:'sante', icon:'🇫🇷' },
+  { label:'INRIA – Actualités',     url:'https://www.inria.fr/fr/rss.xml',                                                     tag:'ia',    icon:'🎓' },
 ];
 
 const VEILLE_CACHE_TTL = 2 * 60 * 60 * 1000; // 2 heures en ms
@@ -2009,8 +2042,8 @@ Génère un rapport de veille quotidien professionnel — cible : 5 à 10 min de
   "tendances": ["Tendance 1 avec momentum précis (ex: +fort / stable / émergent) — secteur IA médicale avec chiffre", "Tendance 2 — wearables & monitoring continu, fait mesurable", "Tendance 3 — réglementation ou marchés, donnée quantifiée", "Tendance 4 — signal faible à surveiller avec horizon temporel"],
   "points_cles": ["Fait marquant 1 avec chiffre et référence source précise entre parenthèses", "Fait marquant 2 — implication sectorielle mesurable et quantifiée", "Fait marquant 3 — signal de rupture ou innovation identifiée avec source", "Fait marquant 4 — enjeu réglementaire ou éthique concret"],
   "linkedin": "Post LinkedIn expert (280-340 mots). STYLE GUIDE SENTINEL — TON ABSOLU : analyste sectoriel senior, style rapport McKinsey ou Berger & Montague appliqué à la santé numérique. RÈGLES STRICTES : zéro emoji dans le corps du texte (toléré uniquement en hashtag), zéro superlatif non étayé ('révolutionnaire', 'incroyable', 'historique', 'game-changer'), zéro formule marketing, zéro CTA commercial. STRUCTURE IMPOSÉE : Ligne 1 seule : 1 chiffre précis + fait factuel immédiat (max 15 mots, pas de ponctuation finale). Ligne 2 vide obligatoire. Paragraphe 1 (3 lignes max) : contexte sectoriel + donnée chiffrée, source entre parenthèses. Ligne vide. Paragraphe 2 (3 lignes max) : implication opérationnelle ou signal faible, chiffre obligatoire. Ligne vide. Paragraphe 3 (2 lignes max) : nuance critique ou limite identifiée — ton analytique, pas alarmiste. Ligne vide. Paragraphe 4 (2 lignes max) : perspective stratégique 6-12 mois, ton sobre. Ligne vide. Ligne finale : question de fond ouverte pour l'audience DSI/directeurs innovation (pas de réponse dans le texte). Ligne vide. 3-4 hashtags uniquement : #SantéNumérique #HealthTech #IA #MedTech.",
-  "facebook": "Post Facebook expert-vulgarisé (200-260 mots). TON : Sciences & Avenir ou Le Monde Sciences — rigoureux, accessible, jamais racoleur. Accroche : 1 chiffre précis + contexte factuel immédiat (zéro clickbait, zéro question rhétorique). Corps : 3 paragraphes clairs pour audience cultivée non-spécialiste — 1 chiffre clé mis en évidence par des astérisques si pertinent. Question de fond ouvrant un débat sérieux en conclusion. 2-3 hashtags sectoriels. 1 emoji max si vraiment pertinent pour la compréhension.",
-  "twitter": "Thread X/Twitter (5 tweets). Tweet 1 (accroche : chiffre précis + contexte, 240 car max). Tweet 2 (fait sectoriel 1 avec preuve, 240 car). Tweet 3 (fait sectoriel 2 + nuance critique, 240 car). Tweet 4 (implication ou signal faible, 240 car). Tweet 5 (perspective 6-12 mois sobre + CTA expert, 240 car). Séparateur : \\n---\\n. Ton expert, zéro sensationnalisme, 1-2 hashtags max. Zéro emoji dans les tweets sauf le premier si pertinent.",
+  "facebook": "Post Facebook (200-260 mots). STYLE GUIDE SENTINEL — TON ABSOLU : journal médical grand public niveau Pour La Science ou BMJ patient edition — rigoureux, factuel, jamais racoleur. RÈGLES STRICTES : zéro superlatif non étayé ('révolutionnaire', 'incroyable', 'historique'), zéro clickbait, zéro question rhétorique en accroche, zéro CTA commercial, zéro emoji dans le corps du texte (1 toléré uniquement si pertinent pour la compréhension). STRUCTURE IMPOSÉE : Ligne 1 : 1 chiffre précis + contexte factuel immédiat (max 18 mots). Ligne vide. Paragraphe 1 (3 lignes) : contexte sectoriel + source entre parenthèses. Paragraphe 2 (3 lignes) : implication ou signal faible, donnée chiffrée obligatoire. Paragraphe 3 (2 lignes) : nuance critique ou limite identifiée. Question de fond sobre en conclusion (pas de réponse). 2-3 hashtags sectoriels uniquement.",
+  "twitter": "Thread X/Twitter (5 tweets). STYLE GUIDE SENTINEL — TON ABSOLU : analyste sectoriel senior, style rapport factuel. RÈGLES STRICTES : zéro sensationnalisme, zéro superlatif non étayé, zéro hashtag de masse, zéro emoji sauf tweet 1 si pertinent. Chaque tweet : 1 fait chiffré + source ou implication mesurable. Tweet 1 (accroche : chiffre précis + contexte factuel, 240 car max). Tweet 2 (fait sectoriel 1 + preuve ou source, 240 car). Tweet 3 (fait sectoriel 2 + nuance critique, 240 car). Tweet 4 (signal faible ou implication opérationnelle, 240 car). Tweet 5 (perspective 6-12 mois sobre, pas de CTA commercial, 240 car). Séparateur entre tweets : \\n---\\n. 1-2 hashtags sectoriels max par thread.",
   "newsletter": "Extrait newsletter B2B (130-180 mots). Titre factuel court. Corps : 4 points en gras + 1-2 lignes d'explication chacun, données chiffrées. Signature 'L'équipe MySentinelSolutions'. Audience : DSI santé, directeurs innovation, investisseurs MedTech, praticiens numériques. Ton rigoureux, aucun jargon commercial, aucun superlatif."
 }`;
 
@@ -2291,6 +2324,41 @@ function showNotifBar() {
 
 function closeNotif() {
   document.getElementById('notifBar').classList.remove('on');
+}
+
+function updateWorkflowCard() {
+  const statusEl = document.getElementById('wfStatus');
+  const countEl  = document.getElementById('wfCountdown');
+  if (!statusEl) return;
+  const lastDate = localStorage.getItem('mss_rapport_date');
+  const isDone   = lastDate === new Date().toDateString();
+  statusEl.textContent = isDone ? '✅ Rapport généré aujourd\'hui' : '📊 Aucun rapport aujourd\'hui';
+  if (!countEl) return;
+  if (isDone) { countEl.style.display = 'none'; return; }
+  const now = new Date(), target = new Date();
+  target.setHours(21, 0, 0, 0);
+  if (now >= target) {
+    countEl.textContent = '⏰ 21h — Rapport disponible';
+    countEl.style.background = 'rgba(255,220,0,.25)';
+    countEl.style.display = 'inline';
+  } else {
+    const diff = target - now;
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    countEl.textContent = `⏱ Rapport dans ${h}h${String(m).padStart(2,'0')}`;
+    countEl.style.display = 'inline';
+  }
+}
+
+async function lancerRoutine() {
+  const btn = document.getElementById('btnRoutine');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ En cours…'; }
+  try {
+    await startRapportAuto();
+    updateWorkflowCard();
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '🚀 Rapport du jour'; }
+  }
 }
 
 function startCountdown21h() {
