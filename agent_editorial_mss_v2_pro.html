@@ -350,6 +350,30 @@
   .btn-routine{padding:12px 22px;background:rgba(255,255,255,.18);color:#fff;border:2px solid rgba(255,255,255,.45);border-radius:var(--r12);font-family:'Outfit',sans-serif;font-size:13px;font-weight:800;cursor:pointer;transition:all .2s;white-space:nowrap;min-height:44px}
   .btn-routine:hover{background:rgba(255,255,255,.3);transform:translateY(-1px)}
   .btn-routine:disabled{opacity:.5;cursor:not-allowed;transform:none}
+  /* ── Quick Post Modal ── */
+  .qp-modal{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.52);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:16px}
+  .qp-modal.on{display:flex}
+  .qp-box{background:var(--bg);border-radius:var(--r24);box-shadow:0 20px 60px rgba(0,0,0,.28);width:100%;max-width:520px;max-height:88vh;display:flex;flex-direction:column;overflow:hidden}
+  .qp-head{padding:14px 18px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--bga)}
+  .qp-title{font-family:'Outfit',sans-serif;font-size:13px;font-weight:800;color:var(--pd)}
+  .qp-close{padding:5px 12px;background:#ef4444;color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif}
+  .qp-body{flex:1;overflow-y:auto;padding:16px}
+  .qp-ring{width:32px;height:32px;margin:20px auto;border:3px solid var(--pl);border-top-color:var(--p);border-radius:50%;animation:spin .7s linear infinite}
+  .qp-section{margin-bottom:14px}
+  .qp-section-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:var(--pd);font-family:'Outfit',sans-serif;margin-bottom:7px;display:flex;align-items:center;justify-content:space-between}
+  .qp-text{font-size:12.5px;color:var(--t);line-height:1.72;font-family:'Manrope',sans-serif;white-space:pre-wrap;background:var(--bga);border:1px solid var(--b);border-radius:var(--r12);padding:12px 14px;word-break:break-word;max-height:220px;overflow-y:auto}
+  .btn-qp-copy{padding:5px 12px;background:var(--p);color:#fff;border:none;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;transition:background .2s}
+  .btn-qp-copy.ok{background:#16a34a}
+  .qp-src-badge{font-size:11px;color:var(--m);margin-bottom:10px;padding:7px 12px;background:var(--bga);border:1px solid var(--b);border-radius:8px;font-family:'Manrope',sans-serif;line-height:1.4}
+  .qp-article-title{font-family:'Outfit',sans-serif;font-size:12.5px;font-weight:700;color:var(--t);margin-bottom:14px;line-height:1.35}
+  .qp-copy-all{width:100%;padding:10px;background:linear-gradient(135deg,var(--p),var(--pd));color:#fff;border:none;border-radius:var(--r12);font-family:'Outfit',sans-serif;font-size:12px;font-weight:800;cursor:pointer;transition:all .2s;margin-bottom:14px}
+  .qp-copy-all:hover{opacity:.9;transform:translateY(-1px)}
+  .qp-copy-all.ok{background:#16a34a}
+  /* ── Feed item quick-post button ── */
+  .feed-qp-btn{padding:3px 9px;background:var(--p);color:#fff;border:none;border-radius:5px;font-size:10px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;white-space:nowrap;flex-shrink:0;transition:background .2s;align-self:flex-start;margin-top:1px;min-height:22px}
+  .feed-qp-btn:hover{background:var(--pd)}
+  /* ── Tone MSS badge ── */
+  .tone-mss-badge{background:var(--p);color:#fff;border-radius:4px;padding:1px 6px;font-size:9px;font-weight:800;font-family:'Outfit',sans-serif;letter-spacing:.4px;margin-left:6px;vertical-align:middle}
 </style>
 </head>
 <body>
@@ -471,7 +495,7 @@
   <label class="flabel">🎙️ Ton éditorial</label>
   <div class="tone-chips" id="toneChips">
     <div class="tone-chip" data-tone="enthusiast">✨ Accessible &amp; Enthousiaste</div>
-    <div class="tone-chip active" data-tone="pro">💼 Sérieux &amp; Professionnel</div>
+    <div class="tone-chip active" data-tone="pro">💼 Sérieux &amp; Professionnel<span class="tone-mss-badge">MSS</span></div>
     <div class="tone-chip" data-tone="pedagogique">📚 Pédagogique &amp; Expert</div>
   </div>
 
@@ -616,6 +640,19 @@
   </div>
 </div>
 
+
+<!-- MODAL QUICK POST -->
+<div class="qp-modal" id="qpModal" onclick="closeQPOnBg(event)">
+  <div class="qp-box">
+    <div class="qp-head">
+      <span class="qp-title" id="qpTitle">⚡ Post Rapide — Génération…</span>
+      <button class="qp-close" onclick="closeQP()">✕ Fermer</button>
+    </div>
+    <div class="qp-body" id="qpBody">
+      <div class="qp-ring"></div>
+    </div>
+  </div>
+</div>
 
 <!-- MODAL PREVIEW -->
 <div class="preview-modal" id="previewModal" onclick="closePreviewOnBg(event)">
@@ -1532,7 +1569,7 @@ function setDevice(mode, btn){
 }
 
 document.addEventListener('keydown', e=>{
-  if(e.key==='Escape'){ closePreview(); }
+  if(e.key==='Escape'){ closePreview(); closeQP(); }
 });
 
 // ── Ton éditorial ──────────────────────────────────────────────────
@@ -1864,6 +1901,7 @@ function renderFeedItems() {
         <div class="feed-item-chk">${selectedArticles.has(a.id) ? '✓' : ''}</div>
         <div class="feed-item-title">${escHtml(a.title)}</div>
         ${a.link ? `<a href="${escHtml(a.link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="feed-item-link" title="Ouvrir la source">↗</a>` : ''}
+        <button class="feed-qp-btn" onclick="event.stopPropagation();generateQuickPost('${a.id}')" title="Générer LinkedIn · Facebook · Twitter depuis cet article">⚡ Post</button>
       </div>
       <div class="feed-item-meta">
         <span class="feed-item-src">${a.icon} ${escHtml(a.source)}</span>
@@ -2436,6 +2474,116 @@ ${rapportHtmlContent}
   printWin.document.close();
   setTimeout(() => { printWin.focus(); printWin.print(); }, 600);
   showToast('✅ Fenêtre impression ouverte (Ctrl+P → Enregistrer en PDF)');
+}
+
+// ── Quick Post (génération post unique depuis un article RSS) ─────────
+async function generateQuickPost(articleId) {
+  const article = veilleArticles.find(a => a.id === articleId);
+  if (!article) { showToast('Article introuvable'); return; }
+  const apiKey = getKey();
+  if (!apiKey) { showToast('Clé API manquante'); return; }
+
+  const modal = document.getElementById('qpModal');
+  const body  = document.getElementById('qpBody');
+  const titleEl = document.getElementById('qpTitle');
+  titleEl.textContent = '⚡ Post Rapide — Génération…';
+  modal.classList.add('on');
+  document.body.style.overflow = 'hidden';
+  body.innerHTML = `
+    <div class="qp-src-badge">${article.icon} ${escHtml(article.source)} · ${article.dateStr || 'récent'}</div>
+    <div class="qp-article-title">${escHtml(article.title)}</div>
+    <div style="display:flex;justify-content:center"><div class="qp-ring"></div></div>
+    <div style="text-align:center;font-size:12px;color:var(--m);margin-top:8px;font-family:'Manrope',sans-serif">Analyse en cours (Gemini Flash)…</div>`;
+
+  const sysPrompt = `Tu es l'analyste éditorial de MySentinelSolutions.com — ton sérieux, professionnel, factuel.
+RÈGLE ABSOLUE : JSON brut uniquement. Commence par { et termine par }. Zéro markdown.`;
+
+  const userPrompt = `SOURCE : [${article.source}] ${article.title}
+RÉSUMÉ : ${article.desc || '(pas de résumé)'}
+
+FORMAT JSON EXACT :
+{
+  "linkedin": "Post LinkedIn expert (180-240 mots). TON : analyste sectoriel senior — zéro emoji dans le corps, zéro superlatif non étayé, zéro formule marketing. STRUCTURE : Ligne 1 : 1 fait précis (chiffre ou stat) + contexte factuel (max 15 mots). Double saut. Paragraphe 1 (2-3 lignes) : contexte + source entre parenthèses. Double saut. Paragraphe 2 (2-3 lignes) : implication ou signal, chiffre obligatoire. Double saut. Paragraphe 3 (1-2 lignes) : nuance ou limite critique. Double saut. Question de fond sobre. 3-4 hashtags : #SantéNumérique #HealthTech #IA #MedTech.",
+  "facebook": "Post Facebook (120-170 mots). TON : vulgarisation scientifique rigoureuse niveau Pour La Science. Accroche : 1 chiffre ou fait concret. Corps : contexte + implication + nuance (zéro clickbait, zéro emoji dans le corps). Question sobre en conclusion. 2-3 hashtags sectoriels.",
+  "twitter": "Tweet unique (220 car max). 1 chiffre précis + implication + source entre parenthèses. Ton analytique. 1-2 hashtags sectoriels. Zéro sensationnalisme."
+}`;
+
+  try {
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          system_instruction: { parts: [{ text: sysPrompt }] },
+          contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
+          generationConfig: { maxOutputTokens: 4096, temperature: 0.4 }
+        })
+      }
+    );
+    const data = await res.json();
+    if (data.error) throw new Error('API : ' + data.error.message);
+    const raw = data.candidates?.map(c => c.content?.parts?.map(p => p.text||'').join('')||'').join('') || '';
+    const parsed = safeParseJSON(raw);
+
+    store.qp_linkedin   = parsed.linkedin  || '';
+    store.qp_facebook   = parsed.facebook  || '';
+    store.qp_twitter    = parsed.twitter   || '';
+
+    const allPack = [
+      '💼 LINKEDIN\n\n' + store.qp_linkedin,
+      '📘 FACEBOOK\n\n' + store.qp_facebook,
+      '𝕏 TWITTER\n\n'  + store.qp_twitter
+    ].filter(s => !s.endsWith('\n\n')).join('\n\n' + '─'.repeat(36) + '\n\n');
+
+    titleEl.textContent = '⚡ Post Rapide — Prêt à copier';
+    body.innerHTML = `
+      <div class="qp-src-badge">${article.icon} ${escHtml(article.source)} · ${article.dateStr || 'récent'}</div>
+      <div class="qp-article-title">${escHtml(article.title)}</div>
+      <button class="qp-copy-all" id="btnQpAll" onclick="copyQPAll(this,'${escHtml(allPack.replace(/'/g,"\\'"))}')">📦 Tout copier — LinkedIn · Facebook · Twitter</button>
+      ${qpSection('💼 LinkedIn', 'qp_linkedin', parsed.linkedin)}
+      ${qpSection('📘 Facebook', 'qp_facebook', parsed.facebook)}
+      ${qpSection('𝕏 Twitter',  'qp_twitter',  parsed.twitter)}`;
+
+  } catch(e) {
+    titleEl.textContent = '⚡ Post Rapide — Erreur';
+    body.innerHTML = `<div style="padding:20px;text-align:center;color:#ef4444;font-size:12px;font-family:'Manrope',sans-serif">Erreur : ${escHtml(e.message)}</div>`;
+  }
+}
+
+function qpSection(label, storeKey, text) {
+  if (!text) return '';
+  return `<div class="qp-section">
+    <div class="qp-section-title">${label}
+      <button class="btn-qp-copy" onclick="copyQP('${storeKey}',this)">📋 Copier</button>
+    </div>
+    <div class="qp-text">${escHtml(text)}</div>
+  </div>`;
+}
+
+function copyQP(key, btn) {
+  navigator.clipboard.writeText(store[key] || '').then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✅ Copié !'; btn.classList.add('ok');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('ok'); }, 2000);
+  }).catch(() => {});
+}
+
+function copyQPAll(btn, pack) {
+  navigator.clipboard.writeText(pack || '').then(() => {
+    btn.textContent = '✅ Pack copié !'; btn.classList.add('ok');
+    setTimeout(() => { btn.textContent = '📦 Tout copier — LinkedIn · Facebook · Twitter'; btn.classList.remove('ok'); }, 2500);
+    showToast('📦 Pack 3 réseaux copié !', 3000);
+  }).catch(() => {});
+}
+
+function closeQP() {
+  document.getElementById('qpModal').classList.remove('on');
+  document.body.style.overflow = '';
+}
+
+function closeQPOnBg(e) {
+  if (e.target === document.getElementById('qpModal')) closeQP();
 }
 
 init();
