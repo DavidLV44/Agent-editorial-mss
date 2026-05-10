@@ -815,6 +815,17 @@ function safeParseJSON(raw){
   }
 }
 
+function restoreTodayRapport() {
+  try {
+    const raw = localStorage.getItem('mss_rapport_today');
+    if (!raw) return;
+    const saved = JSON.parse(raw);
+    if (saved.date !== new Date().toDateString()) return;
+    if (saved.html) document.getElementById('c-rapport').innerHTML = saved.html;
+    if (saved.store) Object.assign(store, saved.store);
+  } catch(e) {}
+}
+
 function init(){
   loadKey();
   updateHistBadge();
@@ -836,6 +847,8 @@ function init(){
     });
   });
   document.getElementById('topicInput').addEventListener('keydown',e=>{ if(e.key==='Enter') generate(); });
+
+  restoreTodayRapport();
 
   // Auto-chargement du cache veille au démarrage
   loadVeille(false);
@@ -1076,6 +1089,7 @@ Génère maintenant. Commence par { directement.`;
     const li = typeof parsed.linkedin === 'object' ? parsed.linkedin : {texte: parsed.linkedin||'', hashtags:''};
     buildLinkedIn(li);
     if(!skipImages) buildLinkedInImage();
+    else { const w=document.getElementById('li-img-wrap'); if(w){w.textContent='';w.style.background='linear-gradient(135deg,var(--pl),var(--pm))';} }
 
     // ── Twitter / X ──
     store.twitter = parsed.twitter || '';
@@ -1871,11 +1885,12 @@ async function loadVeille(forceRefresh = true) {
   veilleArticles = deduplicateArticles(veilleArticles);
   const dedupRemoved = beforeDedup - veilleArticles.length;
   renderFeedItems();
+  smartSelectArticles(true);
   updateVeilleCount();
   status.style.display = 'none';
   saveVeilleCache(veilleArticles);
   updateVeilleTimestamp(Date.now());
-  showToast(`✅ ${veilleArticles.length} articles chargés (${loaded}/${total} sources${dedupRemoved > 0 ? ' · ' + dedupRemoved + ' doublons retirés' : ''}${failed > 0 ? ' · ' + failed + ' échec' + (failed > 1 ? 's' : '') : ''})`);
+  showToast(`✅ ${veilleArticles.length} articles · ${selectedArticles.size} pré-sélectionnés (${loaded}/${total} sources${dedupRemoved > 0 ? ' · ' + dedupRemoved + ' doublons retirés' : ''}${failed > 0 ? ' · ' + failed + ' échec' + (failed > 1 ? 's' : '') : ''})`);
 }
 
 function renderFeedItems() {
@@ -2201,6 +2216,19 @@ ${(parsed.points_cles||[]).length ? `<div style="margin-bottom:18px">
 
     document.getElementById('c-rapport').innerHTML = rapportHtml;
     localStorage.setItem('mss_rapport_date', new Date().toDateString());
+    try {
+      localStorage.setItem('mss_rapport_today', JSON.stringify({
+        date: new Date().toDateString(),
+        html: rapportHtml,
+        store: {
+          rapport: store.rapport||'',
+          rapport_linkedin: store.rapport_linkedin||'',
+          rapport_facebook: store.rapport_facebook||'',
+          rapport_twitter: store.rapport_twitter||'',
+          rapport_newsletter: store.rapport_newsletter||''
+        }
+      }));
+    } catch(e) {}
 
     // Restore labels
     document.querySelector('.loader h3').textContent = 'L\'agent rédige votre contenu…';
@@ -2365,12 +2393,27 @@ function closeNotif() {
 }
 
 function updateWorkflowCard() {
-  const statusEl = document.getElementById('wfStatus');
-  const countEl  = document.getElementById('wfCountdown');
+  const statusEl  = document.getElementById('wfStatus');
+  const countEl   = document.getElementById('wfCountdown');
+  const btnRoutine= document.getElementById('btnRoutine');
   if (!statusEl) return;
   const lastDate = localStorage.getItem('mss_rapport_date');
   const isDone   = lastDate === new Date().toDateString();
   statusEl.textContent = isDone ? '✅ Rapport généré aujourd\'hui' : '📊 Aucun rapport aujourd\'hui';
+  if (btnRoutine) {
+    if (isDone) {
+      btnRoutine.textContent = '👁️ Voir le rapport';
+      btnRoutine.onclick = () => {
+        document.getElementById('results').classList.add('on');
+        document.getElementById('formCard').style.display = 'none';
+        tab('rapport');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      };
+    } else {
+      btnRoutine.textContent = '🚀 Rapport du jour';
+      btnRoutine.onclick = lancerRoutine;
+    }
+  }
   if (!countEl) return;
   if (isDone) { countEl.style.display = 'none'; return; }
   const now = new Date(), target = new Date();
@@ -2531,16 +2574,17 @@ FORMAT JSON EXACT :
     store.qp_twitter    = parsed.twitter   || '';
 
     const allPack = [
-      '💼 LINKEDIN\n\n' + store.qp_linkedin,
-      '📘 FACEBOOK\n\n' + store.qp_facebook,
-      '𝕏 TWITTER\n\n'  + store.qp_twitter
-    ].filter(s => !s.endsWith('\n\n')).join('\n\n' + '─'.repeat(36) + '\n\n');
+      store.qp_linkedin && ('💼 LINKEDIN\n\n' + store.qp_linkedin),
+      store.qp_facebook && ('📘 FACEBOOK\n\n' + store.qp_facebook),
+      store.qp_twitter  && ('𝕏 TWITTER\n\n'  + store.qp_twitter)
+    ].filter(Boolean).join('\n\n' + '─'.repeat(36) + '\n\n');
+    store.qp_all = allPack;
 
     titleEl.textContent = '⚡ Post Rapide — Prêt à copier';
     body.innerHTML = `
       <div class="qp-src-badge">${article.icon} ${escHtml(article.source)} · ${article.dateStr || 'récent'}</div>
       <div class="qp-article-title">${escHtml(article.title)}</div>
-      <button class="qp-copy-all" id="btnQpAll" onclick="copyQPAll(this,'${escHtml(allPack.replace(/'/g,"\\'"))}')">📦 Tout copier — LinkedIn · Facebook · Twitter</button>
+      <button class="qp-copy-all" id="btnQpAll" onclick="copyQP('qp_all',this)">📦 Tout copier — LinkedIn · Facebook · Twitter</button>
       ${qpSection('💼 LinkedIn', 'qp_linkedin', parsed.linkedin)}
       ${qpSection('📘 Facebook', 'qp_facebook', parsed.facebook)}
       ${qpSection('𝕏 Twitter',  'qp_twitter',  parsed.twitter)}`;
