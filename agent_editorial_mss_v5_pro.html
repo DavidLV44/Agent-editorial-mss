@@ -467,7 +467,7 @@
       <span class="wf-countdown" id="wfCountdown" style="display:none"></span>
     </div>
     <div id="wfWeekCal" style="display:flex;gap:4px;margin-top:8px;flex-wrap:nowrap"></div>
-    <div style="font-size:9.5px;color:rgba(255,255,255,.5);font-family:'Manrope',sans-serif;margin-top:6px;letter-spacing:.2px">Alt+R veille · Alt+P rapport 21h · Alt+L routine · Alt+H historique</div>
+    <div style="font-size:9.5px;color:rgba(255,255,255,.5);font-family:'Manrope',sans-serif;margin-top:6px;letter-spacing:.2px">Alt+R veille · Alt+P rapport 21h · Alt+L routine · Alt+H historique · Alt+B favoris</div>
   </div>
   <div style="display:flex;flex-direction:column;gap:6px;align-items:stretch">
     <button class="btn-routine" id="btnRoutine" onclick="lancerRoutine()" title="Actualise les flux RSS · sélectionne les meilleurs articles · génère le rapport complet">🚀 Rapport du jour</button>
@@ -980,6 +980,8 @@ function init(){
   // Charger les prefs avant renderProds pour appliquer le bon silo
   const savedPrefs = loadPrefs();
   updateHistBadge();
+  loadBookmarks();
+  updateBKBadge();
   checkDailyNotif();
   startCountdown21h();
   updateWorkflowCard();
@@ -1058,6 +1060,7 @@ function init(){
       case 'l': e.preventDefault(); lancerRoutine(); break;
       case 'g': e.preventDefault(); document.getElementById('btnGen')?.click(); break;
       case 'h': e.preventDefault(); openHist(); break;
+      case 'b': e.preventDefault(); openBK(); break;
     }
   });
 }
@@ -1102,7 +1105,7 @@ function bindAngleChips(){
 }
 
 function tab(name){
-  const names=['html','images','facebook','linkedin','instagram','twitter','tiktok','newsletter','seo','conseils','sources','rapport'];
+  const names=['html','images','facebook','linkedin','instagram','twitter','tiktok','newsletter','seo','conseils','sources','rapport','divi'];
   document.querySelectorAll('.tbtn').forEach((b,i)=>b.classList.toggle('active',names[i]===name));
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('panel-'+name).classList.add('active');
@@ -1931,6 +1934,15 @@ const RSS_FEEDS = [
   { label:'NEJM AI',                  url:'https://ai.nejm.org/rss/latest',                                                          tag:'ia',    icon:'🔬' },
   { label:'PubMed – IA Médicale',     url:'https://pubmed.ncbi.nlm.nih.gov/rss/search/?term=artificial+intelligence+medicine&limit=15', tag:'ia', icon:'🏛️' },
   { label:'EMA – Santé Numérique',    url:'https://www.ema.europa.eu/en/news.rss',                                                   tag:'sante', icon:'🇪🇺' },
+  // Nouvelles sources 2026 — IA médicale & HealthTech
+  { label:'Neuroscience News',     url:'https://neurosciencenews.com/feed/',                                               tag:'ia',    icon:'🧠' },
+  { label:'Reuters Technology',    url:'https://feeds.reuters.com/reuters/technologyNews',                                 tag:'tech',  icon:'📡' },
+  { label:'Medical Xpress',        url:'https://medicalxpress.com/rss-feed/',                                              tag:'sante', icon:'🏥' },
+  { label:'Tech Xplore',           url:'https://techxplore.com/rss-feed/',                                                 tag:'ia',    icon:'💡' },
+  { label:'Healthcare Dive',       url:'https://www.healthcaredive.com/feeds/news/',                                       tag:'tech',  icon:'📊' },
+  { label:'AI in Medicine Hub',    url:'https://aimedicinahub.it/feed/',                                                    tag:'ia',    icon:'🇮🇹' },
+  { label:'Pharmaphorum – Digital',url:'https://pharmaphorum.com/category/digital/feed/',                                  tag:'sante', icon:'💊' },
+  { label:'Drug Discovery Today',  url:'https://www.drugdiscoverytoday.com/rss/news',                                      tag:'sante', icon:'🔬' },
 ];
 
 const VEILLE_CACHE_TTL = 2 * 60 * 60 * 1000; // 2 heures en ms
@@ -2043,6 +2055,20 @@ function updateVeilleCount() {
   }
 }
 
+// Throttled promise pool - max 10 concurrent requests
+async function runThrottled(tasks, concurrency = 10) {
+  const results = [];
+  let idx = 0;
+  async function worker() {
+    while (idx < tasks.length) {
+      const i = idx++;
+      results[i] = await tasks[i]();
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(concurrency, tasks.length) }, worker));
+  return results;
+}
+
 async function loadVeille(forceRefresh = true) {
   const btnR = document.getElementById('btnRefresh');
   const status = document.getElementById('feedStatus');
@@ -2095,7 +2121,7 @@ async function loadVeille(forceRefresh = true) {
     updateVeilleCount();
   };
 
-  await Promise.allSettled(RSS_FEEDS.map(async f => {
+  const feedTasks = RSS_FEEDS.map(f => async () => {
     try {
       const articles = await fetchFeedProxy(f);
       veilleArticles.push(...articles);
@@ -2105,8 +2131,9 @@ async function loadVeille(forceRefresh = true) {
       console.warn('Feed', f.label, 'failed:', e.message);
     }
     totalResolved++;
-    if (totalResolved % 4 === 0 || totalResolved === total) updateProgress();
-  }));
+    if (totalResolved % 4 === 0 || totalResolved === RSS_FEEDS.length) updateProgress();
+  });
+  await runThrottled(feedTasks, 10);
 
   btnR.disabled = false;
   btnR.textContent = '🔄 Actualiser';
@@ -2162,6 +2189,7 @@ function renderFeedItems() {
         <div class="feed-item-title">${escHtml(a.title)}</div>
         ${a.link ? `<a href="${escHtml(a.link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="feed-item-link" title="Ouvrir la source">↗</a>` : ''}
         <button class="feed-qp-btn" onclick="event.stopPropagation();generateQuickPost('${a.id}')" title="Générer LinkedIn · Facebook · Twitter depuis cet article">⚡ Post</button>
+        <button class="feed-bk-btn${bookmarkedIds.has(a.id)?'  bk-active':''}" onclick="event.stopPropagation();toggleBookmark('${a.id}')" title="Ajouter/retirer des favoris">${bookmarkedIds.has(a.id)?'★':'☆'}</button>
       </div>
       <div class="feed-item-meta" style="flex-wrap:wrap;width:100%">
         <span class="feed-item-src">${a.icon} ${escHtml(a.source)}</span>
@@ -2247,7 +2275,26 @@ const SMART_KEYWORDS = [
   'digital twin','jumeau numérique','precision medicine','médecine de précision','genomique',
   'chirurgie robotique','da vinci','exosquelette','bci','interface cerveau','neural',
   'remote patient monitoring','rpm','hospital at home','soins à domicile connectés',
-  'ambient intelligence','ambiante','health equity','déserts médicaux'
+  'ambient intelligence','ambiante','health equity','déserts médicaux',
+  // IA générative médicale 2026
+  'o3', 'o1', 'gemini 2.0', 'gemini 2.5', 'claude 4', 'claude opus', 'claude sonnet',
+  'med-gemini', 'med-palm', 'health gemini', 'gpt-4o', 'llama 3', 'mistral medical',
+  'multimodal medical', 'vision model health', 'agentic ai health', 'ai agent clinical',
+  // Tendances 2026
+  'ambient clinical intelligence', 'ambient documentation', 'ai scribe', 'dax copilot',
+  'clinical decision support', 'cdss 2025', 'ai radiology report', 'ai pathology slide',
+  'foundation model medical', 'longevity tech', 'bioage', 'healthspan', 'age reversal',
+  'gut microbiome ai', 'pharmacogenomics', 'drug discovery ai', 'protein structure',
+  'alphafold', 'single cell', 'liquid biopsy', 'pan-cancer', 'radiomics',
+  // Accessibilité & équité en santé
+  'health equity', 'algorithmic bias health', 'ai fairness medicine', 'rural health ai',
+  'digital health divide', 'underserved populations ai',
+  // Infrastructure & sécurité
+  'health cloud', 'federated learning health', 'differential privacy health',
+  'zero trust healthcare', 'medical device security', 'iot security hospital',
+  // Europe & France 2026
+  'european health data space', 'ehds', 'espace européen données santé',
+  'France 2030 santé', 'plan numérique santé', 'virage numérique'
 ];
 
 function smartSelectArticles(silent = false) {
@@ -2421,6 +2468,32 @@ Génère un rapport de veille quotidien professionnel — cible : 5 à 10 min de
         + 'CHAPEAU\n' + (da.chapeau||'') + '\n\n'
         + 'CORPS HTML (copier dans l\'éditeur Divi)\n' + (da.corps_html||'');
     } else { store.rapport_divi = ''; }
+
+    // Mettre à jour le panel Divi dédié
+    if (parsed.divi_article) {
+      const da = parsed.divi_article;
+      document.getElementById('c-divi').innerHTML = `
+        <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:var(--r12);padding:14px 16px;margin-bottom:14px">
+          <div style="font-size:11px;font-weight:800;color:#166534;font-family:'Outfit',sans-serif;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">📄 Titre SEO</div>
+          <div style="font-size:15px;font-weight:800;color:#0f172a;font-family:'Outfit',sans-serif;margin-bottom:8px">${escHtml(da.titre||'')}</div>
+          <div style="font-size:10.5px;color:#64748b;font-family:'Manrope',sans-serif;margin-bottom:4px">🔗 Slug : <code style="background:#dcfce7;padding:1px 6px;border-radius:4px;font-size:10px">/${escHtml(da.slug||'')}</code></div>
+          <div style="font-size:10.5px;color:#166534;font-family:'Manrope',sans-serif;margin-bottom:8px">🔍 Meta : ${escHtml(da.meta_description||'')}</div>
+          <div style="font-size:10px;font-weight:700;color:#0c7a8c;font-family:'Outfit',sans-serif;margin-bottom:3px;text-transform:uppercase;letter-spacing:.5px">🏷️ Tags WordPress</div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px">${(da.tags_wp||[]).map(t=>`<span style="background:var(--pl);color:var(--pd);border:1px solid var(--pm);border-radius:5px;padding:2px 8px;font-size:11px;font-weight:700;font-family:'Outfit',sans-serif">${escHtml(t)}</span>`).join('')}</div>
+        </div>
+        <div style="margin-bottom:14px">
+          <div style="font-size:11px;font-weight:800;color:var(--pd);font-family:'Outfit',sans-serif;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">✍️ Chapeau / Introduction</div>
+          <div style="font-size:13px;line-height:1.72;color:var(--t);font-family:'Manrope',sans-serif;background:var(--bga);border:1px solid var(--b);border-radius:var(--r12);padding:14px 16px;font-style:italic">${escHtml(da.chapeau||'')}</div>
+        </div>
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <div style="font-size:11px;font-weight:800;color:var(--pd);font-family:'Outfit',sans-serif;text-transform:uppercase;letter-spacing:.5px">🌐 Corps HTML Divi</div>
+            <button class="bcopy" onclick="copy('rapport_divi',this)">📋 Copier tout</button>
+          </div>
+          <div style="background:#f8fffe;border:1px solid #d1fae5;border-radius:var(--r12);padding:14px;font-family:'Courier New',monospace;font-size:11.5px;line-height:1.7;color:var(--t);white-space:pre-wrap;word-break:break-word;max-height:400px;overflow-y:auto">${escHtml(da.corps_html||'')}</div>
+        </div>`;
+    }
+
     store.rapport = 'RAPPORT VEILLE — ' + today + '\n' + (parsed.titre_rapport||'') +
       (parsed.executive_summary ? '\n\nRÉSUMÉ EXÉCUTIF\n' + parsed.executive_summary : '') +
       '\n\nHIGHLIGHTS\n' + (parsed.highlights||[]).join('\n') +
@@ -3189,6 +3262,93 @@ function toggleCustomFeeds() {
   const open  = body.classList.toggle('on');
   if (arrow) arrow.textContent = open ? '▲' : '▼';
   if (open) renderCustomFeedList();
+}
+
+// ── Bookmarks ───────────────────────────────────────────────────────
+const BK_KEY = 'mss_bookmarks';
+let bookmarkedIds = new Set();
+
+function loadBookmarks() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(BK_KEY) || '[]');
+    bookmarkedIds = new Set(raw.map(b => b.id));
+    return raw;
+  } catch(e) { return []; }
+}
+
+function saveBookmarks(list) {
+  localStorage.setItem(BK_KEY, JSON.stringify(list));
+  bookmarkedIds = new Set(list.map(b => b.id));
+  updateBKBadge();
+}
+
+function toggleBookmark(articleId) {
+  const article = veilleArticles.find(a => a.id === articleId);
+  if (!article) return;
+  const list = loadBookmarks();
+  const idx = list.findIndex(b => b.id === articleId);
+  if (idx >= 0) {
+    list.splice(idx, 1);
+    showToast('☆ Retiré des favoris');
+  } else {
+    list.unshift({ ...article, savedAt: new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) });
+    if (list.length > 50) list.splice(50);
+    showToast('⭐ Ajouté aux favoris');
+  }
+  saveBookmarks(list);
+  renderFeedItems();
+  if (document.getElementById('bkPanel').classList.contains('on')) renderBKList();
+}
+
+function updateBKBadge() {
+  const list = loadBookmarks();
+  const badge = document.getElementById('bkCount');
+  const btn = document.getElementById('bkBtn');
+  if (badge) { badge.textContent = list.length; badge.classList.toggle('on', list.length > 0); }
+}
+
+function openBK() {
+  loadBookmarks();
+  renderBKList();
+  document.getElementById('bkPanel').classList.add('on');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeBK() {
+  document.getElementById('bkPanel').classList.remove('on');
+  document.body.style.overflow = '';
+}
+
+function clearBK() {
+  if (!confirm('Effacer tous les favoris ?')) return;
+  saveBookmarks([]);
+  renderBKList();
+  renderFeedItems();
+  showToast('Favoris effacés');
+}
+
+function renderBKList() {
+  const list = loadBookmarks();
+  const el = document.getElementById('bkList');
+  if (!el) return;
+  if (!list.length) {
+    el.innerHTML = '<div class="bk-empty">Aucun favori.<br>Cliquez sur ☆ sur un article pour l\'ajouter.</div>';
+    return;
+  }
+  el.innerHTML = list.map(a => `
+    <div class="bk-item">
+      <div class="bk-item-title">${escHtml(a.title)}</div>
+      <div class="bk-item-meta">
+        <span class="feed-item-src">${a.icon||''} ${escHtml(a.source)}</span>
+        ${a.savedAt ? `<span class="feed-item-date">⭐ ${a.savedAt}</span>` : ''}
+      </div>
+      ${a.desc ? `<div style="font-size:11px;color:var(--m);font-family:'Manrope',sans-serif;line-height:1.5;margin-bottom:7px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${escHtml(a.desc)}</div>` : ''}
+      <div class="bk-item-actions">
+        ${a.link ? `<a href="${escHtml(a.link)}" target="_blank" rel="noopener" style="padding:4px 10px;background:var(--pl);color:var(--pd);border:1px solid var(--pm);border-radius:5px;font-size:10px;font-weight:700;font-family:'Outfit',sans-serif;text-decoration:none">↗ Source</a>` : ''}
+        <button class="bk-qp-btn" onclick="closeBK();generateQuickPost('${a.id}')">⚡ Post rapide</button>
+        <button class="bk-rm-btn" onclick="toggleBookmark('${a.id}');renderBKList()">✕ Retirer</button>
+      </div>
+    </div>`).join('');
 }
 
 // Patch loadVeille pour injecter les flux custom lors de chaque actualisation
